@@ -12,11 +12,24 @@ function App() {
             }
         }, 10000);
         return () => clearTimeout(timer);
-    }, [text]);
+    }, [text, autoCorrectEnabled]); // Added autoCorrectEnabled to dependencies
 
     const handleAutoCorrect = async () => {
-        const response = await axios.post('http://localhost:8000/api/', { text });
-        setText(response.data.corrected_text);
+        try {
+            const response = await axios.post(
+                'https://studious-cod-46v7wqwvwx725j66-8000.app.github.dev/api/', // Ensure this is the correct endpoint
+                { text },
+                {
+                    headers: {
+                        'Content-Type': 'application/json', // Specify content type
+                    }
+                }
+            );
+            setText(response.data.corrected_text);
+        } catch (error) {
+            console.error('Error during auto-correct:', error);
+            // Optionally, handle the error in the UI
+        }
     };
 
     const handleVoiceToText = () => {

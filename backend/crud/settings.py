@@ -21,13 +21,13 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
+    'rest_framework',
+    'corsheaders',
+    'api',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
-    'corsheaders',
-    'api'
 ]
 
 
@@ -114,3 +114,16 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# CORS RULES
+REST_FRAMEWORK = { 'DEFAULT_PERMISSION_CLASSES': [
+    'rest_framework.permissions.AllowAny'
+]}
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # Adjust this to your React app's URL
+    "https://studious-cod-46v7wqwvwx725j66-8000.app.github.dev",  # Add your deployed app URL if needed
+]
