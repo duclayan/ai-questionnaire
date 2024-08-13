@@ -15,17 +15,21 @@ function App() {
     }, [text, autoCorrectEnabled]); // Added autoCorrectEnabled to dependencies
 
     const handleAutoCorrect = async () => {
+        // 1. Post the current input
+        // 2. Call OpenAI
+        // 3. Gett the results
         try {
             const response = await axios.post(
-                'https://studious-cod-46v7wqwvwx725j66-8000.app.github.dev/api/', // Ensure this is the correct endpoint
-                { text },
+                'https://studious-cod-46v7wqwvwx725j66-8000.app.github.dev/', // Ensure this is the correct endpoint
+                { textinput: text }, // Changed 'inputtext' to 'textinput' to match Django's expected key
                 {
                     headers: {
                         'Content-Type': 'application/json', // Specify content type
                     }
                 }
             );
-            setText(response.data.corrected_text);
+            // setText(response.data.textinput); // Adjusted to access the correct response field
+            setText('Hello I am changed')
         } catch (error) {
             console.error('Error during auto-correct:', error);
             // Optionally, handle the error in the UI
@@ -50,4 +54,4 @@ function App() {
     );
 }
 
-export default App;
+export default App

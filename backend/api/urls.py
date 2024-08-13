@@ -1,13 +1,8 @@
+from django.contrib import admin
 from django.urls import path
-# from .views import autocorrect_text
+from .views import ReactView  # Make sure to import your view
 
-# urlpatterns = [
-#     path('', autocorrect_text, name='autocorrect_text'),
-# ]
-
-# from .views import *
-
-url = [
-    path('admin/', admin.site.urls)
-    path('', ReactView.as_view(), name = "anything")
+urlpatterns = [  # Corrected the variable name to urlpatterns
+    path('admin/', admin.site.urls),  # Added a comma at the end of this line
+    path('', ReactView.as_view(), name="anything"),  # Added a comma at the end of this line
 ]

@@ -123,7 +123,7 @@ REST_FRAMEWORK = { 'DEFAULT_PERMISSION_CLASSES': [
 CORS_ORIGIN_ALLOW_ALL = True
 
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # Adjust this to your React app's URL
-    "https://studious-cod-46v7wqwvwx725j66-8000.app.github.dev",  # Add your deployed app URL if needed
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:3000",  # Adjust this to your React app's URL
+#     "http://studious-cod-46v7wqwvwx725j66-8000.app.github.dev",  # Add your deployed app URL if needed
+# ]

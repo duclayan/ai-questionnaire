@@ -25,3 +25,4 @@ dist-ssr
 
 __pycache__
 migrations
+backend/db.sqlite3

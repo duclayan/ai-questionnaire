@@ -15,7 +15,7 @@ from rest_framework.views import APIView
 
 class ReactView(APIView):
     def get(self,request):
-        output = [{"textInput": output.textInput} for output in React.objects.all()]
+        output = [{"textinput": output.textinput} for output in React.objects.all()]
         return Response(output)
     
     def post(self,request):
