@@ -28,8 +28,8 @@ function App() {
                     }
                 }
             );
-            // setText(response.data.textinput); // Adjusted to access the correct response field
-            setText('Hello I am changed')
+            setText("New response" + response.data.textinput); // Adjusted to access the correct response field
+            console.log(response)
         } catch (error) {
             console.error('Error during auto-correct:', error);
             // Optionally, handle the error in the UI

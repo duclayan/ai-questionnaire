@@ -1,11 +1,15 @@
 from pathlib import Path
+from dotenv import load_dotenv
+
+import os
+
+# Load .env 
+load_dotenv()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "django-insecure-1@rqrs8dt_ptyd@2sn_y(-vpef0u0risop95j*_2p^y&)bt6iz"
@@ -127,3 +131,10 @@ CORS_ORIGIN_ALLOW_ALL = True
 #     "http://localhost:3000",  # Adjust this to your React app's URL
 #     "http://studious-cod-46v7wqwvwx725j66-8000.app.github.dev",  # Add your deployed app URL if needed
 # ]
+
+# AZURE OPENAI
+
+# Azure OpenAI settings
+AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
+AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
+AZURE_OPENAI_DEPLOYMENT_ID = os.getenv("AZURE_OPENAI_DEPLOYMENT_ID")
