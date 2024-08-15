@@ -1,11 +1,24 @@
 from pathlib import Path
 from dotenv import load_dotenv
+from openai import AzureOpenAI
+
 
 import os
 
 # Load .env 
 load_dotenv()
 
+# Azure OpenAI configuration
+AZURE_OAI_ENDPOINT = os.getenv("AZURE_OAI_ENDPOINT")
+AZURE_OAI_KEY = os.getenv("AZURE_OAI_KEY")
+AZURE_OAI_DEPLOYMENT = os.getenv("AZURE_OAI_DEPLOYMENT")
+
+# Initialize the Azure OpenAI client
+AZURE_OAI_CLIENT = AzureOpenAI(
+    api_key=AZURE_OAI_KEY,
+    api_version="2024-02-15-preview",
+    base_url=f"{AZURE_OAI_ENDPOINT}/openai/deployments/{AZURE_OAI_DEPLOYMENT}",
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

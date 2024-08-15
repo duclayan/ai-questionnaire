@@ -7,6 +7,9 @@ from . serializer import *
 from rest_framework.views import APIView
 
 from openai import AzureOpenAI
+from dotenv import load_dotenv
+import os
+
 
 
 # @api_view(['POST'])
@@ -28,34 +31,35 @@ class ReactView(APIView):
             return Response(serializer.data)
 
 class openAIView(APIView):
-    def post(self,request):
-        data = request.data
-            # Initialize the Azure OpenAI client
+    def post(self, request):
+        # Get user input
+        data = request.data.get('text')
+        
+        # Load environment variables
+        load_dotenv()
+        azure_oai_endpoint = os.getenv("AZURE_OAI_ENDPOINT")
+        azure_oai_key = os.getenv("AZURE_OAI_KEY")
+        azure_oai_deployment = os.getenv("AZURE_OAI_DEPLOYMENT")
+        
+        # Initialize the Azure OpenAI client
         client = AzureOpenAI(
-            azure_endpoint = azure_oai_endpoint, 
-            api_key=azure_oai_key,  
-            api_version="2024-02-15-preview"
+            api_key=azure_oai_key,
+            api_version="2024-02-15-preview",
+            base_url=f"{azure_oai_endpoint}/openai/deployments/{azure_oai_deployment}",
         )
-        system_message = 
-        """
 
-        """
-
-        # Add code to send request...
-        # Send request to Azure OpenAI model
+        # Create a chat completion
         response = client.chat.completions.create(
             model=azure_oai_deployment,
             temperature=0.7,
             max_tokens=400,
             messages=[
-                {"role": "system", "content": system_message},
-                {"role": "user", "content": input_text}
+                {"role": "user", "content": data}
             ]
         )
 
+        # Extract the generated text from the response
         generated_text = response.choices[0].message.content
 
-        # Print the response
-        print("Response: " + generated_text + "\n")
-
-        return generated_text
+        # Return a JSON response
+        return Response({'generated_text': generated_text})
