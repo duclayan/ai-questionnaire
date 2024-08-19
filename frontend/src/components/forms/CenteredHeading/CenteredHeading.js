@@ -13,7 +13,7 @@ function CenteredHeading() {
           pb: 2,
         }}
       >
-        My Form
+        General Information
       </Typography>
     </Box>
   );

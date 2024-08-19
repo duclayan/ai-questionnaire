@@ -31,12 +31,18 @@ function QuestionList({ currentStep }) {
     }));
     console.log(answers);
   };
+  const giveSampleAnswer = (id) => {
+    setAnswers((prevAnswers) => ({
+      ...prevAnswers,
+      [id]: "Here is the sample pasted text",
+    }));
+  };
 
   const handleAutoCorrect = async (id) => {
     const text = answers[id];
     const prompt_strategy = "Write in German";
     try {
-      const response = await axios.post("http://localhost:8000/", {
+      const response = await axios.post("https://friendly-system-wr96v7rg9pwjc6qq-8000.app.github.dev/", {
         text,
         prompt_strategy,
       });
@@ -93,7 +99,7 @@ function QuestionList({ currentStep }) {
                   <Button variant="contained" startIcon={<MicIcon />} />
                 </Grid>
                 <Grid item>
-                  <Button variant="contained" startIcon={<ErrorIcon />} />
+                  <Button variant="contained" startIcon={<ErrorIcon />} onClick={() => giveSampleAnswer(question.id)}/>
                 </Grid>
               </Grid>
             </Grid>

@@ -1,6 +1,12 @@
 export const questions = [
   {
     id: 1,
+    prompt_help: "Help text for Application Design",
+    category: "Application Design",
+    question: "Describe your application design.",
+  },
+  {
+    id: 3,
     prompt_help: "Help text for General Information",
     category: "General Information",
     question: "What is your name?",
@@ -10,12 +16,6 @@ export const questions = [
     prompt_help: "Help text for Authentication Authorization Concept",
     category: "Authentication Authorization Concept",
     question: "What is your authentication method?",
-  },
-  {
-    id: 3,
-    prompt_help: "Help text for Application Design",
-    category: "Application Design",
-    question: "Describe your application design.",
   },
   {
     id: 4,

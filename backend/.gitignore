@@ -1,4 +1,6 @@
 .venv
+myenv
+api/__pycache__
 # Logs
 logs
 *.log
