@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -19,6 +20,9 @@ import os
 #     corrected_text = text  # Replace with actual autocorrect logic
 #     return Response({'corrected_text': corrected_text})
 
+class QuestionViewSet(viewsets.ModelViewSet):
+    queryset = Question.objects.all()
+    serializer_class = QuestionSerializer
 class ReactView(APIView):
     def get(self,request):
         output = [{"textinput": output.textinput} for output in React.objects.all()]
@@ -34,6 +38,7 @@ class openAIView(APIView):
     def post(self, request):
         # Get user input
         data = request.data.get('text')
+        prompt = request.data.get('prompt_strategy') 
         
         # Load environment variables
         load_dotenv()
@@ -54,12 +59,19 @@ class openAIView(APIView):
             temperature=0.7,
             max_tokens=400,
             messages=[
-                {"role": "user", "content": data}
+                {"role": "user", "content": f"{prompt}, when the user input is : {data}"}
             ]
         )
-
         # Extract the generated text from the response
         generated_text = response.choices[0].message.content
 
         # Return a JSON response
         return Response({'generated_text': generated_text})
+    
+    # For the Summary upon submission
+    # def submit_answers(request):
+    #     if request.method == 'POST':
+    #         data = request.data
+    #         # Process the answers and generate summary
+    #         summary = generate_summary(data)  # Implement this function as needed
+    #         return Response({"summary": summary})
