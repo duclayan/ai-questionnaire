@@ -3,6 +3,7 @@ import { Box, Typography, Grid, TextField, Button } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import MicIcon from "@mui/icons-material/Mic";
 import ErrorIcon from "@mui/icons-material/Error";
+import axios from "axios"; // Import axios for API requests
 import { questions } from "../Questions/Questions";
 
 function QuestionList({ currentStep }) {
@@ -14,7 +15,8 @@ function QuestionList({ currentStep }) {
     "Interface",
     "Report",
   ][currentStep];
-  // Take only the questions from a specific category / Current Category
+
+  // Filter questions based on the current category
   const filteredQuestions = questions.filter(
     (question) => question.category === currentCategory
   );
@@ -24,11 +26,28 @@ function QuestionList({ currentStep }) {
   const handleInputChange = (id, value, category, currentStep) => {
     setAnswers((prevAnswers) => ({
       ...prevAnswers,
-
       [id]: value,
       [category]: currentStep,
     }));
     console.log(answers);
+  };
+
+  const handleAutoCorrect = async (id) => {
+    const text = answers[id];
+    const prompt_strategy = "Write in German";
+    try {
+      const response = await axios.post("http://localhost:8000/", {
+        text,
+        prompt_strategy,
+      });
+      const correctedText = response.data.generated_text;
+      setAnswers((prevAnswers) => ({
+        ...prevAnswers,
+        [id]: correctedText,
+      }));
+    } catch (error) {
+      console.error("Error during auto-correct:", error);
+    }
   };
 
   return (
@@ -62,7 +81,13 @@ function QuestionList({ currentStep }) {
             <Grid item xs={12} sm={4}>
               <Grid container spacing={1} justifyContent="center">
                 <Grid item>
-                  <Button variant="contained" startIcon={<CheckCircleIcon />} />
+                  <Button
+                    variant="contained"
+                    startIcon={<CheckCircleIcon />}
+                    onClick={() => handleAutoCorrect(question.id)}
+                  >
+                    Auto Correct
+                  </Button>
                 </Grid>
                 <Grid item>
                   <Button variant="contained" startIcon={<MicIcon />} />
