@@ -3,14 +3,13 @@ from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from . models import *
-from . serializer import *
+from .models import *
+from .serializer import *
 from rest_framework.views import APIView
 
 from openai import AzureOpenAI
 from dotenv import load_dotenv
 import os
-
 
 
 # @api_view(['POST'])
@@ -20,32 +19,36 @@ import os
 #     corrected_text = text  # Replace with actual autocorrect logic
 #     return Response({'corrected_text': corrected_text})
 
+
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
+
+
 class ReactView(APIView):
-    def get(self,request):
+    def get(self, request):
         output = [{"textinput": output.textinput} for output in React.objects.all()]
         return Response(output)
-    
-    def post(self,request):
-        serializer = ReactSerializer(data = request.data)
-        if serializer.is_valid(raise_exception = True):
+
+    def post(self, request):
+        serializer = ReactSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data)
+
 
 class openAIView(APIView):
     def post(self, request):
         # Get user input
-        data = request.data.get('text')
-        prompt = request.data.get('prompt_strategy') 
-        
+        data = request.data.get("text")
+        prompt = request.data.get("prompt_strategy")
+
         # Load environment variables
         load_dotenv()
         azure_oai_endpoint = os.getenv("AZURE_OAI_ENDPOINT")
         azure_oai_key = os.getenv("AZURE_OAI_KEY")
         azure_oai_deployment = os.getenv("AZURE_OAI_DEPLOYMENT")
-        
+
         # Initialize the Azure OpenAI client
         client = AzureOpenAI(
             api_key=azure_oai_key,
@@ -59,15 +62,21 @@ class openAIView(APIView):
             temperature=0.7,
             max_tokens=400,
             messages=[
-                {"role": "user", "content": f"{prompt}, when the user input is : {data}"}
-            ]
+                {
+                    "role": "user",
+                    "content": f"""
+                    Improve the text provided with the following information: This is the prompt help: 
+                    {prompt}, when the user input is : {data if data else "Pepsi"}. Write in 1 paragraph form. If data is empty
+                    """,
+                }
+            ],
         )
         # Extract the generated text from the response
         generated_text = response.choices[0].message.content
 
         # Return a JSON response
-        return Response({'generated_text': generated_text})
-    
+        return Response({"generated_text": generated_text})
+
     # For the Summary upon submission
     # def submit_answers(request):
     #     if request.method == 'POST':
