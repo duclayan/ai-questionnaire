@@ -42,6 +42,7 @@ class openAIView(APIView):
         # Get user input
         data = request.data.get("text")
         prompt = request.data.get("prompt_strategy")
+        question = request.data.get("question")
 
         # Load environment variables
         load_dotenv()
@@ -65,8 +66,14 @@ class openAIView(APIView):
                 {
                     "role": "user",
                     "content": f"""
-                    Improve the text provided with the following information: This is the prompt help: 
-                    {prompt}, when the user input is : {data if data else "Pepsi"}. Write in 1 paragraph form. If data is empty
+                    Improve the text that is provided and return the final text. For reference here is the information
+                    question: {question}
+                    prompt strategy: {prompt},
+                    user input: {data}
+
+                    Return only the answer and no explanation for the user is required. 
+                    Do not return follow up questions.
+                    The text format does not include bold/itallic/underline.
                     """,
                 }
             ],

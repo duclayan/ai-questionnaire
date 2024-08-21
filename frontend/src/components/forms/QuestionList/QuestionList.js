@@ -43,10 +43,12 @@ function QuestionList({ currentStep }) {
   const handleAutoCorrect = async (question) => {
     const text = answers[question.id];
     const prompt_strategy = question.prompt_help;
+    const question = question.question
     try {
-      const response = await axios.post("http://127.0.0.1:8000/", {
+      const response = await axios.post("https://friendly-system-wr96v7rg9pwjc6qq-8000.app.github.dev/", {
         text,
         prompt_strategy,
+        question
       });
       const correctedText = response.data.generated_text;
       setAnswers((prevAnswers) => ({

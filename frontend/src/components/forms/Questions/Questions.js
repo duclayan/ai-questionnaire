@@ -14,7 +14,7 @@ export const questions = [
   },
   {
     id: 3,
-    prompt_help: "Improve writing and translate into target language",
+    prompt_help: "Improve writing",
     category: "General Information",
     question:
       "Describe the main business purposes of the application. Companies or consumers in scope",
@@ -138,7 +138,7 @@ export const questions = [
   // Application Design
   {
     id: 19,
-    prompt_help: "Improve the writing and translate into target language",
+    prompt_help: "Improve the writing and  ",
     category: "Application Design",
     question:
       "Describe the main technology used for the application. Main framework, programming language, functions.",
@@ -173,7 +173,7 @@ export const questions = [
   },
   {
     id: 24,
-    prompt_help: "Improve the writing and translate into target language.",
+    prompt_help: "Improve the writing and  .",
     category: "Application Design",
     question: "Describe any library, dependencies used",
   },
