@@ -25,16 +25,16 @@ class QuestionViewSet(viewsets.ModelViewSet):
     serializer_class = QuestionSerializer
 
 
-class ReactView(APIView):
-    def get(self, request):
-        output = [{"textinput": output.textinput} for output in React.objects.all()]
-        return Response(output)
+# class ReactView(APIView):
+#     def get(self, request):
+#         output = [{"textinput": output.textinput} for output in React.objects.all()]
+#         return Response(output)
 
-    def post(self, request):
-        serializer = ReactSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data)
+#     def post(self, request):
+#         serializer = ReactSerializer(data=request.data)
+#         if serializer.is_valid(raise_exception=True):
+#             serializer.save()
+#             return Response(serializer.data)
 
 
 class openAIView(APIView):
