@@ -12,29 +12,9 @@ from dotenv import load_dotenv
 import os
 
 
-# @api_view(['POST'])
-# def autocorrect_text(request):
-#     text = request.data.get('text', '')
-#     # Implement your RAG logic here
-#     corrected_text = text  # Replace with actual autocorrect logic
-#     return Response({'corrected_text': corrected_text})
-
-
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
-
-
-# class ReactView(APIView):
-#     def get(self, request):
-#         output = [{"textinput": output.textinput} for output in React.objects.all()]
-#         return Response(output)
-
-#     def post(self, request):
-#         serializer = ReactSerializer(data=request.data)
-#         if serializer.is_valid(raise_exception=True):
-#             serializer.save()
-#             return Response(serializer.data)
 
 
 class openAIView(APIView):
@@ -83,11 +63,3 @@ class openAIView(APIView):
 
         # Return a JSON response
         return Response({"generated_text": generated_text})
-
-    # For the Summary upon submission
-    # def submit_answers(request):
-    #     if request.method == 'POST':
-    #         data = request.data
-    #         # Process the answers and generate summary
-    #         summary = generate_summary(data)  # Implement this function as needed
-    #         return Response({"summary": summary})
