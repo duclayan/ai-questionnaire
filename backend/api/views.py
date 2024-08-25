@@ -13,14 +13,6 @@ from dotenv import load_dotenv
 import os
 
 
-# @api_view(['POST'])
-# def autocorrect_text(request):
-#     text = request.data.get('text', '')
-#     # Implement your RAG logic here
-#     corrected_text = text  # Replace with actual autocorrect logic
-#     return Response({'corrected_text': corrected_text})
-
-
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
@@ -95,22 +87,27 @@ class AnswersView(APIView):
         data = request.data
         answers_created = []
 
-        # for question_id, answer_text in data.items():
-        #     answer_data = {
-        #         "question_id": question_id,
-        #         "answer_id": answer_id,
-        #         "question": question,
-        #         "input_answer": answer_text,
-        #         "corrected_answer"
-        #         "category": data.get("category"),
-        #     }
-        #     serializer = AnswerSerializer(data=answer_data)
+        for  answer_id, answer in data.items():
+            question_id = answer['question_id']
+            text = answer['input_text']
+            try:
+                question = Question.objects.get(question_id=question_id)
+                
+                answer_data = {
+                "answer_id": answer_id,
+                # "project": '101',
+                "question": question.id,
+                "input_answer": text,
+                "category": question.category,
+                }
+                serializer = AnswerSerializer(data=answer_data)
 
-        #     if serializer.is_valid():
-        #         serializer.save()
-        #         answers_created.append(serializer.data)
-        #     else:
-        #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        # return Response(
-        #     {"message": "Answers submitted successfully", "answers": answers_created}
-        # )
+                if serializer.is_valid():
+                    serializer.save()
+                    answers_created.append(serializer.data)
+                else:
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            except Question.DoesNotExist:
+                return Response({"error": f"Question with id {question_id} does not exist"}), 
+        
+        return Response({"message": "Answers submitted successfully", "answers": answers_created})

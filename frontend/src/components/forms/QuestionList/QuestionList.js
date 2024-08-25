@@ -45,8 +45,10 @@ function QuestionList({ currentStep, onAnswersChange }) {
   const handleInputChange = (id, value, category, currentStep) => {
     setAnswers((prevAnswers) => ({
       ...prevAnswers,
-      [id]: value,
-      [category]: currentStep,
+      [id]: {
+        input_text: value,
+        question_id: id,
+      },
     }));
   };
 
@@ -55,7 +57,10 @@ function QuestionList({ currentStep, onAnswersChange }) {
     const sample_answer = currentQuestion.sample_answer;
     setAnswers((prevAnswers) => ({
       ...prevAnswers,
-      [id]: sample_answer,
+      [id]: {
+        input_text: sample_answer,
+        question_id: id,
+      },
     }));
   };
 
@@ -76,7 +81,10 @@ function QuestionList({ currentStep, onAnswersChange }) {
       const correctedText = response.data.generated_text;
       setAnswers((prevAnswers) => ({
         ...prevAnswers,
-        [currentQuestion.question_id]: correctedText,
+        [currentQuestion.question_id]: {
+          input_text: correctedText,
+          question_id: currentQuestion.question_id,
+        },
       }));
     } catch (error) {
       console.error("Error during auto-correct:", error);
@@ -122,7 +130,7 @@ function QuestionList({ currentStep, onAnswersChange }) {
                   id={`multiline-label-${question.question_id}`}
                   fullWidth
                   multiline
-                  value={answers[question.question_id] || ""}
+                  value={answers[question.question_id]?.input_text || ""}
                   onChange={(e) =>
                     handleInputChange(
                       question.question_id,

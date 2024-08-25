@@ -23,10 +23,13 @@ class Question(models.Model):
 
 class Answer(models.Model):
     answer_id = models.AutoField(primary_key=True)
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    # to unlock when a specific project is connected to a question
+    # project = models.ForeignKey(Project, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     input_answer = models.TextField()
-    corrected_answer = models.TextField()
+    # temporary to see the category of each question easily
+    # can later be cleaned to have access from questions to confirm category
+    category = models.CharField(max_length=100, default="General Information")
 
     def __str__(self):
-        return self.corrected_answer
+        return self.input_answer
