@@ -16,7 +16,6 @@ function StepNavigation({ currentStep, handleStepChange }) {
       <Tabs
         value={currentStep}
         onChange={(event, newValue) => handleStepChange(newValue)}
-        variant="scrollable"
         scrollButtons="auto"
         aria-label="form steps"
         centered
