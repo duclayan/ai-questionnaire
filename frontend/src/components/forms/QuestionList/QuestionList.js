@@ -1,28 +1,46 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Typography, Grid, TextField, IconButton } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import MicIcon from "@mui/icons-material/Mic";
 import ErrorIcon from "@mui/icons-material/Error";
-import axios from "axios"; // Import axios for API requests
-import { questions } from "../Questions/Questions";
+import axios from "axios";
 import { InputLabel, FormControl } from "@mui/material";
 
-function QuestionList({ currentStep }) {
-  const currentCategory = [
+function QuestionList({ currentStep, onAnswersChange }) {
+  const categories = [
     "General Information",
-    "Authentication Authorization Concept",
-    "Application Design",
+    "Authentication and Authorization",
+    "Application Architecture",
     "Cloud Architecture",
     "Interface",
     "Report",
-  ][currentStep];
+  ];
 
-  // Filter questions based on the current category
-  const filteredQuestions = questions.filter(
-    (question) => question.category === currentCategory
-  );
+  const currentCategory = categories[currentStep];
 
+  const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
+
+  useEffect(() => {
+    fetchQuestions(currentCategory);
+  }, [currentStep, currentCategory]);
+
+  useEffect(() => {
+    // Whenever answers change, call the onAnswersChange prop
+    onAnswersChange(answers);
+  }, [answers, onAnswersChange]);
+
+  const fetchQuestions = async (category) => {
+    try {
+      const response = await axios.get("http://localhost:8000/questions", {
+        params: { currentCategory: category },
+      });
+      const question_list = response.data.question_list;
+      setQuestions(question_list);
+    } catch (error) {
+      console.error("Error fetching questions:", error);
+    }
+  };
 
   const handleInputChange = (id, value, category, currentStep) => {
     setAnswers((prevAnswers) => ({
@@ -30,30 +48,35 @@ function QuestionList({ currentStep }) {
       [id]: value,
       [category]: currentStep,
     }));
-    console.log(answers);
   };
 
-  const giveSampleAnswer = (id) => {
+  const giveSampleAnswer = (currentQuestion) => {
+    const id = currentQuestion.question_id;
+    const sample_answer = currentQuestion.sample_answer;
     setAnswers((prevAnswers) => ({
       ...prevAnswers,
-      [id]: "Here is the sample pasted text",
+      [id]: sample_answer,
     }));
   };
 
-  const handleAutoCorrect = async (question) => {
-    const text = answers[question.id];
-    const prompt_strategy = question.prompt_help;
-    const question = question.question
+  const handleAutoCorrect = async (currentQuestion) => {
+    const text = answers[currentQuestion.question_id];
+    const prompt_strategy = currentQuestion.prompt;
+    const question = currentQuestion.question;
+    const sample_answer = currentQuestion.sample_answer;
+
     try {
-      const response = await axios.post("https://friendly-system-wr96v7rg9pwjc6qq-8000.app.github.dev/", {
+      const response = await axios.post("http://localhost:8000/", {
         text,
         prompt_strategy,
-        question
+        question,
+        sample_answer,
       });
+
       const correctedText = response.data.generated_text;
       setAnswers((prevAnswers) => ({
         ...prevAnswers,
-        [question.id]: correctedText,
+        [currentQuestion.question_id]: correctedText,
       }));
     } catch (error) {
       console.error("Error during auto-correct:", error);
@@ -62,9 +85,9 @@ function QuestionList({ currentStep }) {
 
   return (
     <Box sx={{ mt: 4 }}>
-      {filteredQuestions.map((question) => (
+      {questions.map((question) => (
         <Box
-          key={question.id}
+          key={question.question_id}
           sx={{
             mb: 4,
             display: "flex",
@@ -76,9 +99,6 @@ function QuestionList({ currentStep }) {
             margin: "0 auto",
           }}
         >
-          {/* <Typography variant="h6" align="left" sx={{ mb: 2 }} maxWidt="80rem">
-            {question.question}
-          </Typography> */}
           <Grid
             container
             spacing={1}
@@ -88,7 +108,7 @@ function QuestionList({ currentStep }) {
             <Grid item xs={12} md={8}>
               <FormControl fullWidth variant="outlined">
                 <InputLabel
-                  htmlFor={`multiline-label-${question.id}`}
+                  htmlFor={`multiline-label-${question.question_id}`}
                   sx={{
                     whiteSpace: "break-spaces",
                     position: "relative",
@@ -99,13 +119,13 @@ function QuestionList({ currentStep }) {
                   {question.question}
                 </InputLabel>
                 <TextField
-                  id={`multiline-label-${question.id}`}
+                  id={`multiline-label-${question.question_id}`}
                   fullWidth
                   multiline
-                  value={answers[question.id] || ""}
+                  value={answers[question.question_id] || ""}
                   onChange={(e) =>
                     handleInputChange(
-                      question.id,
+                      question.question_id,
                       e.target.value,
                       question.category,
                       currentStep
@@ -121,15 +141,13 @@ function QuestionList({ currentStep }) {
                         <IconButton>
                           <MicIcon />
                         </IconButton>
-                        <IconButton
-                          onClick={() => giveSampleAnswer(question.id)}
-                        >
+                        <IconButton onClick={() => giveSampleAnswer(question)}>
                           <ErrorIcon />
                         </IconButton>
                       </Box>
                     ),
                   }}
-                  sx={{ mt: 1 }} // Add top margin to separate from label
+                  sx={{ mt: 1 }}
                 />
               </FormControl>
             </Grid>

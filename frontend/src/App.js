@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import axios, { all } from "axios";
 import StepNavigation from "./components/forms/StepNavigation/StepNavigation";
 import NavigationButtons from "./components/forms/NavigationButtons/NavigationButtons";
 import CenteredHeading from "./components/forms/CenteredHeading/CenteredHeading";
@@ -8,6 +8,7 @@ import QuestionList from "./components/forms/QuestionList/QuestionList";
 function App() {
   const [text, setText] = useState("");
   const [autoCorrectEnabled, setAutoCorrectEnabled] = useState(false);
+  const [allAnswers, setAllAnswers] = useState({});
   const [currentStep, setCurrentStep] = useState(0);
   const totalSteps = 6; // Total number of steps in the form
 
@@ -49,11 +50,24 @@ function App() {
     setCurrentStep((prevStep) => Math.min(prevStep + 1, totalSteps - 1));
   };
 
-  const handleSubmit = () => {
-    alert("Form submitted!");
+  const handleSubmit = async () => {
+    try {
+      console.log("ALL ANSWERS", allAnswers);
+      const response = await axios.post(
+        "http://localhost:8000/submit-answers/",
+        allAnswers
+      );
+      console.log("Answers submitted successfully:", response.data);
+      // Handle successful submission (e.g., show a success message, reset form, etc.)
+    } catch (error) {
+      console.error("Error submitting answers:", error);
+      // Handle error (e.g., show error message to user)
+    }
     setCurrentStep(totalSteps - 1);
   };
-
+  const handleAnswersChange = (answers) => {
+    setAllAnswers(answers);
+  };
   return (
     <div>
       <StepNavigation
@@ -62,7 +76,10 @@ function App() {
       />
       <CenteredHeading />
       {/* <FormContainer onSubmit={handleSubmit} /> */}
-      <QuestionList currentStep={currentStep} />{" "}
+      <QuestionList
+        currentStep={currentStep}
+        onAnswersChange={handleAnswersChange}
+      />{" "}
       <NavigationButtons
         currentStep={currentStep}
         totalSteps={totalSteps}
