@@ -1,7 +1,16 @@
 import React from "react";
 import { Typography, Box } from "@mui/material";
 
-function CenteredHeading() {
+function CenteredHeading({currentStep}) {
+
+  const steps = [
+    "General Information",
+    "Authentication Authorization Concept",
+    "Application Design",
+    "Cloud Architecture",
+    "Report"
+  ];
+
   return (
     <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
       <Typography
@@ -13,7 +22,7 @@ function CenteredHeading() {
           pb: 2,
         }}
       >
-        General Information
+        {steps[currentStep]}
       </Typography>
     </Box>
   );

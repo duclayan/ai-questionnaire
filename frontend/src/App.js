@@ -9,6 +9,7 @@ import DocumentLoader from "./components/forms/DocumentLoader/DocumentLoader";
 function App() {
   const [text, setText] = useState("");
   const [autoCorrectEnabled, setAutoCorrectEnabled] = useState(false);
+  const [navbarEnabled, setNavbarEnabled] = useState(true);
   const [allAnswers, setAllAnswers] = useState({});
   const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -52,22 +53,6 @@ function App() {
     setCurrentStep((prevStep) => Math.min(prevStep + 1, totalSteps - 1));
   };
 
-  // const handleSubmit = async () => {
-  //   try {
-  //     console.log("ALL ANSWERS", allAnswers);
-  //     const response = await axios.post(
-  //       "http://localhost:8000/submit-answers/",
-  //       allAnswers
-  //     );
-  //     console.log("Answers submitted successfully:", response.data);
-  //     // Handle successful submission (e.g., show a success message, reset form, etc.)
-  //   } catch (error) {
-  //     console.error("Error submitting answers:", error);
-  //     // Handle error (e.g., show error message to user)
-  //   }
-  //   setCurrentStep(totalSteps - 1);
-  // };
-
   const handleSubmit = async () => {
     try {
       console.log("ALL ANSWERS", allAnswers);
@@ -98,13 +83,15 @@ function App() {
       link.click();
       link.remove();
 
-      // Handle successful submission (e.g., show a success message, reset form, etc.)
     } catch (error) {
       console.error("Error submitting answers:", error);
       // Handle error (e.g., show error message to user)
     }
 
-    setCurrentStep(totalSteps - 1);
+    // Remove Navigation Buttons
+    setNavbarEnabled(false)
+    // Show a success text
+    // setCurrentStep(totalSteps - 1);
   };
   const handleAnswersChange = (answers) => {
     setAllAnswers(answers);
@@ -115,14 +102,14 @@ function App() {
         currentStep={currentStep}
         handleStepChange={handleStepChange}
       />
-      <CenteredHeading />
-      {/* <FormContainer onSubmit={handleSubmit} /> */}
+      <CenteredHeading currentStep={currentStep} />
       <QuestionList
         currentStep={currentStep}
         onAnswersChange={handleAnswersChange}
       />{" "}
       <DocumentLoader isLoading={isLoading}/>
       <NavigationButtons
+        navbarEnabled={navbarEnabled}
         currentStep={currentStep}
         totalSteps={totalSteps}
         handlePrevious={handlePrevious}
