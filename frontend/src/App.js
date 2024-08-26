@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from "react";
-import axios, { all } from "axios";
+import axios from "axios";
 import StepNavigation from "./components/forms/StepNavigation/StepNavigation";
 import NavigationButtons from "./components/forms/NavigationButtons/NavigationButtons";
 import CenteredHeading from "./components/forms/CenteredHeading/CenteredHeading";
 import QuestionList from "./components/forms/QuestionList/QuestionList";
+import DocumentLoader from "./components/forms/DocumentLoader/DocumentLoader";
 
 function App() {
   const [text, setText] = useState("");
   const [autoCorrectEnabled, setAutoCorrectEnabled] = useState(false);
   const [allAnswers, setAllAnswers] = useState({});
   const [currentStep, setCurrentStep] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
   const totalSteps = 6; // Total number of steps in the form
 
   useEffect(() => {
@@ -79,13 +81,14 @@ function App() {
       console.log("Answers submitted successfully:", response.data);
 
       // Step 2: Generate the report
+      setIsLoading(true)
       const reportResponse = await axios.get(
         "http://localhost:8000/generate-report/",
         {
           responseType: "blob", // Important for downloading files
         }
       );
-
+      setIsLoading(false)
       // Step 3: Create a URL for the report and download it
       const url = window.URL.createObjectURL(new Blob([reportResponse.data]));
       const link = document.createElement("a");
@@ -118,6 +121,7 @@ function App() {
         currentStep={currentStep}
         onAnswersChange={handleAnswersChange}
       />{" "}
+      <DocumentLoader isLoading={isLoading}/>
       <NavigationButtons
         currentStep={currentStep}
         totalSteps={totalSteps}

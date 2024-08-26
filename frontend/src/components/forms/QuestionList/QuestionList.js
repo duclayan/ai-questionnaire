@@ -12,7 +12,6 @@ function QuestionList({ currentStep, onAnswersChange }) {
     "Authentication and Authorization",
     "Application Architecture",
     "Cloud Architecture",
-    "Interface",
     "Report",
   ];
 
