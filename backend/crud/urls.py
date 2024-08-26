@@ -7,4 +7,6 @@ urlpatterns = [  # This is the correct variable name
     path("", openAIView.as_view(), name="anything"),  # Root path for ReactView
     path("questions/", QuestionListView.as_view(), name="questions"),
     path("submit-answers/", AnswersView.as_view(), name="submit_answers"),
+    path("generate-report/", GenerateReportView.as_view(), name="generate_report"),
+
 ]
