@@ -33,3 +33,7 @@ class Answer(models.Model):
 
     def __str__(self):
         return self.input_answer
+class Report(models.Model):
+    report = models.TextField()
+    def __str__(self):
+        return self.report

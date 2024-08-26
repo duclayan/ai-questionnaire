@@ -50,19 +50,57 @@ function App() {
     setCurrentStep((prevStep) => Math.min(prevStep + 1, totalSteps - 1));
   };
 
+  // const handleSubmit = async () => {
+  //   try {
+  //     console.log("ALL ANSWERS", allAnswers);
+  //     const response = await axios.post(
+  //       "http://localhost:8000/submit-answers/",
+  //       allAnswers
+  //     );
+  //     console.log("Answers submitted successfully:", response.data);
+  //     // Handle successful submission (e.g., show a success message, reset form, etc.)
+  //   } catch (error) {
+  //     console.error("Error submitting answers:", error);
+  //     // Handle error (e.g., show error message to user)
+  //   }
+  //   setCurrentStep(totalSteps - 1);
+  // };
+
   const handleSubmit = async () => {
     try {
       console.log("ALL ANSWERS", allAnswers);
+
+      // Step 1: Submit the answers to the server
       const response = await axios.post(
         "http://localhost:8000/submit-answers/",
         allAnswers
       );
+
       console.log("Answers submitted successfully:", response.data);
+
+      // Step 2: Generate the report
+      const reportResponse = await axios.get(
+        "http://localhost:8000/generate-report/",
+        {
+          responseType: "blob", // Important for downloading files
+        }
+      );
+
+      // Step 3: Create a URL for the report and download it
+      const url = window.URL.createObjectURL(new Blob([reportResponse.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "report_summary.docx"); // Set the file name
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
       // Handle successful submission (e.g., show a success message, reset form, etc.)
     } catch (error) {
       console.error("Error submitting answers:", error);
       // Handle error (e.g., show error message to user)
     }
+
     setCurrentStep(totalSteps - 1);
   };
   const handleAnswersChange = (answers) => {
