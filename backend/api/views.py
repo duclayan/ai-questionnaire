@@ -96,7 +96,7 @@ class AnswersView(APIView):
                 answer_data = {
                 "answer_id": answer_id,
                 # "project": '101',
-                "question": question.id,
+                "question": question.question_id,
                 "input_answer": text,
                 "category": question.category,
                 }
