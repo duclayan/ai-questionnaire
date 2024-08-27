@@ -2,7 +2,7 @@
 import React from "react";
 import "./InputField.css";
 
-const InputField = ({ label, type = "text", value, onChange, placeholder }) => {
+export const InputField = ({ label, type = "text", value, onChange, placeholder }) => {
   return (
     <div className="input-field">
       {label && <label>{label}</label>}
@@ -16,5 +16,3 @@ const InputField = ({ label, type = "text", value, onChange, placeholder }) => {
     </div>
   );
 };
-
-export default InputField;

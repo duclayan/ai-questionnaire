@@ -1,7 +1,7 @@
 import React from "react";
 import { Tabs, Tab, Box } from "@mui/material";
 
-function StepNavigation({ currentStep, handleStepChange }) {
+export const StepNavigation = ({ currentStep, handleStepChange }) =>  {
   // Further extension of this code could be that the steps can be customizable by the users
   const steps = [
     "General Information",
@@ -34,5 +34,3 @@ function StepNavigation({ currentStep, handleStepChange }) {
     </Box>
   );
 }
-
-export default StepNavigation;
