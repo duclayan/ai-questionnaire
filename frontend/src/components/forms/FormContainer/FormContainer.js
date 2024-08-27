@@ -5,7 +5,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import MicIcon from "@mui/icons-material/Mic";
 import ErrorIcon from "@mui/icons-material/Error";
 
-const FormContainer = () => {
+export const FormContainer = () => {
   const [questions, setQuestions] = useState([{ id: 23, text: "What is up" }]);
   const [text, setText] = useState("");
   const [summary, setSummary] = useState("");
@@ -89,5 +89,3 @@ const FormContainer = () => {
     </div>
   );
 };
-
-export default FormContainer;

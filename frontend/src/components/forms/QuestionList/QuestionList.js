@@ -6,7 +6,7 @@ import ErrorIcon from "@mui/icons-material/Error";
 import axios from "axios";
 import { InputLabel, FormControl } from "@mui/material";
 
-function QuestionList({ currentStep, onAnswersChange }) {
+export const QuestionList = ({ currentStep, onAnswersChange })=> {
   const categories = [
     "General Information",
     "Authentication and Authorization",
@@ -164,5 +164,3 @@ function QuestionList({ currentStep, onAnswersChange }) {
     </Box>
   );
 }
-
-export default QuestionList;

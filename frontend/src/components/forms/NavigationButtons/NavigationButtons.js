@@ -1,14 +1,14 @@
 import React from "react";
 import { Box, Button, Typography } from "@mui/material";
 
-function NavigationButtons({
+export const NavigationButtons = ({
   navbarEnabled,
   currentStep,
   totalSteps,
   handlePrevious,
   handleNext,
   handleSubmit,
-}) {
+}) => {
     const isReportStep = currentStep === totalSteps - 1
 
     if (!navbarEnabled) {
@@ -66,5 +66,3 @@ function NavigationButtons({
       );
     }
 }
-
-export default NavigationButtons;

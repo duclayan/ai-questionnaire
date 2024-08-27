@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './DocumentLoader.css';
 
-const DocumentLoader = ({ isLoading }) => {
+export const DocumentLoader = ({ isLoading }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,5 +25,3 @@ const DocumentLoader = ({ isLoading }) => {
 
   return null; 
 };
-
-export default DocumentLoader;

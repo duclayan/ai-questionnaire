@@ -1,7 +1,7 @@
 import React from "react";
 import { Typography, Box } from "@mui/material";
 
-function CenteredHeading({currentStep}) {
+export const CenteredHeading = ({currentStep}) => {
 
   const steps = [
     "General Information",
@@ -27,5 +27,3 @@ function CenteredHeading({currentStep}) {
     </Box>
   );
 }
-
-export default CenteredHeading;

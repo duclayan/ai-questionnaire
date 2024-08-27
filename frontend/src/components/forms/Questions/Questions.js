@@ -1,4 +1,4 @@
-export const questions = [
+export const Questions = [
   // General Information
   {
     id: 1,
