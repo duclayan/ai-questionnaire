@@ -17,10 +17,15 @@ import requests
 from django.http import HttpResponse
 
 class QuestionViewSet(viewsets.ModelViewSet):
+<<<<<<< Updated upstream
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
 
 
+=======
+        queryset = Question.objects.all()
+        serializer_class = QuestionSerializer
+>>>>>>> Stashed changes
 class openAIView(APIView):
     def post(self, request):
         # Get user input
@@ -70,8 +75,6 @@ class openAIView(APIView):
 
         # Return a JSON response
         return Response({"generated_text": generated_text})
-
-
 class QuestionListView(APIView):
     def get(self, request):
         current_category = request.query_params.get("currentCategory")
@@ -83,8 +86,6 @@ class QuestionListView(APIView):
 
         serializer = QuestionSerializer(questions, many=True)
         return Response({"question_list": serializer.data}, status=status.HTTP_200_OK)
-
-
 class AnswersView(APIView):
     def post(self, request):
         data = request.data
@@ -114,7 +115,6 @@ class AnswersView(APIView):
                 return Response({"error": f"Question with id {question_id} does not exist"}), 
         
         return Response({"message": "Answers submitted successfully", "answers": answers_created})
-
 class GenerateReportView(APIView):
     def get(self, request):
         answers = Answer.objects.select_related('question').order_by('category', 'question__question_id')
@@ -231,3 +231,42 @@ class GenerateReportView(APIView):
         response = HttpResponse(buffer.getvalue(), content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
         response['Content-Disposition'] = 'attachment; filename=report_summary.docx'
         return response
+
+class ProjectView(APIView):
+    def get(self, request):
+        """Retrieve all projects."""
+        projects = Project.objects.all()
+        serializer = ProjectSerializer(projects, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        """Create a new project."""
+        serializer = ProjectSerializer(data=request.data.get("params"))
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ProjectDetailView(APIView):
+    def get_object(self, project_id):
+        """Retrieve a project by ID."""
+        try:
+            return Project.objects.get(id=project_id)
+        except Project.DoesNotExist:
+            return None
+
+    def get(self, request, project_id):
+        """Retrieve a specific project."""
+        project = self.get_object(project_id)
+        if project is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = ProjectSerializer(project)
+        return Response(serializer.data)
+
+    def delete(self, request, project_id):
+        """Delete a specific project."""
+        project = self.get_object(project_id)
+        if project is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        project.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
