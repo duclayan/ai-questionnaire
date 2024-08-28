@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { StepNavigation, NavigationButtons, CenteredHeading, QuestionList, DocumentLoader } from "../../components/forms";
+import { useNavigate } from 'react-router-dom';
 
 function Form() {
   const [navbarEnabled, setNavbarEnabled] = useState(true);
@@ -9,7 +10,8 @@ function Form() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const totalSteps = 6;
-  
+  const navigate = useNavigate();
+
   const handleStepChange = (newStep) => {
     setCurrentStep(newStep);
   };
@@ -49,6 +51,7 @@ function Form() {
       document.body.appendChild(link);
       link.click();
       link.remove();
+      navigate("/form-submitted")
 
     } catch (error) {
       console.error("Error submitting answers:", error);
