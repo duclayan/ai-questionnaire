@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { Box, Typography, Grid, TextField, IconButton } from "@mui/material";
+import React, {  useState, useEffect } from "react";
+import { Box, Grid, IconButton } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import MicIcon from "@mui/icons-material/Mic";
 import ErrorIcon from "@mui/icons-material/Error";
 import axios from "axios";
 import { InputLabel, FormControl } from "@mui/material";
-
+import "./QuestionList.css"
 export const QuestionList = ({ currentStep, onAnswersChange })=> {
   const categories = [
     "General Information",
@@ -92,75 +92,63 @@ export const QuestionList = ({ currentStep, onAnswersChange })=> {
 
   return (
     <Box sx={{ mt: 4 }}>
-      {questions.map((question) => (
-        <Box
-          key={question.question_id}
-          sx={{
-            mb: 4,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "left",
-            width: "100%",
-            paddingTop: "1.5rem",
-            maxWidth: "100rem",
-            margin: "0 auto",
-          }}
-        >
-          <Grid
-            container
-            spacing={1}
-            justifyContent="center"
-            alignItems="center"
-          >
-            <Grid item xs={12} md={8}>
-              <FormControl fullWidth variant="outlined">
-                <InputLabel
-                  htmlFor={`multiline-label-${question.question_id}`}
-                  sx={{
-                    whiteSpace: "break-spaces",
-                    position: "relative",
-                    transform: "none",
-                    marginBottom: 1,
-                  }}
-                >
-                  {question.question}
-                </InputLabel>
-                <TextField
-                  id={`multiline-label-${question.question_id}`}
-                  fullWidth
-                  multiline
-                  value={answers[question.question_id]?.input_text || ""}
-                  onChange={(e) =>
-                    handleInputChange(
-                      question.question_id,
-                      e.target.value,
-                      question.category,
-                      currentStep
-                    )
-                  }
-                  variant="outlined"
-                  InputProps={{
-                    endAdornment: (
-                      <Box sx={{ display: "flex" }}>
-                        <IconButton onClick={() => handleAutoCorrect(question)}>
-                          <CheckCircleIcon />
-                        </IconButton>
-                        <IconButton>
-                          <MicIcon />
-                        </IconButton>
-                        <IconButton onClick={() => giveSampleAnswer(question)}>
-                          <ErrorIcon />
-                        </IconButton>
-                      </Box>
-                    ),
-                  }}
-                  sx={{ mt: 1 }}
-                />
-              </FormControl>
-            </Grid>
-          </Grid>
-        </Box>
-      ))}
-    </Box>
+    {questions.map((question) => (
+      <Box
+        key={question.question_id}
+        sx={{
+          mb: 4,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "left",
+          width: "100%",
+          paddingTop: "1.5rem",
+          maxWidth: "100rem",
+          margin: "0 auto",
+        }}
+      >
+        <Grid item xs={4} md={8}>
+          <FormControl fullWidth variant="outlined">
+            <InputLabel
+              htmlFor={`multiline-label-${question.question_id}`}
+              sx={{
+                whiteSpace: "break-spaces",
+                position: "relative",
+                transform: "none",
+                marginBottom: 1,
+              }}
+            >
+              {question.question}
+            </InputLabel>
+            <Box sx={{ display: "flex", alignItems: "flex-end" }}>
+              <textarea
+                className="textarea" // Apply the textarea class
+                id={`multiline-label-${question.question_id}`}
+                value={answers[question.question_id]?.input_text || ""}
+                onChange={(e) =>
+                  handleInputChange(
+                    question.question_id,
+                    e.target.value,
+                    question.category,
+                    currentStep
+                  )
+                }
+              />
+              <Box className="icon-container">
+                <IconButton onClick={() => handleAutoCorrect(question)}>
+                  <CheckCircleIcon />
+                </IconButton>
+                <IconButton>
+                  <MicIcon />
+                </IconButton>
+                <IconButton onClick={() => giveSampleAnswer(question)}>
+                  <ErrorIcon />
+                </IconButton>
+              </Box>
+            </Box>
+          </FormControl>
+        </Grid>
+      </Box>
+    ))}
+  </Box>
   );
 }

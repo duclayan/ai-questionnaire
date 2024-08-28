@@ -1,0 +1,27 @@
+.textarea {
+    width: 100%;
+    min-height: 100px; /* Minimum height */
+    max-height: 300px; /* Maximum height */
+    overflow-y: auto; /* Allow vertical scrolling */
+    padding: 10px; /* Padding for better text input */
+    border-radius: 4px; /* Match Material-UI rounded corners */
+    border: 1px solid #ccc; /* Border to match Material-UI */
+    resize: none; /* Prevent manual resizing */
+    font-size: 16px; /* Font size for better readability */
+    outline: none; /* Remove outline on focus */
+    box-shadow: none; /* Remove default shadow */
+    font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif; /* Match Material-UI font */
+  }
+  
+  .icon-container {
+    display: flex;
+    flex-direction: column; /* Default to vertical layout */
+    justify-content: flex-end; /* Align icons to the bottom */
+    margin-left: 8px; /* Space between textarea and icons */
+  }
+  
+  @media (min-width: 600px) { /* Adjust breakpoint as needed */
+    .icon-container {
+      flex-direction: row; /* Change to horizontal layout on larger screens */
+    }
+  }

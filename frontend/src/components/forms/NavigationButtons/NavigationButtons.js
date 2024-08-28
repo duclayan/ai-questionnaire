@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button} from "@mui/material";
 
 export const NavigationButtons = ({
   navbarEnabled,
@@ -10,14 +10,6 @@ export const NavigationButtons = ({
   handleSubmit,
 }) => {
     const isReportStep = currentStep === totalSteps - 1
-
-    if (!navbarEnabled) {
-      return(
-        <Box  sx={{ display: "flex", justifyContent: "center"}}> 
-        Succesfully Downloaded the File
-        </Box>
-      )
-    } else {
       return (
         <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 4 }}>
           <Button
@@ -64,5 +56,4 @@ export const NavigationButtons = ({
           )}
         </Box>
       );
-    }
 }
