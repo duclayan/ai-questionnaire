@@ -39,7 +39,7 @@ export const FormContainer = () => {
 
   const handleAutoCorrect = async (inputText) => {
     try {
-      const response = await axios.post("http://localhost:8000/", {
+      const response = await axios.post("http://localhost:8000/api/", {
         inputText,
       });
       const correctedText = response.data.generated_text;

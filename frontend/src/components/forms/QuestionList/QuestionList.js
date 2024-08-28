@@ -31,7 +31,7 @@ export const QuestionList = ({ currentStep, onAnswersChange })=> {
 
   const fetchQuestions = async (category) => {
     try {
-      const response = await axios.get("http://localhost:8000/questions", {
+      const response = await axios.get("http://localhost:8000/api/questions", {
         params: { currentCategory: category },
       });
       const question_list = response.data.question_list;
@@ -70,7 +70,7 @@ export const QuestionList = ({ currentStep, onAnswersChange })=> {
     const sample_answer = currentQuestion.sample_answer;
 
     try {
-      const response = await axios.post("http://localhost:8000/", {
+      const response = await axios.post("http://localhost:8000/api/", {
         text,
         prompt_strategy,
         question,

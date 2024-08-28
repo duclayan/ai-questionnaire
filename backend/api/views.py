@@ -16,6 +16,40 @@ import os
 import requests
 from django.http import HttpResponse
 
+from django.contrib.auth import authenticate
+from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
+import logging
+logger = logging.getLogger(__name__)
+
+class UserView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+        
+        logger.info(f"Received login attempt for username: {username}")
+
+        if not username or not password:
+            return Response({'error': 'Please provide both username and password'}, status=400)
+
+        # Ensure password is a string
+        if isinstance(password, (list, tuple)):
+            password = password[0] if password else ''
+        password = str(password)
+
+        logger.debug(f"Password type after conversion: {type(password)}")
+
+        user = authenticate(request, username=username, password=password)
+        
+        if user:
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({'token': token.key})
+        else:
+            logger.warning(f"Failed login attempt for username: {username}")
+            return Response({'error': 'Invalid credentials'}, status=401)
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
@@ -71,7 +105,6 @@ class openAIView(APIView):
         # Return a JSON response
         return Response({"generated_text": generated_text})
 
-
 class QuestionListView(APIView):
     def get(self, request):
         current_category = request.query_params.get("currentCategory")
@@ -83,7 +116,6 @@ class QuestionListView(APIView):
 
         serializer = QuestionSerializer(questions, many=True)
         return Response({"question_list": serializer.data}, status=status.HTTP_200_OK)
-
 
 class AnswersView(APIView):
     def post(self, request):
