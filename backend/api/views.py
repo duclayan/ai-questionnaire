@@ -51,20 +51,8 @@ class UserView(APIView):
             logger.warning(f"Failed login attempt for username: {username}")
             return Response({'error': 'Invalid credentials'}, status=401)
 class QuestionViewSet(viewsets.ModelViewSet):
-<<<<<<< HEAD
-<<<<<<< Updated upstream
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
-=======
-        queryset = Question.objects.all()
-        serializer_class = QuestionSerializer
->>>>>>> b16db4e492e5074685a7475c890f96a4cd932557
-
-
-=======
-        queryset = Question.objects.all()
-        serializer_class = QuestionSerializer
->>>>>>> Stashed changes
 class openAIView(APIView):
     def post(self, request):
         # Get user input
