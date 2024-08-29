@@ -2,6 +2,9 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import *
 from .serializer import *
@@ -24,32 +27,33 @@ import logging
 logger = logging.getLogger(__name__)
 
 class UserView(APIView):
-    permission_classes = [AllowAny]
+    # authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        username = request.data.get('username')
-        password = request.data.get('password')
-        
-        logger.info(f"Received login attempt for username: {username}")
+        username = request.data.get("username")
+        password = request.data.get("password")
 
         if not username or not password:
-            return Response({'error': 'Please provide both username and password'}, status=400)
+            return Response(
+                {"error": "Please provide both username and password"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-        # Ensure password is a string
-        if isinstance(password, (list, tuple)):
-            password = password[0] if password else ''
-        password = str(password)
-
-        logger.debug(f"Password type after conversion: {type(password)}")
-
-        user = authenticate(request, username=username, password=password)
-        
-        if user:
-            token, created = Token.objects.get_or_create(user=user)
-            return Response({'token': token.key})
-        else:
-            logger.warning(f"Failed login attempt for username: {username}")
-            return Response({'error': 'Invalid credentials'}, status=401)
+        user = authenticate(username=username, password=password)
+        if user is None:
+            return Response(
+                {"error": "Invalid username or password"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+        refresh = RefreshToken.for_user(user)
+        return Response(
+            {
+                "refresh": str(refresh),
+                "access": str(refresh.access_token),
+            },
+            status=status.HTTP_200_OK,
+        )
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
@@ -122,12 +126,12 @@ class AnswersView(APIView):
         data = request.data
         answers_created = []
 
-        for  answer_id, answer in data.items():
-            question_id = answer['question_id']
-            text = answer['input_text']
+        for answer_id, answer in data.items():
+            question_id = answer["question_id"]
+            text = answer["input_text"]
             try:
                 question = Question.objects.get(question_id=question_id)
-                
+
                 answer_data = {
                 "answer_id": answer_id,
                 # "project": '101',
