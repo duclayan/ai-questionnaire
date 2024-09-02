@@ -7,6 +7,7 @@ import { Navbar } from "./components/navbar/Navbar";
 import FormSubmitted from "./views/Form/FormSubmitted";
 import PrivateRoute from "./utils/PrivateRoute";
 import { AuthProvider } from "./contexts/AuthContext";
+import Dashboard from "./views/Dashboard/Dashboard";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/form-submitted" element={<FormSubmitted />} />
         </Routes>
       </Router>

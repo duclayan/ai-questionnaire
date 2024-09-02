@@ -1,10 +1,10 @@
 from django.db import models
 
-
 class Project(models.Model):
-    project_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=200)
-    owner = models.CharField(max_length=100)
+    owner = models.CharField(max_length=200)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
@@ -30,7 +30,7 @@ class Answer(models.Model):
     # temporary to see the category of each question easily
     # can later be cleaned to have access from questions to confirm category
     category = models.CharField(max_length=100, default="General Information")
-
+    
     def __str__(self):
         return self.input_answer
 class Report(models.Model):

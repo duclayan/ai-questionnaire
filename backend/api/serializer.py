@@ -5,8 +5,7 @@ from .models import *
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = ["textinput"]
-
+        fields = "__all__"
 
 class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
