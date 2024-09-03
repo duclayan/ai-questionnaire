@@ -32,7 +32,7 @@ jobs:
       - name: Set AZURE_OPENAI_API_KEY
         env:
           AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
-        run: echo "AZURE_OPENAI_API_KEY=$AZURE_OPENAI_API_KEY" >> $GITHUB_OUTPUT
+        run: echo "AZURE_OPENAI_API_KEY=${{ secrets.AZURE_OPENAI_API_KEY }}" >> $GITHUB_OUTPUT
       - name: Run collectstatic
         run: |
           cd backend
