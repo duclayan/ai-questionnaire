@@ -30,13 +30,11 @@ jobs:
       
       - name: Install dependencies
         run: |
-          cd
           cd backend
           pip install -r requirements.txt
       
       - name: Run collectstatic
         run: |
-          cd
           cd backend
           python manage.py collectstatic --no-input
 

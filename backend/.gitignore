@@ -4,7 +4,7 @@ __pycache__/
 *$py.class
 /myenv
 /new_env
-/.env
+.env
 # Distribution / packaging
 .Python
 build/
