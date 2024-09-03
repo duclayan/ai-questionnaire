@@ -29,10 +29,15 @@ jobs:
       
       - name: Install dependencies
         run: pip install -r requirements.txt
-      - name: Set AZURE_OPENAI_API_KEY
+      - name: Set Azure OpenAI Environment Variables
         env:
           AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
-        run: echo "AZURE_OPENAI_API_KEY=${{ secrets.AZURE_OPENAI_API_KEY }}" >> $GITHUB_OUTPUT
+          AZURE_OAI_ENDPOINT: ${{ secrets.AZURE_OAI_ENDPOINT }}
+          AZURE_OAI_DEPLOYMENT: ${{ secrets.AZURE_OAI_DEPLOYMENT }}
+        run: |
+          echo "AZURE_OPENAI_API_KEY=${{ secrets.AZURE_OPENAI_API_KEY }}" >> $GITHUB_OUTPUT
+          echo "AZURE_OAI_ENDPOINT=${{ secrets.AZURE_OAI_ENDPOINT }}" >> $GITHUB_OUTPUT
+          echo "AZURE_OAI_DEPLOYMENT=${{ secrets.AZURE_OAI_DEPLOYMENT }}" >> $GITHUB_OUTPUT
       - name: Run collectstatic
         run: |
           cd backend
