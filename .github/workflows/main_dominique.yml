@@ -29,7 +29,9 @@ jobs:
           source venv/bin/activate
       
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          cd backend
+          pip install -r requirements.txt
       
       - name: Set Azure OpenAI Environment Variables
         env:
@@ -37,12 +39,14 @@ jobs:
           AZURE_OAI_ENDPOINT: ${{ secrets.AZURE_OAI_ENDPOINT }}
           AZURE_OAI_DEPLOYMENT: ${{ secrets.AZURE_OAI_DEPLOYMENT }}
         run: |
+          cd backend
           echo "AZURE_OPENAI_API_KEY=${{ secrets.AZURE_OPENAI_API_KEY }}" >> $GITHUB_OUTPUT
           echo "AZURE_OAI_ENDPOINT=${{ secrets.AZURE_OAI_ENDPOINT }}" >> $GITHUB_OUTPUT
           echo "AZURE_OAI_DEPLOYMENT=${{ secrets.AZURE_OAI_DEPLOYMENT }}" >> $GITHUB_OUTPUT
 
       - name: Run collectstatic
         run: |
+          cd backend
           python manage.py collectstatic --no-input
 
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
