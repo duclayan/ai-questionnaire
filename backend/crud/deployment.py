@@ -23,9 +23,10 @@ MIDDLEWARE = [
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 AZURE_OPENAI_API_KEY = os.getenv('AZURE_OPENAI_API_KEY')
-if AZURE_OPENAI_API_KEY is None:
-    raise ValueError("AZURE_OPENAI_API_KEY environment variable not set.")
-
+AZURE_OPENAI_ENDPOINT = os.getenv('AZURE_OPENAI_ENDPOINT')
+AZURE_OPENAI_DEPLOYMENT = os.getenv('AZURE_OPENAI_DEPLOYMENT')
+if AZURE_OPENAI_API_KEY is None or AZURE_OPENAI_ENDPOINT is None:
+    raise ValueError("AZURE_OPENAI_API_KEY and AZURE_OPENAI_ENDPOINT environment variables must be set.")
 conn_str = os.environ['AZURE_POSTGRESQL_CONNECTIONSTRING']
 conn_str_params = {pair.split('=')[0]: pair.split('=')[1] for pair in conn_str.split(' ')}
 DATABASES = {
