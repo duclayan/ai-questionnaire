@@ -4,5 +4,5 @@ from api.views import *  # Import your view
 
 urlpatterns = [  # This is the correct variable name
     path("admin/", admin.site.urls),  # Admin path
-    path("api/", include("api.urls")),  # Root path for ReactView
+    path("", include('api.urls')),  # Root path for ReactView
 ]

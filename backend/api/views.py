@@ -92,10 +92,8 @@ class UserView(APIView):
             status=status.HTTP_200_OK,
         )
 class QuestionViewSet(viewsets.ModelViewSet):
-    queryset = Question.objects.all()
-    serializer_class = QuestionSerializer
-
-
+        queryset = Question.objects.all()
+        serializer_class = QuestionSerializer
 class openAIView(APIView):
     def post(self, request):
         # Get user input
@@ -145,8 +143,6 @@ class openAIView(APIView):
 
         # Return a JSON response
         return Response({"generated_text": generated_text})
-
-class QuestionListView(APIView):
     def get(self, request):
         current_category = request.query_params.get("currentCategory")
 
@@ -158,6 +154,24 @@ class QuestionListView(APIView):
         serializer = QuestionSerializer(questions, many=True)
         return Response({"question_list": serializer.data}, status=status.HTTP_200_OK)
 
+class ProjectsView(APIView):
+    # List all the projects
+    def get(self, request):
+        projects = Project.objects.all()
+        serializer = ProjectSerializer(projects, many=True)
+        return Response({"project_list": serializer.data}, status=status.HTTP_200_OK)
+    
+    # Create a New Project
+    def post(self, request):
+        serializer = ProjectSerializer(data=request.data)
+        print("Serializer:", serializer)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Project created successfully", "project": serializer.data}, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    
 class AnswersView(APIView):
     def post(self, request):
         data = request.data

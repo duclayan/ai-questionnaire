@@ -9,9 +9,12 @@ import os
 load_dotenv()
 
 # Azure OpenAI configuration
-AZURE_OAI_ENDPOINT = os.getenv("AZURE_OAI_ENDPOINT")
-AZURE_OAI_KEY = os.getenv("AZURE_OAI_KEY")
-AZURE_OAI_DEPLOYMENT = os.getenv("AZURE_OAI_DEPLOYMENT")
+# AZURE_OAI_ENDPOINT = os.getenv("AZURE_OAI_ENDPOINT")
+# AZURE_OAI_KEY = os.getenv("AZURE_OAI_KEY")
+# AZURE_OAI_DEPLOYMENT = os.getenv("AZURE_OAI_DEPLOYMENT")
+AZURE_OAI_ENDPOINT = "https://xijinopenai.openai.azure.com"
+AZURE_OAI_KEY = "9570364630d04e8ebe2489e85d3d86be"
+AZURE_OAI_DEPLOYMENT ="xijingpt-4o"
 
 # Initialize the Azure OpenAI client
 AZURE_OAI_CLIENT = AzureOpenAI(
@@ -142,9 +145,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, 'static_collected')
-
+STATIC_URL = "static/"
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
