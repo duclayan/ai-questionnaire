@@ -27,7 +27,7 @@ function Form() {
       console.log("ALL ANSWERS", allAnswers);
 
       const response = await axios.post(
-        "http://localhost:8000/api/submit-answers/",
+        "http://localhost:8000/submit-answers/",
         allAnswers
       );
 
@@ -35,7 +35,7 @@ function Form() {
 
       setIsLoading(true);
       const reportResponse = await axios.get(
-        "http://localhost:8000/api/generate-report/",
+        "http://localhost:8000/generate-report/",
         {
           responseType: "blob",
         }

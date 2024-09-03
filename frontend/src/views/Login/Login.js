@@ -10,7 +10,7 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8000/api/login/', { username, password });
+      const response = await axios.post('http://localhost:8000/login/', { username, password });
       localStorage.setItem('token', response.data.token);
       navigate('/form');
     } catch (error) {
@@ -20,6 +20,7 @@ function Login() {
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <> {console.log( process.env.REACT_APP_MODE)}</>
       <form onSubmit={handleSubmit} style={{ width: '300px' }}>
         <h2>Login</h2>
         <input
