@@ -68,7 +68,7 @@ jobs:
 
       - name: Unzip artifact for deployment
         run: |
-          cd backend
+          ls
           unzip release.zip
 
       - name: 'Deploy to Azure Web App'
