@@ -29,6 +29,7 @@ jobs:
       
       - name: Install dependencies
         run: pip install -r requirements.txt
+      
       - name: Set Azure OpenAI Environment Variables
         env:
           AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
@@ -38,10 +39,12 @@ jobs:
           echo "AZURE_OPENAI_API_KEY=${{ secrets.AZURE_OPENAI_API_KEY }}" >> $GITHUB_OUTPUT
           echo "AZURE_OAI_ENDPOINT=${{ secrets.AZURE_OAI_ENDPOINT }}" >> $GITHUB_OUTPUT
           echo "AZURE_OAI_DEPLOYMENT=${{ secrets.AZURE_OAI_DEPLOYMENT }}" >> $GITHUB_OUTPUT
+
       - name: Run collectstatic
         run: |
           cd backend
-          python manage.py collectstatic
+          python manage.py collectstatic --no-input
+
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
       - name: Zip artifact for deployment
@@ -71,7 +74,6 @@ jobs:
       - name: Unzip artifact for deployment
         run: unzip release.zip
 
-      
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
