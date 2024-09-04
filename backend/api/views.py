@@ -112,7 +112,6 @@ class openAIView(APIView):
 
         serializer = QuestionSerializer(questions, many=True)
         return Response({"question_list": serializer.data}, status=status.HTTP_200_OK)
-
 class ProjectsView(APIView):
     # List all the projects
     def get(self, request):
@@ -129,8 +128,30 @@ class ProjectsView(APIView):
             return Response({"message": "Project created successfully", "project": serializer.data}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # Edit an existing project
+    def put(self, request):
 
-    
+        print(request.data)
+        # try:
+        #     project = Project.objects.get(pk=pk)
+        # except Project.DoesNotExist:
+        #     return Response({'error': 'Project not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # serializer = ProjectSerializer(project, data=request.data)
+        # if serializer.is_valid():
+        #     serializer.save()
+        #     return Response({"message": "Project updated successfully", "project": serializer.data}, status=status.HTTP_200_OK)
+        # else:
+        #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # Delete a project
+    def delete(self, request, pk):
+        try:
+            project = Project.objects.get(pk=pk)
+            project.delete()
+            return Response({"message": "Project deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        except Project.DoesNotExist:
+            return Response({'error': 'Project not found'}, status=status.HTTP_404_NOT_FOUND)
 class AnswersView(APIView):
     def post(self, request):
         data = request.data

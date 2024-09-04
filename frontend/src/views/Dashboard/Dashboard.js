@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
 import {
   AppBar,
   Toolbar,
@@ -23,70 +22,64 @@ const Dashboard = () => {
   const [projects, setProjects] = useState([]);
   const [open, setOpen] = useState(false);
   const [newProject, setNewProject] = useState({ name: '', owner: '' });
-  // const [projects, setProjects] = useState([]);
+  const [editMode, setEditMode] = useState(false);
+  const [currentProjectId, setCurrentProjectId] = useState(null);
 
-  const handleOpen = () => setOpen(true);
+  const handleOpen = (project = null) => {
+    if (project) {
+      setNewProject({ name: project.name, owner: project.owner });
+      setCurrentProjectId(project.project_id); // Ensure you're using the correct ID field
+      setEditMode(true);
+    } else {
+      setNewProject({ name: '', owner: '' });
+      setCurrentProjectId(null);
+      setEditMode(false);
+    }
+    setOpen(true);
+  };
+
   const handleClose = () => setOpen(false);
 
-  // const handleCreateProject = async () => {
-  //   setProjects([...projects, { ...newProject, id: Date.now() }]);
-  //   setNewProject({ name: '', owner: '' });
-  //   const response = await axios.post(
-  //     "http://localhost:8000/api/projects/",
-  //     newProject
-  //   );
-  //   handleClose();
+  const handleCreateOrUpdateProject = async () => {
+    const response = await axios.put(`http://localhost:8000/projects/`, newProject);
 
-  // };
-  // Handle project creation
-  const handleCreateProject = async () => {
-    try {
-        const response = await axios.post('http://localhost:8000/projects/', newProject); // Adjust the URL as needed
-        console.log(response.data.message);
-        setProjects([...projects, response.data.project]); // Add new project to the list
-        setNewProject({ name: '', owner: '' }); // Reset form
-        handleClose()
-    } catch (error) {
-        console.error('Error creating project:', error.response.data);
-    }
-};
-  const handleDeleteProject = (id) => {
-    setProjects(projects.filter(project => project.id !== id));
+    // try {
+    //   if (editMode) {
+    //     // Update existing project
+    //     const response = await axios.put(`http://localhost:8000/projects/`, newProject);
+    //     setProjects(projects.map(project => (project.project_id === currentProjectId ? response.data.project : project)));
+    //   } else {
+    //     // Create new project
+    //     const response = await axios.post('http://localhost:8000/projects/', newProject);
+    //     setProjects([...projects, response.data.project]);
+    //   }
+    //   handleClose();
+    // } catch (error) {
+    //   console.error('Error saving project:', error.response.data);
+    // }
   };
 
-  const handleEditProject = (id) => {
-    // Implement edit functionality here
-    console.log('Edit project', id);
-  };
-  // useEffect(() => {
-  //   fetchProjects();
-  // }, [newProject]);  
-
-    // Fetch projects on component mount
-    useEffect(() => {
-      const fetchProjects = async () => {
-          try {
-              const response = await axios.get('http://localhost:8000/projects'); // Adjust the URL as needed
-              setProjects(response.data.project_list);
-          } catch (error) {
-              console.error('Error fetching projects:', error);
-          }
-      };
-
-      fetchProjects();
-    }, []);
-
-  const fetchProjects = async (category) => {
+  const handleDeleteProject = async (id) => {
     try {
-      const response = await axios.get("http://localhost:8000/projects");
-      const project_list = response.data;
-      console.log(project_list)
-      setProjects(project_list.project_list);
-      console.log("Projects", projects)
+      await axios.delete(`http://localhost:8000/projects/${id}/`);
+      setProjects(projects.filter(project => project.project_id !== id)); // Ensure you're using the correct ID field
     } catch (error) {
-      console.error("Error fetching questions:", error);
+      console.error('Error deleting project:', error);
     }
   };
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/projects/');
+        setProjects(response.data.project_list);
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+      }
+    };
+
+    fetchProjects();
+  }, []);
 
   return (
     <>
@@ -98,19 +91,19 @@ const Dashboard = () => {
         </Toolbar>
       </AppBar>
       <Container maxWidth="md" sx={{ mt: 4 }}>
-        <Button variant="contained" onClick={handleOpen} sx={{ mb: 2 }}>
+        <Button variant="contained" onClick={() => handleOpen()} sx={{ mb: 2 }}>
           Create Project
         </Button>
         <List>
           {projects.map((project) => (
             <ListItem
-              key={project.id}
+              key={project.project_id} // Ensure you're using the correct ID field
               secondaryAction={
                 <>
-                  <IconButton edge="end" aria-label="edit" onClick={() => handleEditProject(project.id)}>
+                  <IconButton edge="end" aria-label="edit" onClick={() => handleOpen(project)}>
                     <Edit />
                   </IconButton>
-                  <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteProject(project.id)}>
+                  <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteProject(project.project_id)}> {/* Ensure you're using the correct ID field */}
                     <Delete />
                   </IconButton>
                 </>
@@ -122,7 +115,7 @@ const Dashboard = () => {
         </List>
       </Container>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Create New Project</DialogTitle>
+        <DialogTitle>{editMode ? 'Edit Project' : 'Create New Project'}</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
@@ -144,7 +137,7 @@ const Dashboard = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleCreateProject}>Create</Button>
+          <Button onClick={handleCreateOrUpdateProject}>{editMode ? 'Update' : 'Create'}</Button>
         </DialogActions>
       </Dialog>
     </>

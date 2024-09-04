@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "corsheaders",
     "api",
+    "whitenoise",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
