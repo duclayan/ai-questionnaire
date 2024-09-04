@@ -43,7 +43,7 @@ jobs:
         run: |
           cd backend
           pip install -r requirements.txt
-          python -m myproject.deployment
+          python -m crud.deployment
           python manage.py collectstatic --noinput 
         shell: bash
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
