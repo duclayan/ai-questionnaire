@@ -22,12 +22,12 @@ MIDDLEWARE = [
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-# AZURE_OPENAI_API_KEY = os.getenv('AZURE_OPENAI_API_KEY')
-# AZURE_OPENAI_ENDPOINT = os.getenv('AZURE_OPENAI_ENDPOINT')
-# AZURE_OPENAI_DEPLOYMENT = os.getenv('AZURE_OPENAI_DEPLOYMENT')
-AZURE_OAI_ENDPOINT = "https://xijinopenai.openai.azure.com"
-AZURE_OAI_KEY = "9570364630d04e8ebe2489e85d3d86be"
-AZURE_OAI_DEPLOYMENT ="xijingpt-4o"
+AZURE_OPENAI_API_KEY = os.getenv('AZURE_OPENAI_API_KEY')
+AZURE_OPENAI_ENDPOINT = os.getenv('AZURE_OPENAI_ENDPOINT')
+AZURE_OPENAI_DEPLOYMENT = os.getenv('AZURE_OPENAI_DEPLOYMENT')
+# AZURE_OAI_ENDPOINT = "https://xijinopenai.openai.azure.com"
+# AZURE_OAI_KEY = "9570364630d04e8ebe2489e85d3d86be"
+# AZURE_OAI_DEPLOYMENT ="xijingpt-4o"
 
 if AZURE_OPENAI_API_KEY is None or AZURE_OPENAI_ENDPOINT is None:
     raise ValueError("AZURE_OPENAI_API_KEY and AZURE_OPENAI_ENDPOINT environment variables must be set.")
