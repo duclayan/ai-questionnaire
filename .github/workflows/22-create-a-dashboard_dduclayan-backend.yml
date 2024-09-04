@@ -41,7 +41,13 @@ jobs:
           pip install -r requirements.txt
       - name: Run deployment script
         env:
-          AZURE_WEBAPP_NAME: ${{ secrets.AZURE_WEBAPP_NAME }}
+          # AZURE_WEBAPP_NAME: ${{ secrets.AZURE_WEBAPP_NAME }}
+          SECRET: ${{ secrets.SECRET }}
+          WEBSITE_HOSTNAME: ${{ secrets.WEBSITE_HOSTNAME }}
+          AZURE_POSTGRESQL_CONNECTIONSTRING: ${{ secrets.AZURE_POSTGRESQL_CONNECTIONSTRING }}
+          AZURE_OPEN_API_KEY: ${{ secrets.AZURE_OPEN_API_KEY }}
+          AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
+          AZURE_OPENAI_DEPLOYMENT: ${{ secrets.AZURE_OAI_DEPLOYMENT }}
         run: |
           cd backend
           pip install -r requirements.txt
