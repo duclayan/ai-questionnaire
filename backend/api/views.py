@@ -63,20 +63,20 @@ class openAIView(APIView):
 
         # Load environment variables
         load_dotenv()
-        azure_oai_endpoint = os.getenv("AZURE_OAI_ENDPOINT")
-        azure_oai_key = os.getenv("AZURE_OAI_KEY")
-        azure_oai_deployment = os.getenv("AZURE_OAI_DEPLOYMENT")
+        AZURE_OPENAI_ENDPOINT= os.getenv("AZURE_OPENAI_ENDPOINT")
+        AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
+        AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT")
 
         # Initialize the Azure OpenAI client
         client = AzureOpenAI(
-            api_key=azure_oai_key,
+            api_key=AZURE_OPENAI_API_KEY,
             api_version="2024-02-15-preview",
-            base_url=f"{azure_oai_endpoint}/openai/deployments/{azure_oai_deployment}",
+            base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
         )
 
         # Create a chat completion
         response = client.chat.completions.create(
-            model=azure_oai_deployment,
+            model=AZURE_OPENAI_DEPLOYMENT,
             temperature=0.7,
             max_tokens=400,
             messages=[

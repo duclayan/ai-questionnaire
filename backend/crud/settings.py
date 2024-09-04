@@ -9,18 +9,15 @@ import os
 load_dotenv()
 
 # Azure OpenAI configuration
-# AZURE_OAI_ENDPOINT = os.getenv("AZURE_OAI_ENDPOINT")
-# AZURE_OAI_KEY = os.getenv("AZURE_OAI_KEY")
-# AZURE_OAI_DEPLOYMENT = os.getenv("AZURE_OAI_DEPLOYMENT")
-AZURE_OAI_ENDPOINT = "https://xijinopenai.openai.azure.com"
-AZURE_OAI_KEY = "9570364630d04e8ebe2489e85d3d86be"
-AZURE_OAI_DEPLOYMENT ="xijingpt-4o"
+AZURE_OPENAI_ENDPOINT= os.getenv("AZURE_OPENAI_ENDPOINT")
+AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
+AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT")
 
 # Initialize the Azure OpenAI client
 AZURE_OAI_CLIENT = AzureOpenAI(
-    api_key=AZURE_OAI_KEY,
+    api_key=AZURE_OPENAI_API_KEY,
     api_version="2024-02-15-preview",
-    base_url=f"{AZURE_OAI_ENDPOINT}/openai/deployments/{AZURE_OAI_DEPLOYMENT}",
+    base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
