@@ -92,9 +92,3 @@ jobs:
           app-name: 'dduclayan-backend'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_CC7C1BBCEACF4D94BD4227D2B5315EBA }}
-          SECRET: ${{ secrets.SECRET }}
-          WEBSITE_HOSTNAME: ${{ secrets.WEBSITE_HOSTNAME }}
-          AZURE_POSTGRESQL_CONNECTIONSTRING: ${{ secrets.AZURE_POSTGRESQL_CONNECTIONSTRING }}
-          AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPEN_API_KEY }}
-          AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
-          AZURE_OPENAI_DEPLOYMENT: ${{ secrets.AZURE_OPENAI_DEPLOYMENT }}
