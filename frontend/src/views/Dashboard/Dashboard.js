@@ -24,6 +24,7 @@ const Dashboard = () => {
   const [newProject, setNewProject] = useState({ name: '', owner: '' });
   const [editMode, setEditMode] = useState(false);
   const [currentProjectId, setCurrentProjectId] = useState(null);
+  const apiEndpoint = process.env.REACT_APP_API_ENDPOINT
 
   const handleOpen = (project = null) => {
     if (project) {
@@ -41,7 +42,7 @@ const Dashboard = () => {
   const handleClose = () => setOpen(false);
 
   const handleCreateOrUpdateProject = async () => {
-    const response = await axios.put(`http://localhost:8000/projects/`, newProject);
+    const response = await axios.put(`${apiEndpoint}/projects/` , newProject);
 
     // try {
     //   if (editMode) {
@@ -61,7 +62,7 @@ const Dashboard = () => {
 
   const handleDeleteProject = async (id) => {
     try {
-      await axios.delete(`http://localhost:8000/projects/${id}/`);
+      await axios.delete(`${apiEndpoint}/projects/${id}/`);
       setProjects(projects.filter(project => project.project_id !== id)); // Ensure you're using the correct ID field
     } catch (error) {
       console.error('Error deleting project:', error);
@@ -71,7 +72,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/projects/');
+        const response = await axios.get(`${apiEndpoint}/projects`);
         setProjects(response.data.project_list);
       } catch (error) {
         console.error('Error fetching projects:', error);

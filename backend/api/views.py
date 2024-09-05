@@ -50,9 +50,11 @@ class UserView(APIView):
         else:
             logger.warning(f"Failed login attempt for username: {username}")
             return Response({'error': 'Invalid credentials'}, status=401)
-class QuestionViewSet(viewsets.ModelViewSet):
-        queryset = Question.objects.all()
-        serializer_class = QuestionSerializer
+class QuestionViewSet(APIView):
+        def get(self, request):
+            queryset = Question.objects.all()
+            serializer = QuestionSerializer(queryset, many=True)
+            return Response({"question_list": serializer.data}, status=status.HTTP_200_OK)
 class openAIView(APIView):
     def post(self, request):
         # Get user input
