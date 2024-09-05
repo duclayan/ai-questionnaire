@@ -6,7 +6,7 @@ from .settings import BASE_DIR
 SECRET_KEY = os.environ['SECRET']
 ALLOWED_HOSTS = [os.environ['WEBSITE_HOSTNAME']]
 CSRF_TRUSTED_ORIGINS = ['https://' + os.environ['WEBSITE_HOSTNAME']]
-DEBUG = False
+DEBUG = True
 
 # WhiteNoise configuration
 MIDDLEWARE = [
@@ -21,6 +21,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 AZURE_OPENAI_API_KEY = os.getenv('AZURE_OPENAI_API_KEY')
