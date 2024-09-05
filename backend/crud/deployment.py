@@ -57,3 +57,7 @@ DATABASES = {
         'PASSWORD': conn_str_params.get('password'),
     }
 }
+
+CORS_ALLOWED_ORIGINS = [
+    "https://dduclayan-frontend-egacbucchbcgfhd8.eastus-01.azurewebsites.net",
+]
