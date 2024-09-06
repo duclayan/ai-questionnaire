@@ -2,12 +2,7 @@
     "navigationFallback": {
       "rewrite": "/index.html"
     },
-    "globalHeaders": {
-      "Content-Security-Policy": "default-src https: 'unsafe-eval' 'unsafe-inline'; object-src 'none'",
-      "Access-Control-Allow-Origin": "http://dduclayan-backend-dme4fxabfcfkg6a9.eastus-01.azurewebsites.net",
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS, PUT, DELETE, HEAD, PATCH",
-      "Access-Control-Allow-Headers": "Content-Type"
-    },
+
     "routes": [
       {
         "route": "/",
@@ -33,13 +28,6 @@
         "route": "/login",
         "serve": "/index.html",
         "statusCode": 200
-      },
-      {
-        "route": "/api/*",
-        "allowedMethods": ["GET", "POST", "PUT", "DELETE", "HEAD", "PATCH", "OPTIONS"],
-        "allowedOrigins": ["*"],
-        "allowedHeaders": ["*"],
-        "exposedHeaders": ["*"]
       }
     ]
   }
