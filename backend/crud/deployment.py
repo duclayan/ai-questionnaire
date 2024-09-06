@@ -35,9 +35,11 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "https://dduclayan-frontend-egacbucchbcgfhd8.eastus-01.azurewebsites.net",
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "https://dduclayan-frontend-egacbucchbcgfhd8.eastus-01.azurewebsites.net",
+#     Microsoft
+# ]
+CORS_ALLOW_ALL_ORIGINS = True
 # CORS_ORIGIN_ALLOW_ALL = True
 
 STORAGES = {
