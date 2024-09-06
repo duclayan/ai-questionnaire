@@ -2,18 +2,14 @@
     "navigationFallback": {
       "rewrite": "/index.html"
     },
-
     "globalHeaders": {
-    "Access-Control-Allow-Origin": "https://dduclayan-backend-dme4fxabfcfkg6a9.eastus-01.azurewebsites.net",
+    "content-security-policy": "default-src https: 'unsafe-eval' 'unsafe-inline'; object-src 'none'",
+
+    "Access-Control-Allow-Origin": "http://your-django-backend-url",
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type"
     },
     "routes": [
-        {
-            "route": "/api/*",
-            "allowedRoles": ["anonymous"],
-            "serve": "/index.html"
-          },
       {
         "route": "/",
         "serve": "/index.html",
