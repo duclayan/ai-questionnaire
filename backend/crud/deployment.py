@@ -64,15 +64,23 @@ for pair in conn_str.split(' '):
         print(f"Warning: Skipping malformed pair: {pair}")
 
 # Define the DATABASES dictionary for Django
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': conn_str_params.get('dbname'),
+#         'HOST': conn_str_params.get('host'),
+#         'USER': conn_str_params.get('user'),
+#         'PASSWORD': conn_str_params.get('password'),
+#     }
+# }
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': conn_str_params.get('dbname'),
-        'HOST': conn_str_params.get('host'),
-        'USER': conn_str_params.get('user'),
-        'PASSWORD': conn_str_params.get('password'),
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+
 
 CORS_ALLOWED_ORIGINS = [
     "https://dduclayan-frontend-egacbucchbcgfhd8.eastus-01.azurewebsites.net",
