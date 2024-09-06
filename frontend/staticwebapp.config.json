@@ -2,10 +2,18 @@
     "navigationFallback": {
       "rewrite": "/index.html"
     },
+
     "globalHeaders": {
-        "content-security-policy": "default-src https: 'unsafe-eval' 'unsafe-inline'; object-src 'none'"
-      },
+    "Access-Control-Allow-Origin": "https://dduclayan-backend-dme4fxabfcfkg6a9.eastus-01.azurewebsites.net",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type"
+    },
     "routes": [
+        {
+            "route": "/api/*",
+            "allowedRoles": ["anonymous"],
+            "serve": "/index.html"
+          },
       {
         "route": "/",
         "serve": "/index.html",
