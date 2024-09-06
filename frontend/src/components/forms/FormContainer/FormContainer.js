@@ -11,11 +11,12 @@ export const FormContainer = () => {
   const [summary, setSummary] = useState("");
   const [idleTimeout, setIdleTimeout] = useState(null);
 
+  const apiEndpoint = process.env.REACT_APP_API_ENDPOINT;
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8000/questions/"
+          `${apiEndpoint}/questions/`
         );
         setQuestions(response.data);
       } catch (error) {
@@ -39,7 +40,7 @@ export const FormContainer = () => {
 
   const handleAutoCorrect = async (inputText) => {
     try {
-      const response = await axios.post("http://localhost:8000/", {
+      const response = await axios.post(`${apiEndpoint}/`, {
         inputText,
       });
       const correctedText = response.data.generated_text;
@@ -53,7 +54,7 @@ export const FormContainer = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.post("http://localhost:8000/submit/", {
+      const response = await axios.post(`${apiEndpoint}/submit/`, {
         text,
       });
       setSummary(response.data.summary);

@@ -19,6 +19,7 @@ export const QuestionList = ({ currentStep, onAnswersChange })=> {
 
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
+  const apiEndpoint = process.env.REACT_APP_API_ENDPOINT
 
   useEffect(() => {
     fetchQuestions(currentCategory);
@@ -31,10 +32,11 @@ export const QuestionList = ({ currentStep, onAnswersChange })=> {
 
   const fetchQuestions = async (category) => {
     try {
-      const response = await axios.get("http://localhost:8000/questions", {
+      const response = await axios.get(`${apiEndpoint}/questions`, {
         params: { currentCategory: category },
       });
       const question_list = response.data.question_list;
+      console.log("Question List:", response)
       setQuestions(question_list);
     } catch (error) {
       console.error("Error fetching questions:", error);
@@ -70,7 +72,7 @@ export const QuestionList = ({ currentStep, onAnswersChange })=> {
     const sample_answer = currentQuestion.sample_answer;
 
     try {
-      const response = await axios.post("http://localhost:8000/", {
+      const response = await axios.post(`${apiEndpoint}/`, {
         text,
         prompt_strategy,
         question,

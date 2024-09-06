@@ -50,9 +50,23 @@ class UserView(APIView):
         else:
             logger.warning(f"Failed login attempt for username: {username}")
             return Response({'error': 'Invalid credentials'}, status=401)
-class QuestionViewSet(viewsets.ModelViewSet):
-        queryset = Question.objects.all()
-        serializer_class = QuestionSerializer
+
+class QuestionListView(APIView):
+    def get(self, request):
+        current_category = request.query_params.get("currentCategory")
+        if current_category and current_category != "Report":
+            questions = Question.objects.filter(category=current_category)
+        else:
+            questions = ""
+
+        serializer = QuestionSerializer(questions, many=True)
+        return Response({"question_list": serializer.data}, status=status.HTTP_200_OK)
+    def post(self, request):
+        serializer = QuestionSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 class openAIView(APIView):
     def post(self, request):
         # Get user input
@@ -63,20 +77,20 @@ class openAIView(APIView):
 
         # Load environment variables
         load_dotenv()
-        azure_oai_endpoint = os.getenv("AZURE_OAI_ENDPOINT")
-        azure_oai_key = os.getenv("AZURE_OAI_KEY")
-        azure_oai_deployment = os.getenv("AZURE_OAI_DEPLOYMENT")
+        AZURE_OPENAI_ENDPOINT= os.getenv("AZURE_OPENAI_ENDPOINT")
+        AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
+        AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT")
 
         # Initialize the Azure OpenAI client
         client = AzureOpenAI(
-            api_key=azure_oai_key,
+            api_key=AZURE_OPENAI_API_KEY,
             api_version="2024-02-15-preview",
-            base_url=f"{azure_oai_endpoint}/openai/deployments/{azure_oai_deployment}",
+            base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
         )
 
         # Create a chat completion
         response = client.chat.completions.create(
-            model=azure_oai_deployment,
+            model=AZURE_OPENAI_DEPLOYMENT,
             temperature=0.7,
             max_tokens=400,
             messages=[
@@ -112,7 +126,6 @@ class openAIView(APIView):
 
         serializer = QuestionSerializer(questions, many=True)
         return Response({"question_list": serializer.data}, status=status.HTTP_200_OK)
-
 class ProjectsView(APIView):
     # List all the projects
     def get(self, request):
@@ -129,8 +142,30 @@ class ProjectsView(APIView):
             return Response({"message": "Project created successfully", "project": serializer.data}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # Edit an existing project
+    def put(self, request):
 
-    
+        print(request.data)
+        # try:
+        #     project = Project.objects.get(pk=pk)
+        # except Project.DoesNotExist:
+        #     return Response({'error': 'Project not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # serializer = ProjectSerializer(project, data=request.data)
+        # if serializer.is_valid():
+        #     serializer.save()
+        #     return Response({"message": "Project updated successfully", "project": serializer.data}, status=status.HTTP_200_OK)
+        # else:
+        #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # Delete a project
+    def delete(self, request, pk):
+        try:
+            project = Project.objects.get(pk=pk)
+            project.delete()
+            return Response({"message": "Project deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        except Project.DoesNotExist:
+            return Response({'error': 'Project not found'}, status=status.HTTP_404_NOT_FOUND)
 class AnswersView(APIView):
     def post(self, request):
         data = request.data

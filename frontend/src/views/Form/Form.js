@@ -9,7 +9,8 @@ function Form() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const totalSteps = 6;
-  
+  const apiEndpoint = process.env.REACT_APP_API_ENDPOINT
+
   const handleStepChange = (newStep) => {
     setCurrentStep(newStep);
   };
@@ -27,7 +28,7 @@ function Form() {
       console.log("ALL ANSWERS", allAnswers);
 
       const response = await axios.post(
-        "http://localhost:8000/submit-answers/",
+        `${apiEndpoint}/submit-answers/`,
         allAnswers
       );
 
@@ -35,7 +36,7 @@ function Form() {
 
       setIsLoading(true);
       const reportResponse = await axios.get(
-        "http://localhost:8000/generate-report/",
+        `${apiEndpoint}/generate-report/`,
         {
           responseType: "blob",
         }
