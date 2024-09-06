@@ -5,7 +5,7 @@
     "globalHeaders": {
     "content-security-policy": "default-src https: 'unsafe-eval' 'unsafe-inline'; object-src 'none'",
 
-    "Access-Control-Allow-Origin": "http://your-django-backend-url",
+    "Access-Control-Allow-Origin": "http://dduclayan-backend-dme4fxabfcfkg6a9.eastus-01.azurewebsites.net",
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type"
     },
