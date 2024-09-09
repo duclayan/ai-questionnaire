@@ -4,8 +4,19 @@ from .settings import BASE_DIR
 
 
 SECRET_KEY = os.environ['SECRET']
-ALLOWED_HOSTS = [os.environ['WEBSITE_HOSTNAME'], "169.254.131.9:8181"]
-CSRF_TRUSTED_ORIGINS = ['https://' + os.environ['WEBSITE_HOSTNAME']]
+# ALLOWED_HOSTS = [os.environ['WEBSITE_HOSTNAME'], "169.254.131.9:8181"]
+# CSRF_TRUSTED_ORIGINS = ['https://' + os.environ['WEBSITE_HOSTNAME']]
+
+# Determine allowed hosts based on environment variables
+if 'WEBSITE_HOSTNAME' in os.environ or "169.254.131.9:8181" in os.environ:
+    ALLOWED_HOSTS = [os.environ['WEBSITE_HOSTNAME'], "169.254.131.9"]
+else:
+    ALLOWED_HOSTS = ["localhost", "127.0.0.1"]  # Use localhost for local development
+
+# Configure CSRF trusted origins
+CSRF_TRUSTED_ORIGINS = ['https://' + os.environ['WEBSITE_HOSTNAME']] if 'WEBSITE_HOSTNAME' in os.environ else []
+
+
 DEBUG = True
 
 # WhiteNoise configuration
