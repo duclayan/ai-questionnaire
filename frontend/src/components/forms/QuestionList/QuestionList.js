@@ -9,8 +9,8 @@ import { InputLabel, FormControl } from "@mui/material";
 export const QuestionList = ({ currentStep, onAnswersChange })=> {
   const categories = [
     "General Information",
-    "Authentication and Authorization",
-    "Application Architecture",
+    "Authentication Authorization Concept",
+    "Application Design",
     "Cloud Architecture",
     "Report",
   ];
