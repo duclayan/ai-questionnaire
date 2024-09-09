@@ -22,7 +22,46 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 import logging
 logger = logging.getLogger(__name__)
+class MockRequest:
+    def __init__(self, data):
+        self.data = data
 
+class DocumentGenerator:
+    def create_document_response(self, gpt_response):
+        doc = Document()
+
+        doc.add_heading('Report Summary', level=1)  # Main heading
+
+        # Split the GPT response into sections based on new lines
+        sections = gpt_response.strip().split("\n\n")  # Split by double newlines for sections
+
+        for section in sections:
+            if section:  
+                # Ensure the section is not empty
+                # Split the section into lines
+                lines = section.splitlines()
+                if lines:
+                    # The first line is treated as the heading
+                    heading = lines[0].strip()
+                    if heading.startswith("## "):
+                        heading = heading[3:].strip()
+                    # Add the heading to the document
+                    doc.add_heading(heading, level=2)  
+                    
+                    # The rest of the lines are treated as the body text
+                    body = "\n".join(line.strip() for line in lines[1:] if line.strip())
+                    if body:
+                        doc.add_paragraph(body)  # Add the body text below the heading
+
+        # Save the document to a BytesIO object
+        buffer = BytesIO()
+        doc.save(buffer)
+        buffer.seek(0)
+
+        # Create the HTTP response with the document
+        response = HttpResponse(buffer.getvalue(), content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+        response['Content-Disposition'] = 'attachment; filename=report_summary.docx'
+        return response
 class UserView(APIView):
     permission_classes = [AllowAny]
 
@@ -199,26 +238,30 @@ class AnswersView(APIView):
 class GenerateReportView(APIView):
     def get(self, request):
         answers = Answer.objects.select_related('question').order_by('category', 'question__question_id')
-        doc, answers_text = self.create_document_and_text(answers)
-        summary = self.generate_summary(answers_text)
+        # doc, answers_text = self.create_document_and_text(answers)
+        answers_text = self.create_document_and_text(answers)
 
-        return self.create_document_response(summary)
+        gpt_response = self.generate_summary(answers_text)
+        message = gpt_response.data.get("generated_text")
+            # Create an instance of the DocumentGenerator
+        generator = DocumentGenerator()
+        
+        # Simulate the response (in a Django view, you would return this response)
+        response = generator.create_document_response(message)
+        
+        return response
     
     def create_document_and_text(self, answers):
-        doc = Document()
-        doc.add_heading('Report Summary', 0)
         answers_text = ""
         current_category = None
         for answer in answers:
             if answer.category != current_category:
                 answers_text += f"\n{answer.category}\n"
-                doc.add_heading(answer.category, level=1)
                 current_category = answer.category
             q_text = f"• {answer.question.question}: {answer.input_answer}\n"
             answers_text += q_text
-            doc.add_paragraph(f"Q: {answer.question.question}", style='List Bullet')
-            doc.add_paragraph(f"A: {answer.input_answer}")
-        return doc, answers_text.strip()
+           
+        return answers_text
     
     def generate_summary(self, answers_text):
         # Prepare the data for the OpenAIView
@@ -226,89 +269,45 @@ class GenerateReportView(APIView):
             "text": answers_text,
             "prompt_strategy": 
             """
-            Create a report based on the given information, you do not need to rewrite what is already writted but focus on the prompt points that was mentioned. The prompt points, put it as header. General information should also be mentioned only once. This should be very concise:
+            Create a concise report with the following structure:
 
-            Final prompting:
+            ## Management Summary
+            Briefly mention the business function and critical controls.
 
-            Create a report with following structure:
+            ## Introduction
+            Describe the business functions and general aspects.
 
-            Management summary and mention the business function briefly and the most critical controls.
+            ## Authentication/Authorization
+            Describe the authentication/authorization concept.
 
-            Introduction of the business functions and general aspect description.
+            ## Application Architecture
+            Describe the application architecture and recommended controls.
 
-            Describe authentication/authorization concept.
+            ## Cloud Architecture Controls
+            Describe controls for the cloud architecture.
 
-            Describe the application architecture and its recommended controls.
+            ## Architecture Visualization (Backlog)
+            Visualize the architecture.
 
-            Describe controls for cloud architecture.
-
-            Let general information such as application name, confidentiality etc. always be integrated in the following chapters.
-
-            A further chapter for visualization of the architecture (backlog).
-
+            Note: Integrate general information (application name, confidentiality, etc.) throughout the report.
 
             """,
             "question": "Generate a Report summary",
             "sample_answer": ""
         }
 
-        # Make a POST request to the OpenAIView
-        # response = requests.post('http://localhost:8000/', json=data)
+        # Create a mock request with the data
+        mock_request = MockRequest(data)
+
+        # Create an instance of openAIView
+        open_ai_view = openAIView()
+
+        # Call the post method of openAIView with the mock request
+        response = open_ai_view.post(mock_request)
         
-        # if response.status_code == 200:
-        #     print("RESPONSE:", response.json()['generated_text'])
-        #     return response.json()['generated_text']
-        # else:
-        #     return "Failed to generate summary"
-        sample_response = """
-        Management Summary:
-        Teacher Helper – Azure OpenAI LLM is a Cloud-Based AI Application designed to assist teachers in grading and rating student exams efficiently. The most critical controls include robust encryption, access controls, regular integrity checks, and secure storage solutions to ensure confidentiality and integrity.
+        if response.status_code == 200:
+            print("RESPONSE:", response)
 
-        Introduction:
-        Teacher Helper is a confidential application due to the inclusion of pupils' grades, personal information, and exam questions. It aims to simplify the grading process for teachers by providing OCR functionality and an administrative dashboard for configuring grading criteria.
-
-        Authentication and Authorization:
-        The application employs a built-in authentication system where users receive account authentication via their email addresses. It uses a robust password-based authentication policy, requiring passwords to be at least 10 characters long, including capital letters, numbers, and symbols, and to be updated every 3 months. Account creation involves a self-registration process approved by a Principal, ensuring secure account creation and management. Role-based access control (RBAC) manages user roles (admin, principal, teacher) using cookies containing tokens validated with every request.
-
-        Application Architecture:
-        The application uses Python Django as the middle layer, ReactJS for the frontend, Azure SQL Database (MySQL, Postgres, etc.), and Azure Blob Storage for storing scanned files. Recommended controls include secure coding practices, regular security audits, and using HTTPS for data transmission.
-
-        Controls for Cloud Architecture:
-        Given the sensitive nature of the data, controls for the cloud architecture must include robust encryption for data at rest and in transit, access management, regular backups, and compliance with relevant data protection regulations.
-
-        Visualization of the Architecture:
-        A detailed visualization of the application architecture will be provided in the backlog, showcasing the interactions between the frontend, middle layer, and backend storage solutions.
-        """
-        return sample_response
-
-
-    def create_document_response(self, gpt_response):
-        doc = Document()  # Create a new Document instance
-
-        doc.add_heading('Report Summary')
-        # Split the GPT response into sections based on new lines
-        sections = gpt_response.strip().split("\n\n")  # Split by double newlines for sections
-
-        for section in sections:
-            if section:  # Ensure the section is not empty
-                # Split the section into lines
-                lines = section.splitlines()
-                if lines:
-                    # The first line is treated as the heading
-                    heading = lines[0].strip()
-                    doc.add_heading(heading, level=1)  # Add the heading to the document
-                    
-                    # The rest of the lines are treated as the body text
-                    body = "\n".join(line.strip() for line in lines[1:] if line.strip())
-                    if body:
-                        doc.add_paragraph(body)  # Add the body text below the heading
-
-        # Save the document to a BytesIO object
-        buffer = BytesIO()
-        doc.save(buffer)
-        buffer.seek(0)
-
-        # Create the HTTP response with the document
-        response = HttpResponse(buffer.getvalue(), content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-        response['Content-Disposition'] = 'attachment; filename=report_summary.docx'
-        return response
+            return response
+        else:
+            return "Failed to generate summary"
