@@ -6,12 +6,16 @@ import Login from './views/Login/Login';
 import Dashboard from './views/Dashboard/Dashboard';
 import { AuthProvider, useAuth } from './components/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import Navbar from './components/navbar/Navbar';
+import Home from './views/Home/Home';
 function App() {
   return (
     <AuthProvider>
       <Router>
+        <Navbar/>
         <Routes>
           <Route path="/" element={<ProtectedRoute element={<Form />} />} />
+          <Route path="/home" element={<Home/>} />
           <Route path="/login" element={<Login/>} />
           {/* <Route path="/dashboard" element={<Dashboard />} /> */}
           <Route path="/form" element={<ProtectedRoute element={<Form />} />} />
