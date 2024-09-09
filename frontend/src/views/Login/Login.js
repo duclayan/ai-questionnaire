@@ -1,19 +1,25 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../components/AuthContext';
-import { Alert, Box, Button, Container, Snackbar, TextField, Typography } from '@mui/material';
+import { Alert, Button, Container, TextField, Typography } from '@mui/material';
 
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [openSnackbar, setOpenSnackbar] = useState(false);
 
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
 
   const navigate = useNavigate();
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT;
+
+  // Redirect to FormPage once authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/form'); 
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,13 +30,9 @@ function Login() {
       navigate('/form');
     } catch (error) {
       setError('Incorrect username or password');
-      setOpenSnackbar(true);
-      console.error('Login failed:', error);
     }
   };
-  const handleCloseSnackbar = () => {
-    setOpenSnackbar(false);
-  };
+
   return (
     <Container 
       maxWidth="xs" 

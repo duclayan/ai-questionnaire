@@ -6,7 +6,7 @@ const ProtectedRoute = ({ element }) => {
 console.log("Protected Route")
   const { isAuthenticated } = useAuth();
   
-  return isAuthenticated ? element : <Navigate to="/" />;
+  return isAuthenticated ? element : <Navigate to='/login' />;
 };
 
 export default ProtectedRoute;
