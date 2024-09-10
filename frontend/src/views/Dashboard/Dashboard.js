@@ -17,6 +17,7 @@ import {
   IconButton,
 } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
+import { Link, useNavigate  } from 'react-router-dom';
 
 const Dashboard = () => {
   const [projects, setProjects] = useState([]);
@@ -25,11 +26,11 @@ const Dashboard = () => {
   const [editMode, setEditMode] = useState(false);
   const [currentProjectId, setCurrentProjectId] = useState(null);
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT
-
+  const navigate = useNavigate(); 
   const handleOpen = (project = null) => {
     if (project) {
       setNewProject({ name: project.name, owner: project.owner });
-      setCurrentProjectId(project.project_id); // Ensure you're using the correct ID field
+      setCurrentProjectId(project.project_id); 
       setEditMode(true);
     } else {
       setNewProject({ name: '', owner: '' });
@@ -42,43 +43,44 @@ const Dashboard = () => {
   const handleClose = () => setOpen(false);
 
   const handleCreateOrUpdateProject = async () => {
-    const response = await axios.put(`${apiEndpoint}/projects/` , newProject);
-
-    // try {
-    //   if (editMode) {
-    //     // Update existing project
-    //     const response = await axios.put(`http://localhost:8000/projects/`, newProject);
-    //     setProjects(projects.map(project => (project.project_id === currentProjectId ? response.data.project : project)));
-    //   } else {
-    //     // Create new project
-    //     const response = await axios.post('http://localhost:8000/projects/', newProject);
-    //     setProjects([...projects, response.data.project]);
-    //   }
-    //   handleClose();
-    // } catch (error) {
-    //   console.error('Error saving project:', error.response.data);
-    // }
+    try {
+      if (editMode) {
+        // Update existing project
+        const response = await axios.put(`${apiEndpoint}/projects/${currentProjectId}/`, newProject);
+        setProjects(projects.map(project => (project.project_id === currentProjectId ? response.data.project : project)));
+      } else {
+        // Create new project
+        const response = await axios.post(`${apiEndpoint}/projects/`, newProject);
+        setProjects([...projects, response.data.project]);
+        console.log("SUCCESS ACCOUNT", response);
+        // Navigate to the new form after creating a project
+        navigate(`/forms/${response.data.project.project_id}`);
+      }
+      handleClose();
+    } catch (error) {
+      console.error('Error saving project:', error.response.data);
+    }
   };
 
-  const handleDeleteProject = async (id) => {
+  const handleDeleteProject = async (projectId) => {
     try {
-      await axios.delete(`${apiEndpoint}/projects/${id}/`);
-      setProjects(projects.filter(project => project.project_id !== id)); // Ensure you're using the correct ID field
+      await axios.delete(`${apiEndpoint}/projects/${projectId}/`);
+      fetchProjects(); // Refresh the project list
     } catch (error) {
-      console.error('Error deleting project:', error);
+      console.error("Error deleting project:", error);
+    }
+  };
+  
+  const fetchProjects = async () => {
+    try {
+      const response = await axios.get(`${apiEndpoint}/projects`);
+      setProjects(response.data.project_list);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
     }
   };
 
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const response = await axios.get(`${apiEndpoint}/projects`);
-        setProjects(response.data.project_list);
-      } catch (error) {
-        console.error('Error fetching projects:', error);
-      }
-    };
-
     fetchProjects();
   }, []);
 
@@ -98,13 +100,15 @@ const Dashboard = () => {
         <List>
           {projects.map((project) => (
             <ListItem
-              key={project.project_id} // Ensure you're using the correct ID field
+              key={project.project_id} 
               secondaryAction={
                 <>
-                  <IconButton edge="end" aria-label="edit" onClick={() => handleOpen(project)}>
-                    <Edit />
+                  <IconButton edge="end" aria-label="edit">
+                    <Link to={`/forms/${project.project_id}`}>
+                      <Edit />
+                    </Link>
                   </IconButton>
-                  <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteProject(project.project_id)}> {/* Ensure you're using the correct ID field */}
+                  <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteProject(project.project_id)}>
                     <Delete />
                   </IconButton>
                 </>

@@ -1,8 +1,8 @@
 // Form.js
-import React, { useState, useEffect } from "react";
+import React, { useState} from "react";
 import axios from "axios";
 import { StepNavigation, NavigationButtons, CenteredHeading, QuestionList, DocumentLoader } from "../../components/forms";
-
+import { useParams } from 'react-router-dom';
 function Form() {
   const [navbarEnabled, setNavbarEnabled] = useState(true);
   const [allAnswers, setAllAnswers] = useState({});
@@ -10,7 +10,7 @@ function Form() {
   const [isLoading, setIsLoading] = useState(false);
   const totalSteps = 6;
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT
-
+  const { project_id } = useParams();
   const handleStepChange = (newStep) => {
     setCurrentStep(newStep);
   };
@@ -72,8 +72,9 @@ function Form() {
       <QuestionList
         currentStep={currentStep}
         onAnswersChange={handleAnswersChange}
+        projectID={project_id}
       />
-      <DocumentLoader isLoading={isLoading}/>
+      <DocumentLoader isLoading={isLoading} />
       <NavigationButtons
         navbarEnabled={navbarEnabled}
         currentStep={currentStep}

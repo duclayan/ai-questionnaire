@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Button, Typography } from "@mui/material";
-
+import { useNavigate } from 'react-router-dom';
 export const NavigationButtons = ({
   navbarEnabled,
   currentStep,
@@ -10,12 +10,26 @@ export const NavigationButtons = ({
   handleSubmit,
 }) => {
     const isReportStep = currentStep === totalSteps - 1
+    const navigate = useNavigate(); 
+    const handleNewProject = () => {navigate('/dashboard')};
 
     if (!navbarEnabled) {
       return(
-        <Box  sx={{ display: "flex", justifyContent: "center"}}> 
-        Succesfully Downloaded the File
-        </Box>
+        <Box sx={{ display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center" }}>
+        <p>The report is now in your local. In this current version, no editing is possible. Please create a new project.</p>
+        <Button
+          variant="contained"
+          onClick={handleNewProject}
+          sx={{
+            bgcolor: "primary.main",
+            "&:hover": {
+              bgcolor: "primary.dark",
+            },
+          }}
+        >
+          New Project
+        </Button>
+      </Box>
       )
     } else {
       return (

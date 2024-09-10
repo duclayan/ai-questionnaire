@@ -9,8 +9,8 @@ import { InputLabel, FormControl } from "@mui/material";
 export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
   const categories = [
     "General Information",
-    "Authentication Authorization Concept",
-    "Application Design",
+    "Authentication and Authorization",
+    "Application Architecture",
     "Cloud Architecture",
     "Report",
   ];
@@ -28,15 +28,16 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
       await fetchAnswers(); // Fetch answers
       setLoading(false); // End loading
     };
+
     fetchData();
   }, [projectID]); // Depend on categories and projectID
- 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true); // Start loading
       await fetchQuestions(currentCategory); // Fetch questions
       setLoading(false); // End loading
     };
+
     fetchData();
   }, [currentStep, currentCategory, ]); // Depend on categories and projectID
 
