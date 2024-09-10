@@ -28,16 +28,15 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
       await fetchAnswers(); // Fetch answers
       setLoading(false); // End loading
     };
-
     fetchData();
   }, [projectID]); // Depend on categories and projectID
+ 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true); // Start loading
       await fetchQuestions(currentCategory); // Fetch questions
       setLoading(false); // End loading
     };
-
     fetchData();
   }, [currentStep, currentCategory, ]); // Depend on categories and projectID
 
