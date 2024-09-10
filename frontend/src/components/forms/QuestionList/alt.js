@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Grid, TextField, IconButton } from "@mui/material";
+import { Box, Grid, TextField, IconButton, FormControl, InputLabel } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import MicIcon from "@mui/icons-material/Mic";
 import ErrorIcon from "@mui/icons-material/Error";
 import axios from "axios";
-import { InputLabel, FormControl } from "@mui/material";
 
-export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
+export const QuestionList = ({ currentStep, onAnswersChange, projectID }) => {
   const categories = [
     "General Information",
     "Authentication and Authorization",
@@ -18,88 +17,106 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
   const currentCategory = categories[currentStep];
 
   const [questions, setQuestions] = useState([]);
-  const [answers, setAnswers] = useState({});
-  const [loading, setLoading] = useState(true); // Loading state
-  const apiEndpoint = process.env.REACT_APP_API_ENDPOINT
+  const [answers, setAnswers] = useState([]); // Ensure initial state is an array
+  const [loading, setLoading] = useState(true);
+  const [currentQuestionID, setCurrentQuestionID] = useState();
+  const [inputValues, setInputValues] = useState({}); // State to manage input values
+  const apiEndpoint = process.env.REACT_APP_API_ENDPOINT;
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true); // Start loading
-      await fetchAnswers(); // Fetch answers
-      setLoading(false); // End loading
+      setLoading(true);
+      await fetchAnswers();
+      await fetchQuestions(currentCategory);
+      setLoading(false);
     };
 
     fetchData();
-  }, [projectID]); // Depend on categories and projectID
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true); // Start loading
-      await fetchQuestions(currentCategory); // Fetch questions
-      setLoading(false); // End loading
-    };
-
-    fetchData();
-  }, [currentStep, currentCategory, ]); // Depend on categories and projectID
+  }, [projectID, currentCategory]);
 
   useEffect(() => {
-    // Whenever answers change, call the onAnswersChange prop
     onAnswersChange(answers);
   }, [answers, onAnswersChange]);
 
+  useEffect(() => {
+    saveInputValue(currentQuestionID);
+  }, [currentQuestionID]);
   const fetchQuestions = async (category) => {
     try {
       const response = await axios.get(`${apiEndpoint}/questions`, {
         params: { currentCategory: category },
       });
-      const question_list = response.data.question_list;
-      console.log("Question List:", response)
+      const question_list = response.data.question_list; // Adjust based on your API response structure
       setQuestions(question_list);
     } catch (error) {
       console.error("Error fetching questions:", error);
     }
   };
+
   const fetchAnswers = async () => {
     try {
       const response = await axios.get(`${apiEndpoint}/submit-answers`, {
         params: { project_id: projectID },
       });
-      const answer_list = response.data.answer_list;
-      console.log("Answer List:", response)
-      setAnswers(answer_list);
+      const answer_list = response.data.answer_list; // Ensure this is an array
+      setAnswers(Array.isArray(answer_list) ? answer_list : []); // Set answers to an array
 
+      // Initialize inputValues based on fetched answers
+      const initialInputValues = {};
+      answer_list.forEach(answer => {
+        initialInputValues[answer.question] = answer.input_answer; // Map question ID to input answer
+      });
+      setInputValues(initialInputValues);
     } catch (error) {
       console.error('Error fetching answers:', error);
+      setAnswers([]); // Ensure answers is an empty array on error
     }
   };
-  const handleInputChange = (id, value, category, currentStep) => {
-    setAnswers((prevAnswers) => ({
-      ...prevAnswers,
-      [id]: {
-        input_answer: value,
-        question: id,
-        project_id: projectID,
-        category: category
-      },
+  const handleInputChange = (id, value, category) => {
+    // Update the inputValues state when the user types
+    setInputValues((prevInputValues) => ({
+      ...prevInputValues,
+      [id]:value,
     }));
-    console.log("Answer changed", answers)
+    setCurrentQuestionID(id)
+  };
+
+  const saveInputValue = (id) => {
+    console.log("TO CHANGE",  inputValues[id])
+    // Save the input value to answers state
+    setAnswers((prevAnswers) => {
+      const existingAnswer = prevAnswers.find(answer => answer.question === id);
+      if (existingAnswer) {
+        return prevAnswers.map(answer =>
+          answer.question === id
+            ? { ...existingAnswer, input_answer: inputValues[id] }
+            : answer
+        );
+      } else {
+        return [
+          ...prevAnswers,
+          {
+            input_answer: inputValues[id],
+            question: id,
+            project_id: projectID,
+            category: currentCategory
+          },
+        ];
+      }
+    });
   };
 
   const giveSampleAnswer = (currentQuestion) => {
     const id = currentQuestion.question_id;
     const sample_answer = currentQuestion.sample_answer;
-    setAnswers((prevAnswers) => ({
-      ...prevAnswers,
-      [id]: {
-        input_answer: sample_answer,
-        question: id,
-        project_id: projectID,
-        category: currentCategory
-      },
+    setInputValues((prevInputValues) => ({
+      ...prevInputValues,
+      [id]: sample_answer, // Set the sample answer in input values
     }));
   };
 
   const handleAutoCorrect = async (currentQuestion) => {
-    const text = answers[currentQuestion.question_id];
+    const text = inputValues[currentQuestion.question_id] || "";
     const prompt_strategy = currentQuestion.prompt;
     const question = currentQuestion.question;
     const sample_answer = currentQuestion.sample_answer;
@@ -113,14 +130,9 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
       });
 
       const correctedText = response.data.generated_text;
-      setAnswers((prevAnswers) => ({
-        ...prevAnswers,
-        [currentQuestion.question_id]: {
-          input_answer: correctedText,
-          question: currentQuestion.question_id,
-          project_id: projectID,
-          category: currentCategory
-        },
+      setInputValues((prevInputValues) => ({
+        ...prevInputValues,
+        [currentQuestion.question_id]: correctedText, // Update input value with corrected text
       }));
     } catch (error) {
       console.error("Error during auto-correct:", error);
@@ -170,19 +182,13 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
                   id={`multiline-label-${question.question_id}`}
                   fullWidth
                   multiline
-                  value={answers[question.question_id]?.input_answer || ""}
-                  onChange={(e) =>
-                    handleInputChange(
-                      question.question_id,
-                      e.target.value,
-                      question.category,
-                      currentStep
-                    )
-                  }
+                  value={inputValues[question.question_id] || ""} // Use local state for the input value
+                  onChange={(e) => handleInputChange(question.question_id, e.target.value, question.category)} // Update local state on change
                   variant="outlined"
                   InputProps={{
                     endAdornment: (
                       <Box sx={{ display: "flex" }}>
+                        {/* <IconButton onClick={() => saveInputValue(question.question_id, question.category)}> */}
                         <IconButton onClick={() => handleAutoCorrect(question)}>
                           <CheckCircleIcon />
                         </IconButton>
@@ -204,4 +210,4 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
       ))}
     </Box>
   );
-}
+};

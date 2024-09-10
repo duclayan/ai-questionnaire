@@ -17,7 +17,7 @@ function Login() {
   // Redirect to FormPage once authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/form'); 
+      navigate('/dashboard'); 
     }
   }, [isAuthenticated, navigate]);
 
@@ -27,7 +27,7 @@ function Login() {
       const response = await axios.post(`${apiEndpoint}/login/`, { username, password });
       localStorage.setItem('token', response.data.token);
       login()
-      navigate('/form');
+      navigate('/dashboard');
     } catch (error) {
       setError('Incorrect username or password');
     }

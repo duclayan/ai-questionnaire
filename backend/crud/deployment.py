@@ -88,3 +88,5 @@ DATABASES = {
         'PASSWORD': conn_str_params.get('password'),
     }
 }
+
+print("***** THIS IS THE DATABASE", DATABASES)
