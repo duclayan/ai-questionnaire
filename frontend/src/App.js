@@ -19,7 +19,7 @@ function App() {
           <Route path="/login" element={<Login/>} />
           <Route path="/form" element={<ProtectedRoute element={<Form />} />} />
           <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
-          <Route path="/forms/:project_id" element={<Form />} />
+          <Route path="/forms/:project_id" element={<ProtectedRoute element={<Form />} />} />
         </Routes>
       </Router>
     </AuthProvider>

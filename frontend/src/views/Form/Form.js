@@ -74,7 +74,7 @@ function Form() {
         onAnswersChange={handleAnswersChange}
         projectID={project_id}
       />
-      <DocumentLoader isLoading={isLoading} />
+      <DocumentLoader isLoading={isLoading} text={"We are preparing your report"} />      
       <NavigationButtons
         navbarEnabled={navbarEnabled}
         currentStep={currentStep}

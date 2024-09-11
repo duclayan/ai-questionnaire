@@ -3,12 +3,13 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../components/AuthContext';
 import { Alert, Button, Container, TextField, Typography } from '@mui/material';
+import { DocumentLoader } from '../../components/forms';
 
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-
+  const [loading, setLoading] = useState(false);
   const { login, isAuthenticated } = useAuth();
 
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ function Login() {
   }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e) => {
+    setLoading(true)
     e.preventDefault();
     try {
       const response = await axios.post(`${apiEndpoint}/login/`, { username, password });
@@ -31,7 +33,12 @@ function Login() {
     } catch (error) {
       setError('Incorrect username or password');
     }
+    setLoading(false)
   };
+
+  if (loading) {
+    return <DocumentLoader isLoading={loading} text={"Preparing Login"} />; // Show loading screen while fetching data
+  }
 
   return (
     <Container 

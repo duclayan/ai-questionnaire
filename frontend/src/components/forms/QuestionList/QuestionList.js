@@ -5,6 +5,7 @@ import MicIcon from "@mui/icons-material/Mic";
 import ErrorIcon from "@mui/icons-material/Error";
 import axios from "axios";
 import { InputLabel, FormControl } from "@mui/material";
+import { DocumentLoader } from "../DocumentLoader/DocumentLoader";
 
 export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
   const categories = [
@@ -127,7 +128,8 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
   };
 
   if (loading) {
-    return <div>Loading...</div>; // Show loading screen while fetching data
+     // Show loading screen while fetching data
+    return <DocumentLoader isLoading={loading} text={"Preparing the Data"} />;
   }
 
   return (
