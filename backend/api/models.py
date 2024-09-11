@@ -29,10 +29,10 @@ class Question(models.Model):
 
 
 class Answer(models.Model):
-    answer_id = models.CharField(max_length=255, primary_key=True)  # Use IntegerField instead of AutoField    # to unlock when a specific project is connected to a question
+    answer_id = models.CharField(max_length=255, primary_key=True, default="0-0") 
     # project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    question= models.ForeignKey(Question, on_delete=models.CASCADE)
-    project_id = models.ForeignKey(Project, on_delete=models.CASCADE)
+    question= models.ForeignKey(Question, on_delete=models.CASCADE, default=0)
+    project_id = models.ForeignKey(Project, on_delete=models.CASCADE, default=0)
     input_answer = models.TextField()
     # temporary to see the category of each question easily
     # can later be cleaned to have access from questions to confirm category
