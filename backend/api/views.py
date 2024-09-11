@@ -234,64 +234,34 @@ class AnswersView(APIView):
             try:
                 question = Question.objects.get(question_id=question_id)
                 
-                answer_data = {
-                "answer_id": f"{project_id}-{question_id}",
-                "project_id": project_id,
-                "question": question.question_id,
-                "input_answer": text,
-                "category": question.category,
-                }
-                serializer = AnswerSerializer(data=answer_data)
+                # Check if the answer already exists
+                existing_answer = Answer.objects.filter(project_id=project_id, question=question).first()
 
-                if serializer.is_valid():
-                    serializer.save()
-                    answers_created.append(serializer.data)
+                if existing_answer:
+                    # Update the existing answer
+                    existing_answer.input_answer = text
+                    existing_answer.save()
+                    answers_created.append(AnswerSerializer(existing_answer).data)
                 else:
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                    # Create a new answer
+                    answer_data = {
+                        "answer_id": f"{project_id}-{question_id}",
+                        "project_id": project_id,
+                        "question": question.question_id,
+                        "input_answer": text,
+                        "category": question.category,
+                    }
+                    serializer = AnswerSerializer(data=answer_data)
+
+                    if serializer.is_valid():
+                        serializer.save()
+                        answers_created.append(serializer.data)
+                    else:
+                        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             except Question.DoesNotExist:
-                return Response({"error": f"Question with id {question_id} does not exist"}), 
-        
-        return Response({"message": "Answers submitted successfully", "answers": answers_created})
-    # def post(self, request):
-    #     data = request.data
-    #     answers_created = []
-    #     print("DATA COLLECTED:", data)
-    #     for answer in data:
-    #         question_id = answer['question']
-    #         project_id = answer['project_id']
-    #         text = answer['input_answer']
+                return Response({"error": f"Question with id {question_id} does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
-    #         try:
-    #             question = Question.objects.get(question_id=question_id)
-                
-    #             # Check if the answer already exists
-    #             existing_answer = Answer.objects.filter(project_id=project_id, question=question).first()
-
-    #             if existing_answer:
-    #                 # Update the existing answer
-    #                 existing_answer.input_answer = text
-    #                 existing_answer.save()
-    #                 answers_created.append(AnswerSerializer(existing_answer).data)
-    #             else:
-    #                 # Create a new answer
-    #                 answer_data = {
-    #                     "answer_id": f"{project_id}-{question_id}",
-    #                     "project_id": project_id,
-    #                     "question": question.question_id,
-    #                     "input_answer": text,
-    #                     "category": question.category,
-    #                 }
-    #                 serializer = AnswerSerializer(data=answer_data)
-
-    #                 if serializer.is_valid():
-    #                     serializer.save()
-    #                     answers_created.append(serializer.data)
-    #                 else:
-    #                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    #         except Question.DoesNotExist:
-    #             return Response({"error": f"Question with id {question_id} does not exist"}, status=status.HTTP_404_NOT_FOUND)
-
-    #     return Response({"message": "Answers submitted successfully", "answers": answers_created}, status=status.HTTP_201_CREATED)
+        return Response({"message": "Answers submitted successfully", "answers": answers_created}, status=status.HTTP_201_CREATED)
 
 class GenerateReportView(APIView):
     def get(self, request):

@@ -19,33 +19,39 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
   const currentCategory = categories[currentStep];
 
   const [questions, setQuestions] = useState([]);
-  const [answers, setAnswers] = useState({});
+  const [answers, setAnswers] = useState([]);
   const [loading, setLoading] = useState(true); // Loading state
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT
 
+// Fetch answers according to the current project
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true); // Start loading
-      await fetchAnswers(); // Fetch answers
-      setLoading(false); // End loading
+      setLoading(true); 
+      await fetchAnswers();
+      setLoading(false);
     };
     fetchData();
-  }, [projectID]); // Depend on categories and projectID
- 
+    console.log("ANSWERS AFTER IT HAS BEEN FETCHED", answers)
+  }, [projectID]); 
+  useEffect(() => {
+    console.log("Updated answers", answers)
+  }, [answers]); 
+// Fetch Questions on the current category
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true); // Start loading
-      await fetchQuestions(currentCategory); // Fetch questions
-      setLoading(false); // End loading
+      setLoading(true);
+      await fetchQuestions(currentCategory); 
+      setLoading(false);
     };
     fetchData();
-  }, [currentStep, currentCategory, ]); // Depend on categories and projectID
+  }, [currentStep, currentCategory, ]); 
 
+// When the answers change, the answerlist is updated in the main form 
   useEffect(() => {
-    // Whenever answers change, call the onAnswersChange prop
     onAnswersChange(answers);
   }, [answers, onAnswersChange]);
 
+// Functions : FetchQuestion
   const fetchQuestions = async (category) => {
     try {
       const response = await axios.get(`${apiEndpoint}/questions`, {
@@ -58,19 +64,36 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
       console.error("Error fetching questions:", error);
     }
   };
+
   const fetchAnswers = async () => {
     try {
       const response = await axios.get(`${apiEndpoint}/submit-answers`, {
         params: { project_id: projectID },
       });
       const answer_list = response.data.answer_list;
-      console.log("Answer List:", response)
-      setAnswers(answer_list);
-
+      console.log("Answer List:", answer_list)
+      // Initialize inputValues based on fetched answers
+      const initialInputValues = {};
+      answer_list.forEach(answer => {
+        initialInputValues[answer.question] = {
+          input_answer: answer.input_answer,
+          question: answer.question,
+          category: answer.category,
+          project_id: answer.project_id
+        }; // Map question ID to input answer
+      });
+      setAnswers(initialInputValues);
+      console.log("Initial Input Values", initialInputValues)
+      console.log("New answer set", answers)
     } catch (error) {
       console.error('Error fetching answers:', error);
+      setAnswers([]); // Ensure answers is an empty array on error
     }
   };
+
+// Functions involving the input box directly 
+// This includes handling change of input, giving sample answer and gpt autocorrect
+
   const handleInputChange = (id, value, category, currentStep) => {
     setAnswers((prevAnswers) => ({
       ...prevAnswers,
@@ -127,8 +150,8 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
     }
   };
 
+// Show loading screen while fetching data
   if (loading) {
-     // Show loading screen while fetching data
     return <DocumentLoader isLoading={loading} text={"Preparing the Data"} />;
   }
 
