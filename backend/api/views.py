@@ -265,7 +265,9 @@ class AnswersView(APIView):
 
 class GenerateReportView(APIView):
     def get(self, request):
-        answers = Answer.objects.select_related('question').order_by('category', 'question__question_id')
+        project_id = request.query_params.get("project_id")
+        project_answers = Answer.objects.filter(project_id=project_id)
+        answers = project_answers.select_related('question').order_by('category', 'question__question_id')
         # doc, answers_text = self.create_document_and_text(answers)
         answers_text = self.create_document_and_text(answers)
 
@@ -286,7 +288,7 @@ class GenerateReportView(APIView):
             if answer.category != current_category:
                 answers_text += f"\n{answer.category}\n"
                 current_category = answer.category
-            q_text = f"• {answer.question.question}: {answer.input_answer}\n"
+            q_text = f"• {answer.question}: {answer.input_answer}\n"
             answers_text += q_text
            
         return answers_text
@@ -298,7 +300,7 @@ class GenerateReportView(APIView):
             "prompt_strategy": 
             """
             Create a concise report with the following structure:
-
+            Name of the Application : [insert name here]
             ## Management Summary
             Briefly mention the business function and critical controls.
 

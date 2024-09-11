@@ -33,15 +33,17 @@ function Form() {
       );
 
       console.log("Answers submitted successfully:", response.data);
-
+      console.log("Project_id", project_id)
       setIsLoading(true);
       const reportResponse = await axios.get(
         `${apiEndpoint}/generate-report/`,
         {
+          params: { project_id: project_id },
           responseType: "blob",
         }
       );
       setIsLoading(false);
+      console.log("Success with project_id", project_id)
 
       const url = window.URL.createObjectURL(new Blob([reportResponse.data]));
       const link = document.createElement("a");
