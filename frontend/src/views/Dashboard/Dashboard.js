@@ -18,6 +18,7 @@ import {
 } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
 import { Link, useNavigate  } from 'react-router-dom';
+import { DocumentLoader } from '../../components/forms';
 
 const Dashboard = () => {
   const [projects, setProjects] = useState([]);
@@ -25,6 +26,8 @@ const Dashboard = () => {
   const [newProject, setNewProject] = useState({ name: '', owner: '' });
   const [editMode, setEditMode] = useState(false);
   const [currentProjectId, setCurrentProjectId] = useState(null);
+  const [loading, setLoading] = useState(false);
+
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT
   const navigate = useNavigate(); 
   const handleOpen = (project = null) => {
@@ -81,9 +84,15 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
+    setLoading(true)
     fetchProjects();
+    setLoading(false)
   }, []);
 
+  if (loading) {
+    // Show loading screen while fetching data
+   return <DocumentLoader isLoading={loading} text={"Preparing the Data"} />;
+ }
   return (
     <>
       <AppBar position="static">
