@@ -3,11 +3,15 @@ import React, { useState} from "react";
 import axios from "axios";
 import { StepNavigation, NavigationButtons, CenteredHeading, QuestionList, DocumentLoader } from "../../components/forms";
 import { useParams } from 'react-router-dom';
+import { AutoCorrectSettings } from "../../components/forms/AutoCorrectSettings/AutoCorrectSettings";
 function Form() {
   const [navbarEnabled, setNavbarEnabled] = useState(true);
   const [allAnswers, setAllAnswers] = useState({});
   const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState("English");
+  const [autoCorrectEnabled, setAutoCorrectEnabled] = useState(true);
+
   const totalSteps = 6;
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT
   const { project_id } = useParams();
@@ -25,25 +29,21 @@ function Form() {
 
   const handleSubmit = async () => {
     try {
-      console.log("ALL ANSWERS", allAnswers);
-
       const response = await axios.post(
         `${apiEndpoint}/submit-answers/`,
         allAnswers
       );
 
-      console.log("Answers submitted successfully:", response.data);
-      console.log("Project_id", project_id)
+
       setIsLoading(true);
       const reportResponse = await axios.get(
         `${apiEndpoint}/generate-report/`,
         {
-          params: { project_id: project_id },
+          params: { language: selectedLanguage, project_id: project_id },
           responseType: "blob",
         }
       );
       setIsLoading(false);
-      console.log("Success with project_id", project_id)
 
       const url = window.URL.createObjectURL(new Blob([reportResponse.data]));
       const link = document.createElement("a");
@@ -64,8 +64,22 @@ function Form() {
     setAllAnswers(answers);
   };
 
+  const handleLanguageChange = (language) => {
+    setSelectedLanguage(language);
+  };
+
+  const handleAutoCorrectToggle = () => {
+    setAutoCorrectEnabled((prev) => !prev);
+  };
+
   return (
     <div>
+      <AutoCorrectSettings
+       autoCorrectEnabled={autoCorrectEnabled}
+       handleAutoCorrectToggle={handleAutoCorrectToggle}
+       language = {selectedLanguage}
+       handleLanguageChange={handleLanguageChange}/>
+
       <StepNavigation
         currentStep={currentStep}
         handleStepChange={handleStepChange}
@@ -75,6 +89,8 @@ function Form() {
         currentStep={currentStep}
         onAnswersChange={handleAnswersChange}
         projectID={project_id}
+        language={selectedLanguage}
+        autoCorrectEnabled={autoCorrectEnabled}
       />
       <DocumentLoader isLoading={isLoading} text={"We are preparing your report"} />      
       <NavigationButtons

@@ -110,6 +110,7 @@ class openAIView(APIView):
     def post(self, request):
         # Get user input
         data = request.data.get("text")
+        language = request.data.get("language")
         prompt = request.data.get("prompt_strategy")
         question = request.data.get("question")
         sample = request.data.get("sample_answer")
@@ -146,6 +147,8 @@ class openAIView(APIView):
                     Return only the answer and no explanation for the user is required. 
                     Do not return follow up questions.
                     The text format does not include bold/itallic/underline.
+
+                    Translate the whole text to {language}
                      """,
                 }
             ],
@@ -262,16 +265,16 @@ class AnswersView(APIView):
                 return Response({"error": f"Question with id {question_id} does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
         return Response({"message": "Answers submitted successfully", "answers": answers_created}, status=status.HTTP_201_CREATED)
-
 class GenerateReportView(APIView):
     def get(self, request):
+        language = request.query_params.get("language")
         project_id = request.query_params.get("project_id")
         project_answers = Answer.objects.filter(project_id=project_id)
         answers = project_answers.select_related('question').order_by('category', 'question__question_id')
         # doc, answers_text = self.create_document_and_text(answers)
         answers_text = self.create_document_and_text(answers)
 
-        gpt_response = self.generate_summary(answers_text)
+        gpt_response = self.generate_summary(answers_text, language)
         message = gpt_response.data.get("generated_text")
             # Create an instance of the DocumentGenerator
         generator = DocumentGenerator()
@@ -293,10 +296,11 @@ class GenerateReportView(APIView):
            
         return answers_text
     
-    def generate_summary(self, answers_text):
+    def generate_summary(self, answers_text, language):
         # Prepare the data for the OpenAIView
         data = {
             "text": answers_text,
+            "language": language,
             "prompt_strategy": 
             """
             Create a concise report with the following structure:

@@ -7,7 +7,7 @@ import axios from "axios";
 import { InputLabel, FormControl } from "@mui/material";
 import { DocumentLoader } from "../DocumentLoader/DocumentLoader";
 
-export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
+export const QuestionList = ({ currentStep, onAnswersChange, projectID, language, autoCorrectEnabled  })=> {
   const categories = [
     "General Information",
     "Authentication and Authorization",
@@ -22,6 +22,7 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
   const [answers, setAnswers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [questionBeingCorrected, setQuestionBeingCorrected] = useState(null)
+  const [idleTimers, setIdleTimers] = useState({});
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT
 
 // Fetch answers according to the current project
@@ -46,6 +47,7 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
 // When the answers change, the answerlist is updated in the main form 
   useEffect(() => {
     onAnswersChange(answers);
+    console.log("Updated Answers", answers)
   }, [answers]);
 
 // Functions : FetchQuestion
@@ -88,6 +90,25 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
 
 // Functions involving the input box directly 
 // This includes handling change of input, giving sample answer and gpt autocorrect
+  const handleInputChangeWithIdle = (questionId, value) => {
+    console.log("Handle Input Change with Idle")
+    const question = questions.find(q => q.question_id === questionId);
+    handleInputChange(questionId, value,question.category);
+    
+    // Clear previous timer if exists
+    if (idleTimers[questionId]) {
+      clearTimeout(idleTimers[questionId]);
+    }
+
+    // Set a new timer for auto-correction
+    if (autoCorrectEnabled) {
+      const timer = setTimeout(() => {
+        handleAutoCorrect(question);
+      }, 3000); // 10 seconds idle
+
+      setIdleTimers((prev) => ({ ...prev, [questionId]: timer }));
+    }
+  };
 
   const handleInputChange = (id, value, category, currentStep) => {
     setAnswers((prevAnswers) => ({
@@ -116,6 +137,7 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
   };
 
   const handleAutoCorrect = async (currentQuestion) => {
+    console.log("AUTO CORRECT")
     const text = answers[currentQuestion.question_id];
     const prompt_strategy = currentQuestion.prompt;
     const question = currentQuestion.question;
@@ -123,6 +145,7 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
     setQuestionBeingCorrected(currentQuestion.question_id)
     try {
       const response = await axios.post(`${apiEndpoint}/`, {
+        language,
         text,
         prompt_strategy,
         question,
@@ -191,12 +214,7 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
                   multiline
                   value={answers[question.question_id]?.input_answer || ""}
                   onChange={(e) =>
-                    handleInputChange(
-                      question.question_id,
-                      e.target.value,
-                      question.category,
-                      currentStep
-                    )
+                    handleInputChangeWithIdle(question.question_id, e.target.value)
                   }
                   variant="outlined"
                   InputProps={{
