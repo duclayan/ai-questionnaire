@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Grid, TextField, IconButton } from "@mui/material";
+import { Box, Grid, TextField, IconButton, CircularProgress } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import MicIcon from "@mui/icons-material/Mic";
 import ErrorIcon from "@mui/icons-material/Error";
@@ -21,6 +21,7 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState([]);
   const [loading, setLoading] = useState(true); // Loading state
+  const [questionBeingCorrected, setQuestionBeingCorrected] = useState(null)
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT
 
 // Fetch answers according to the current project
@@ -31,11 +32,10 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
       setLoading(false);
     };
     fetchData();
-    console.log("ANSWERS AFTER IT HAS BEEN FETCHED", answers)
   }, [projectID]); 
   useEffect(() => {
-    console.log("Updated answers", answers)
   }, [answers]); 
+
 // Fetch Questions on the current category
   useEffect(() => {
     const fetchData = async () => {
@@ -58,7 +58,6 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
         params: { currentCategory: category },
       });
       const question_list = response.data.question_list;
-      console.log("Question List:", response)
       setQuestions(question_list);
     } catch (error) {
       console.error("Error fetching questions:", error);
@@ -71,7 +70,6 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
         params: { project_id: projectID },
       });
       const answer_list = response.data.answer_list;
-      console.log("Answer List:", answer_list)
       // Initialize inputValues based on fetched answers
       const initialInputValues = {};
       answer_list.forEach(answer => {
@@ -83,8 +81,6 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
         }; // Map question ID to input answer
       });
       setAnswers(initialInputValues);
-      console.log("Initial Input Values", initialInputValues)
-      console.log("New answer set", answers)
     } catch (error) {
       console.error('Error fetching answers:', error);
       setAnswers([]); // Ensure answers is an empty array on error
@@ -104,7 +100,6 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
         category: category
       },
     }));
-    console.log("Answer changed", answers)
   };
 
   const giveSampleAnswer = (currentQuestion) => {
@@ -126,7 +121,7 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
     const prompt_strategy = currentQuestion.prompt;
     const question = currentQuestion.question;
     const sample_answer = currentQuestion.sample_answer;
-
+    setQuestionBeingCorrected(currentQuestion.question_id)
     try {
       const response = await axios.post(`${apiEndpoint}/`, {
         text,
@@ -148,6 +143,7 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
     } catch (error) {
       console.error("Error during auto-correct:", error);
     }
+    setQuestionBeingCorrected(null)
   };
 
 // Show loading screen while fetching data
@@ -216,7 +212,11 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
                         <IconButton onClick={() => giveSampleAnswer(question)}>
                           <ErrorIcon />
                         </IconButton>
+                        {questionBeingCorrected === question.question_id && (
+                          <CircularProgress size={20} sx={{ marginLeft: 1 }} />
+                        )}
                       </Box>
+                       
                     ),
                   }}
                   sx={{ mt: 1 }}
