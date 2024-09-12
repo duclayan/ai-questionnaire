@@ -8,26 +8,42 @@ import { AuthProvider } from './components/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/navbar/Navbar';
 import Home from './views/Home/Home';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 function App() {
+
+  const theme = createTheme({
+    palette: {
+      primary: {
+        main: '#00695c', // Set your custom primary color here
+      },
+      secondary: {
+        main: '#ff4081', // Optional: Set a custom secondary color
+      },
+    },
+  });
+
   return (
-    <AuthProvider>
-      <Router>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<ProtectedRoute element={<Dashboard />} />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/form" element={<ProtectedRoute element={<Form />} />} />
-          <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
-          <Route path="/forms/:project_id" element={<ProtectedRoute element={<Form />} />} />
-          
-          {/* Redirect all unmatched routes to the dashboard */}
-          <Route path="*" element={<Navigate to="/dashboard" />} />
-        </Routes>
-      </Router>
-    </AuthProvider>
-  );
+    <ThemeProvider theme={theme}>
+      <AuthProvider>
+        <Router>
+          <Navbar/>
+          <Routes>
+            <Route path="/" element={<ProtectedRoute element={<Dashboard />} />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/login" element={<Home />} />
+            <Route path="/form" element={<ProtectedRoute element={<Form />} />} />
+            <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
+            <Route path="/forms/:project_id" element={<ProtectedRoute element={<Form />} />} />
+            
+            {/* Redirect all unmatched routes to the dashboard */}
+            <Route path="*" element={<Navigate to="/dashboard" />} />
+          </Routes>
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
+  )
+  ;
 }
 
 export default App;

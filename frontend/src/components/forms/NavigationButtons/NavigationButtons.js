@@ -20,13 +20,7 @@ export const NavigationButtons = ({
         <Button
           variant="contained"
           onClick={handleNewProject}
-          sx={{
-            bgcolor: "primary.main",
-            "&:hover": {
-              bgcolor: "primary.dark",
-            },
-          }}
-        >
+          >
           New Project
         </Button>
       </Box>
@@ -38,13 +32,6 @@ export const NavigationButtons = ({
             variant="contained"
             onClick={handlePrevious}
             disabled={currentStep === 0 || isReportStep}
-            sx={{
-              bgcolor: currentStep === 0 || isReportStep ? "gray" : "primary.main",
-              "&:hover": {
-                bgcolor:
-                  currentStep === 0 || isReportStep ? "gray" : "primary.dark",
-              },
-            }}
           >
             Previous
           </Button>
@@ -52,13 +39,7 @@ export const NavigationButtons = ({
             <Button
               variant="contained"
               onClick={handleNext}
-              sx={{
-                bgcolor: "primary.main",
-                "&:hover": {
-                  bgcolor: "primary.dark",
-                },
-              }}
-            >
+              >
               Next
             </Button>
           )}
@@ -66,12 +47,6 @@ export const NavigationButtons = ({
             <Button
               variant="contained"
               onClick={handleSubmit}
-              sx={{
-                bgcolor: "primary.main",
-                "&:hover": {
-                  bgcolor: "primary.dark",
-                },
-              }}
             >
               Submit
             </Button>

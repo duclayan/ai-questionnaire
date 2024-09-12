@@ -73,13 +73,13 @@ function Form() {
   };
 
   return (
-    <div>
+    <div class="app-container">
       <AutoCorrectSettings
        autoCorrectEnabled={autoCorrectEnabled}
        handleAutoCorrectToggle={handleAutoCorrectToggle}
        language = {selectedLanguage}
-       handleLanguageChange={handleLanguageChange}/>
-
+       handleLanguageChange={handleLanguageChange}
+       />
       <StepNavigation
         currentStep={currentStep}
         handleStepChange={handleStepChange}

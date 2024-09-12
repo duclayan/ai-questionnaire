@@ -2,7 +2,6 @@ import React from "react";
 import { Tabs, Tab, Box } from "@mui/material";
 
 export const StepNavigation = ({ currentStep, handleStepChange }) =>  {
-  // Further extension of this code could be that the steps can be customizable by the users
   const steps = [
     "General Information",
     "Authentication Authorization Concept",
@@ -12,7 +11,7 @@ export const StepNavigation = ({ currentStep, handleStepChange }) =>  {
   ];
 
   return (
-    <Box sx={{ width: "100%", bgcolor: "background.paper" }}>
+    <Box class="app-container" sx={{ width: "100%"}}>
       <Tabs
         value={currentStep}
         onChange={(event, newValue) => handleStepChange(newValue)}

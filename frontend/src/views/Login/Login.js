@@ -43,7 +43,7 @@ function Login() {
   return (
     <Container 
       maxWidth="xs" 
-      style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}
+      style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
     >
       <form onSubmit={handleSubmit} style={{ width: '100%' }}>
         <Typography variant="h4" align="center" gutterBottom>

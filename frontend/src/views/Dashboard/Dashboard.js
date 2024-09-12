@@ -11,15 +11,16 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  List,
-  ListItem,
-  ListItemText,
   IconButton,
+  Card,
+  CardContent,
+  CardActions,
+  Box,
 } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
 import { Link, useNavigate  } from 'react-router-dom';
 import { DocumentLoader } from '../../components/forms';
-
+import './styles.css'; 
 const Dashboard = () => {
   const [projects, setProjects] = useState([]);
   const [open, setOpen] = useState(false);
@@ -55,7 +56,6 @@ const Dashboard = () => {
         // Create new project
         const response = await axios.post(`${apiEndpoint}/projects/`, newProject);
         setProjects([...projects, response.data.project]);
-        console.log("SUCCESS ACCOUNT", response);
         // Navigate to the new form after creating a project
         navigate(`/forms/${response.data.project.project_id}`);
       }
@@ -94,40 +94,36 @@ const Dashboard = () => {
    return <DocumentLoader isLoading={loading} text={"Preparing the Data"} />;
  }
   return (
-    <>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1, textAlign: 'center' }}>
-            Dashboard
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Container maxWidth="md" sx={{ mt: 4 }}>
+  <div className="app-container" >
+    <Container maxWidth="md" sx={{ mt: 4 }}>
         <Button variant="contained" onClick={() => handleOpen()} sx={{ mb: 2 }}>
           Create Project
         </Button>
-        <List>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {projects.map((project) => (
-            <ListItem
-              key={project.project_id} 
-              secondaryAction={
-                <>
-                  <IconButton edge="end" aria-label="edit">
-                    <Link to={`/forms/${project.project_id}`}>
+            <Card key={project.project_id} variant="outlined" className="card">
+              <CardContent sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Box sx={{ flexGrow: 1 }}>
+                  <Typography variant="h6" className="card-title">
+                    {project.name}
+                  </Typography>
+                  <Typography className="card-owner">Owner: {project.owner}</Typography>
+                </Box>
+                <CardActions>
+                  <IconButton aria-label="edit">
+                    <Link to={`/forms/${project.project_id}`} >
                       <Edit />
                     </Link>
                   </IconButton>
-                  <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteProject(project.project_id)}>
+                  <IconButton aria-label="delete" sx={{ color: '#00695c' }} onClick={() => handleDeleteProject(project.project_id)}>
                     <Delete />
                   </IconButton>
-                </>
-              }
-            >
-              <ListItemText primary={project.name} secondary={`Owner: ${project.owner}`} />
-            </ListItem>
+                </CardActions>
+              </CardContent>
+            </Card>
           ))}
-        </List>
-      </Container>
+        </Box>      
+    </Container>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>{editMode ? 'Edit Project' : 'Create New Project'}</DialogTitle>
         <DialogContent>
@@ -154,7 +150,7 @@ const Dashboard = () => {
           <Button onClick={handleCreateOrUpdateProject}>{editMode ? 'Update' : 'Create'}</Button>
         </DialogActions>
       </Dialog>
-    </>
+    </div>
   );
 };
 

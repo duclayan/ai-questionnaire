@@ -1,6 +1,10 @@
 import React from 'react';
-import { Box, Typography, TextField, Button, Grid, Container, Card, CardContent, useTheme } from '@mui/material';
-import HeroImage from '../assets/hero-image.jpg'; // Import your hero image
+import { Box, Typography, TextField, Button, Grid, Container, Card, CardContent, useTheme, IconButton } from '@mui/material';
+import HeroImage from '../assets/hero-image.png'; // Import your hero image
+import Login from '../Login/Login';
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import MicIcon from "@mui/icons-material/Mic";
+import ErrorIcon from "@mui/icons-material/Error";
 
 const Home = () => {
   const theme = useTheme();
@@ -35,59 +39,20 @@ const Home = () => {
                 padding: theme.spacing(4),
               }}
             >
-              {/* <Typography variant="h4" align="center" gutterBottom>
-                We help you with the creation of your reports
-              </Typography> */}
-              <Typography variant="h4" gutterBottom>
-                Log In
-              </Typography>
-              <TextField
-                label="Username"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                InputProps={{
-                  style: {
-                    borderRadius: theme.spacing(1),
-                  },
-                }}
-              />
-              <TextField
-                label="Password"
-                type="password"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                InputProps={{
-                  style: {
-                    borderRadius: theme.spacing(1),
-                  },
-                }}
-              />
-              <Button
-                variant="contained"
-                color="primary"
-                fullWidth
-                sx={{
-                  borderRadius: theme.spacing(1),
-                  padding: theme.spacing(1.5),
-                }}
-              >
-                Log In
-              </Button>
+              <Login/>
               <Typography variant="h5" gutterBottom sx={{ mt: 4 }}>
                 Some few legends:
               </Typography>
               <Box display="flex" alignItems="center" mb={2}>
-                <Box mr={2}>🔍</Box>
+              <IconButton> <CheckCircleIcon /> </IconButton>
                 <Typography>You can auto correct your text</Typography>
               </Box>
               <Box display="flex" alignItems="center" mb={2}>
-                <Box mr={2}>🎤</Box>
+                <IconButton> <MicIcon/> </IconButton>
                 <Typography>Speech to text</Typography>
               </Box>
               <Box display="flex" alignItems="center" mb={2}>
-                <Box mr={2}>📝</Box>
+                <IconButton> <ErrorIcon/> </IconButton>
                 <Typography>Sample Answer</Typography>
               </Box>
             </Card>
