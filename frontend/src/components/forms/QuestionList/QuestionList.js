@@ -20,7 +20,7 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
 
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState([]);
-  const [loading, setLoading] = useState(true); // Loading state
+  const [loading, setLoading] = useState(true);
   const [questionBeingCorrected, setQuestionBeingCorrected] = useState(null)
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT
 
@@ -33,10 +33,7 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
     };
     fetchData();
   }, [projectID]); 
-  useEffect(() => {
-  }, [answers]); 
 
-// Fetch Questions on the current category
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -44,17 +41,18 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
       setLoading(false);
     };
     fetchData();
-  }, [currentStep, currentCategory, ]); 
+  }, [currentStep]); 
 
 // When the answers change, the answerlist is updated in the main form 
   useEffect(() => {
     onAnswersChange(answers);
-  }, [answers, onAnswersChange]);
+  }, [answers]);
 
 // Functions : FetchQuestion
   const fetchQuestions = async (category) => {
     try {
-      const response = await axios.get(`${apiEndpoint}/questions`, {
+      const response = await axios.get(
+        `${apiEndpoint}/questions`, {
         params: { currentCategory: category },
       });
       const question_list = response.data.question_list;
@@ -66,11 +64,12 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
 
   const fetchAnswers = async () => {
     try {
-      const response = await axios.get(`${apiEndpoint}/submit-answers`, {
+      const response = await axios.get(
+        `${apiEndpoint}/submit-answers`, {
         params: { project_id: projectID },
       });
       const answer_list = response.data.answer_list;
-      // Initialize inputValues based on fetched answers
+      // Temporary holder for the anwers
       const initialInputValues = {};
       answer_list.forEach(answer => {
         initialInputValues[answer.question] = {
@@ -78,7 +77,7 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
           question: answer.question,
           category: answer.category,
           project_id: answer.project_id
-        }; // Map question ID to input answer
+        }; 
       });
       setAnswers(initialInputValues);
     } catch (error) {
