@@ -1,13 +1,27 @@
 import React, { useEffect, useState } from "react";
-import { Box, Grid, TextField, IconButton, CircularProgress } from "@mui/material";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import MicIcon from "@mui/icons-material/Mic";
-import ErrorIcon from "@mui/icons-material/Error";
+import { Box } from "@mui/material";
 import axios from "axios";
-import { InputLabel, FormControl } from "@mui/material";
 import { DocumentLoader } from "../DocumentLoader/DocumentLoader";
+import { NavigationButtons } from "../NavigationButtons/NavigationButtons";
+import { AutoCorrectSettings } from "../AutoCorrectSettings/AutoCorrectSettings";
+import { InputField } from "../InputField/InputField";
 
-export const QuestionList = ({ currentStep, onAnswersChange, projectID, language, autoCorrectEnabled  })=> {
+export const QuestionList = ({
+  currentStep,
+  onAnswersChange,
+  projectID,
+  language,
+  autoCorrectEnabled,
+  navbarEnabled,
+  setNavbarEnabled,
+  totalSteps,
+  handlePrevious,
+  handleNext,
+  handleSubmit,
+  handleAutoCorrectToggle,
+  selectedLanguage,
+  handleLanguageChange
+}) => {
   const categories = [
     "General Information",
     "Authentication and Authorization",
@@ -25,32 +39,32 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID, language
   const [idleTimers, setIdleTimers] = useState({});
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT
 
-// Fetch answers according to the current project
+  // Fetch answers according to the current project
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true); 
+      setLoading(true);
       await fetchAnswers();
       setLoading(false);
     };
     fetchData();
-  }, [projectID]); 
+  }, [projectID]);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      await fetchQuestions(currentCategory); 
+      await fetchQuestions(currentCategory);
       setLoading(false);
     };
     fetchData();
-  }, [currentStep]); 
+  }, [currentStep]);
 
-// When the answers change, the answerlist is updated in the main form 
+  // When the answers change, the answerlist is updated in the main form 
   useEffect(() => {
     onAnswersChange(answers);
     console.log("Updated Answers", answers)
   }, [answers]);
 
-// Functions : FetchQuestion
+  // Functions : FetchQuestion
   const fetchQuestions = async (category) => {
     try {
       const response = await axios.get(
@@ -79,7 +93,7 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID, language
           question: answer.question,
           category: answer.category,
           project_id: answer.project_id
-        }; 
+        };
       });
       setAnswers(initialInputValues);
     } catch (error) {
@@ -88,13 +102,13 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID, language
     }
   };
 
-// Functions involving the input box directly 
-// This includes handling change of input, giving sample answer and gpt autocorrect
+  // Functions involving the input box directly 
+  // This includes handling change of input, giving sample answer and gpt autocorrect
   const handleInputChangeWithIdle = (questionId, value) => {
     console.log("Handle Input Change with Idle")
     const question = questions.find(q => q.question_id === questionId);
-    handleInputChange(questionId, value,question.category);
-    
+    handleInputChange(questionId, value, question.category);
+
     // Clear previous timer if exists
     if (idleTimers[questionId]) {
       clearTimeout(idleTimers[questionId]);
@@ -104,7 +118,7 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID, language
     if (autoCorrectEnabled) {
       const timer = setTimeout(() => {
         handleAutoCorrect(question);
-      }, 3000); // 10 seconds idle
+      }, 3000);
 
       setIdleTimers((prev) => ({ ...prev, [questionId]: timer }));
     }
@@ -137,7 +151,6 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID, language
   };
 
   const handleAutoCorrect = async (currentQuestion) => {
-    console.log("AUTO CORRECT")
     const text = answers[currentQuestion.question_id];
     const prompt_strategy = currentQuestion.prompt;
     const question = currentQuestion.question;
@@ -168,7 +181,6 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID, language
     setQuestionBeingCorrected(null)
   };
 
-// Show loading screen while fetching data
   if (loading) {
     return <DocumentLoader isLoading={loading} text={"Preparing the Data"} />;
   }
@@ -176,73 +188,32 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID, language
   return (
     <Box sx={{ mt: 4 }}>
       {questions.map((question) => (
-        <Box
-          key={question.question_id}
-          sx={{
-            mb: 4,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "left",
-            width: "100%",
-            paddingTop: "1.5rem",
-            maxWidth: "100rem",
-            margin: "0 auto",
-          }}
-        >
-          <Grid
-            container
-            spacing={1}
-            justifyContent="center"
-            alignItems="center"
-          >
-            <Grid item xs={12} md={8}>
-              <FormControl fullWidth variant="outlined">
-                <InputLabel
-                  htmlFor={`multiline-label-${question.question_id}`}
-                  sx={{
-                    whiteSpace: "break-spaces",
-                    position: "relative",
-                    transform: "none",
-                    marginBottom: 1,
-                  }}
-                >
-                  {question.question}
-                </InputLabel>
-                <TextField
-                  id={`multiline-label-${question.question_id}`}
-                  fullWidth
-                  multiline
-                  value={answers[question.question_id]?.input_answer || ""}
-                  onChange={(e) =>
-                    handleInputChangeWithIdle(question.question_id, e.target.value)
-                  }
-                  variant="outlined"
-                  InputProps={{
-                    endAdornment: (
-                      <Box sx={{ display: "flex" }}>
-                        <IconButton onClick={() => handleAutoCorrect(question)}>
-                          <CheckCircleIcon />
-                        </IconButton>
-                        <IconButton>
-                          <MicIcon />
-                        </IconButton>
-                        <IconButton onClick={() => giveSampleAnswer(question)}>
-                          <ErrorIcon />
-                        </IconButton>
-                        {questionBeingCorrected === question.question_id && (
-                          <CircularProgress size={20} sx={{ marginLeft: 1 }} />
-                        )}
-                      </Box>
-                       
-                    ),
-                  }}
-                  sx={{ mt: 1 }}
-                />
-              </FormControl>
-            </Grid>
-          </Grid>
-        </Box>
+        <InputField
+          question={question}
+          answers={answers}
+          handleInputChangeWithIdle={handleInputChangeWithIdle}
+          handleAutoCorrect={handleAutoCorrect}
+          giveSampleAnswer={giveSampleAnswer}
+          questionBeingCorrected={questionBeingCorrected} />
       ))}
+      <NavigationButtons
+        navbarEnabled={navbarEnabled}
+        setNavbarEnabled={setNavbarEnabled}
+        currentStep={currentStep}
+        totalSteps={totalSteps}
+        handlePrevious={handlePrevious}
+        handleNext={handleNext}
+        handleSubmit={handleSubmit}
+      />
+      {currentStep < totalSteps - 2 && (
+        <AutoCorrectSettings
+          autoCorrectEnabled={autoCorrectEnabled}
+          handleAutoCorrectToggle={handleAutoCorrectToggle}
+          language={selectedLanguage}
+          handleLanguageChange={handleLanguageChange}
+        />
+
+      )}
     </Box>
   );
 }

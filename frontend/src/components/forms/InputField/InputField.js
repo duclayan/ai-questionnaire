@@ -1,18 +1,88 @@
 // src/components/forms/InputField/InputField.js
 import React from "react";
 import "./InputField.css";
+import { Box, CircularProgress, FormControl, Grid, IconButton, InputLabel, TextField } from "@mui/material";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import MicIcon from "@mui/icons-material/Mic";
+import ErrorIcon from "@mui/icons-material/Error";
 
-export const InputField = ({ label, type = "text", value, onChange, placeholder }) => {
+export const InputField = ({ 
+  question,
+  answers,
+  handleInputChangeWithIdle,
+  handleAutoCorrect,
+  giveSampleAnswer,
+  questionBeingCorrected,
+
+ }) => {
+  
   return (
-    <div className="input-field">
-      {label && <label>{label}</label>}
-      <input
-        type={type}
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        className="input"
-      />
-    </div>
+    <Box
+    key={question.question_id}
+    sx={{
+      mb: 4,
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "left",
+      width: "100%",
+      paddingTop: "1.5rem",
+      maxWidth: "100rem",
+      margin: "0 auto",
+    }}
+  >
+    <Grid
+      container
+      spacing={1}
+      justifyContent="center"
+      alignItems="center"
+    >
+      <Grid item xs={12} md={8}>
+        <FormControl fullWidth variant="outlined">
+          <InputLabel
+            htmlFor={`multiline-label-${question.question_id}`}
+            sx={{
+              whiteSpace: "break-spaces",
+              position: "relative",
+              transform: "none",
+              marginBottom: 1,
+            }}
+          >
+            {question.question}
+          </InputLabel>
+          <TextField
+            id={`multiline-label-${question.question_id}`}
+            fullWidth
+            multiline
+            value={answers[question.question_id]?.input_answer || ""}
+            onChange={(e) =>
+              handleInputChangeWithIdle(question.question_id, e.target.value)
+            }
+            variant="outlined"
+            InputProps={{
+              endAdornment: (
+                <Box sx={{ display: "flex" }}>
+                  
+                  <IconButton onClick={() => handleAutoCorrect(question)}>
+                    <CheckCircleIcon />
+                  </IconButton>
+                  <IconButton>
+                    <MicIcon />
+                  </IconButton>
+                  <IconButton onClick={() => giveSampleAnswer(question)}>
+                    <ErrorIcon />
+                  </IconButton>
+                  {questionBeingCorrected === question.question_id && (
+                    <CircularProgress size={20} sx={{ marginLeft: 1 }} />
+                  )}
+                </Box>
+                 
+              ),
+            }}
+            sx={{ mt: 1 }}
+          />
+        </FormControl>
+      </Grid>
+    </Grid>
+  </Box>
   );
 };

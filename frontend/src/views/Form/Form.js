@@ -1,9 +1,8 @@
 // Form.js
-import React, { useState} from "react";
+import React, { useState } from "react";
 import axios from "axios";
-import { StepNavigation, NavigationButtons, CenteredHeading, QuestionList, DocumentLoader } from "../../components/forms";
+import { StepNavigation, CenteredHeading, QuestionList, DocumentLoader } from "../../components/forms";
 import { useParams } from 'react-router-dom';
-import { AutoCorrectSettings } from "../../components/forms/AutoCorrectSettings/AutoCorrectSettings";
 function Form() {
   const [navbarEnabled, setNavbarEnabled] = useState(true);
   const [allAnswers, setAllAnswers] = useState({});
@@ -29,17 +28,21 @@ function Form() {
 
   const handleSubmit = async () => {
     try {
+      // Submit all the answers
       const response = await axios.post(
         `${apiEndpoint}/submit-answers/`,
         allAnswers
       );
 
-
+      // Generate Report
       setIsLoading(true);
       const reportResponse = await axios.get(
         `${apiEndpoint}/generate-report/`,
         {
-          params: { language: selectedLanguage, project_id: project_id },
+          params: {
+            language: selectedLanguage,
+            project_id: project_id
+          },
           responseType: "blob",
         }
       );
@@ -74,12 +77,6 @@ function Form() {
 
   return (
     <div class="app-container">
-      <AutoCorrectSettings
-       autoCorrectEnabled={autoCorrectEnabled}
-       handleAutoCorrectToggle={handleAutoCorrectToggle}
-       language = {selectedLanguage}
-       handleLanguageChange={handleLanguageChange}
-       />
       <StepNavigation
         currentStep={currentStep}
         handleStepChange={handleStepChange}
@@ -91,16 +88,16 @@ function Form() {
         projectID={project_id}
         language={selectedLanguage}
         autoCorrectEnabled={autoCorrectEnabled}
-      />
-      <DocumentLoader isLoading={isLoading} text={"We are preparing your report"} />      
-      <NavigationButtons
         navbarEnabled={navbarEnabled}
-        currentStep={currentStep}
+        setNavbarEnabled={setNavbarEnabled}
         totalSteps={totalSteps}
         handlePrevious={handlePrevious}
         handleNext={handleNext}
         handleSubmit={handleSubmit}
+        handleAutoCorrectToggle={handleAutoCorrectToggle}
+        handleLanguageChange={handleLanguageChange}
       />
+      <DocumentLoader isLoading={isLoading} text={"We are preparing your report"} />
     </div>
   );
 }
