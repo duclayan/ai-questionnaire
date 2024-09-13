@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, TextField, Button, Grid, Container, Card, CardContent, useTheme, IconButton } from '@mui/material';
+import { Box, Typography, Grid, Container, Card, useTheme, IconButton } from '@mui/material';
 import HeroImage from '../assets/hero-image.png'; // Import your hero image
 import Login from '../Login/Login';
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -15,7 +15,7 @@ const Home = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        height: '100vh',
+        minHeight: '100vh',
         animation: 'fadeIn 0.5s ease-in-out',
         '@keyframes fadeIn': {
           '0%': {
@@ -25,10 +25,11 @@ const Home = () => {
             opacity: 1,
           },
         },
+        padding: theme.spacing(2),
       }}
     >
       {/* Main Section */}
-      <Container maxWidth="lg">
+      <Container maxWidth="lg" sx={{ mt: 2 }}>
         <Grid container spacing={4}>
           {/* Left Side: Login and Legends */}
           <Grid item xs={12} md={6}>
@@ -39,20 +40,20 @@ const Home = () => {
                 padding: theme.spacing(4),
               }}
             >
-              <Login/>
+              <Login />
               <Typography variant="h5" gutterBottom sx={{ mt: 4 }}>
                 Some few legends:
               </Typography>
               <Box display="flex" alignItems="center" mb={2}>
-              <IconButton> <CheckCircleIcon /> </IconButton>
+                <IconButton> <CheckCircleIcon /> </IconButton>
                 <Typography>You can auto correct your text</Typography>
               </Box>
               <Box display="flex" alignItems="center" mb={2}>
-                <IconButton> <MicIcon/> </IconButton>
+                <IconButton> <MicIcon /> </IconButton>
                 <Typography>Speech to text</Typography>
               </Box>
               <Box display="flex" alignItems="center" mb={2}>
-                <IconButton> <ErrorIcon/> </IconButton>
+                <IconButton> <ErrorIcon /> </IconButton>
                 <Typography>Sample Answer</Typography>
               </Box>
             </Card>
@@ -70,6 +71,7 @@ const Home = () => {
                 objectFit: 'cover',
                 borderRadius: theme.spacing(2),
                 boxShadow: `0 0 ${theme.spacing(2)} rgba(0, 0, 0, 0.1)`,
+                display: { xs: 'none', md: 'block' }, // Hide on extra-small screens
               }}
             />
           </Grid>
