@@ -6,7 +6,7 @@ from .settings import BASE_DIR
 SECRET_KEY = os.environ['SECRET']
 
 # Determine allowed hosts based on environment variables
-if 'WEBSITE_HOSTNAME' in os.environ or "169.254.131.9:8181" in os.environ:
+if 'WEBSITE_HOSTNAME' in os.environ or "169.254.131.9:8181" in os.environ or "cyberai.sbs" in os.environ:
     ALLOWED_HOSTS = [os.environ['WEBSITE_HOSTNAME'], "169.254.131.9", 'cyberai.sbs' ]
 else:
     ALLOWED_HOSTS = ["localhost", "127.0.0.1"]  # Use localhost for local development
