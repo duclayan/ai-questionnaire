@@ -68,7 +68,7 @@ export const QuestionList = ({
   const fetchQuestions = async (category) => {
     try {
       const response = await axios.get(
-        `${apiEndpoint}/questions`, {
+        `${apiEndpoint}/api/questions`, {
         params: { currentCategory: category },
       });
       const question_list = response.data.question_list;
@@ -81,7 +81,7 @@ export const QuestionList = ({
   const fetchAnswers = async () => {
     try {
       const response = await axios.get(
-        `${apiEndpoint}/submit-answers`, {
+        `${apiEndpoint}/api/submit-answers`, {
         params: { project_id: projectID },
       });
       const answer_list = response.data.answer_list;
@@ -157,7 +157,7 @@ export const QuestionList = ({
     const sample_answer = currentQuestion.sample_answer;
     setQuestionBeingCorrected(currentQuestion.question_id)
     try {
-      const response = await axios.post(`${apiEndpoint}/`, {
+      const response = await axios.post(`${apiEndpoint}/api/`, {
         language,
         text,
         prompt_strategy,

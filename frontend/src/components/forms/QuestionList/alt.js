@@ -43,7 +43,7 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID }) => {
   }, [currentQuestionID]);
   const fetchQuestions = async (category) => {
     try {
-      const response = await axios.get(`${apiEndpoint}/questions`, {
+      const response = await axios.get(`${apiEndpoint}/api/questions`, {
         params: { currentCategory: category },
       });
       const question_list = response.data.question_list; // Adjust based on your API response structure
@@ -55,7 +55,7 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID }) => {
 
   const fetchAnswers = async () => {
     try {
-      const response = await axios.get(`${apiEndpoint}/submit-answers`, {
+      const response = await axios.get(`${apiEndpoint}/api/submit-answers`, {
         params: { project_id: projectID },
       });
       const answer_list = response.data.answer_list; // Ensure this is an array
@@ -122,7 +122,7 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID }) => {
     const sample_answer = currentQuestion.sample_answer;
 
     try {
-      const response = await axios.post(`${apiEndpoint}/`, {
+      const response = await axios.post(`${apiEndpoint}/api/`, {
         text,
         prompt_strategy,
         question,

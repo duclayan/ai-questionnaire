@@ -30,14 +30,14 @@ function Form() {
     try {
       // Submit all the answers
       const response = await axios.post(
-        `${apiEndpoint}/submit-answers/`,
+        `${apiEndpoint}/api/submit-answers/`,
         allAnswers
       );
 
       // Generate Report
       setIsLoading(true);
       const reportResponse = await axios.get(
-        `${apiEndpoint}/generate-report/`,
+        `${apiEndpoint}/api/generate-report/`,
         {
           params: {
             language: selectedLanguage,

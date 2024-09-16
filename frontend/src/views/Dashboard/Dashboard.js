@@ -50,11 +50,11 @@ const Dashboard = () => {
     try {
       if (editMode) {
         // Update existing project
-        const response = await axios.put(`${apiEndpoint}/projects/${currentProjectId}/`, newProject);
+        const response = await axios.put(`${apiEndpoint}/api/projects/${currentProjectId}/`, newProject);
         setProjects(projects.map(project => (project.project_id === currentProjectId ? response.data.project : project)));
       } else {
         // Create new project
-        const response = await axios.post(`${apiEndpoint}/projects/`, newProject);
+        const response = await axios.post(`${apiEndpoint}/api/projects/`, newProject);
         setProjects([...projects, response.data.project]);
         // Navigate to the new form after creating a project
         navigate(`/forms/${response.data.project.project_id}`);
@@ -67,7 +67,7 @@ const Dashboard = () => {
 
   const handleDeleteProject = async (projectId) => {
     try {
-      await axios.delete(`${apiEndpoint}/projects/${projectId}/`);
+      await axios.delete(`${apiEndpoint}/api/projects/${projectId}/`);
       fetchProjects(); // Refresh the project list
     } catch (error) {
       console.error("Error deleting project:", error);
@@ -76,7 +76,7 @@ const Dashboard = () => {
   
   const fetchProjects = async () => {
     try {
-      const response = await axios.get(`${apiEndpoint}/projects`);
+      const response = await axios.get(`${apiEndpoint}/api/projects`);
       setProjects(response.data.project_list);
     } catch (error) {
       console.error('Error fetching projects:', error);

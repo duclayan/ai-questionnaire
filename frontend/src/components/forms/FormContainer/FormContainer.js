@@ -16,7 +16,7 @@ export const FormContainer = () => {
     const fetchQuestions = async () => {
       try {
         const response = await axios.get(
-          `${apiEndpoint}/questions/`
+          `${apiEndpoint}/api/questions/`
         );
         setQuestions(response.data);
       } catch (error) {
@@ -40,7 +40,7 @@ export const FormContainer = () => {
 
   const handleAutoCorrect = async (inputText) => {
     try {
-      const response = await axios.post(`${apiEndpoint}/`, {
+      const response = await axios.post(`${apiEndpoint}/api`, {
         inputText,
       });
       const correctedText = response.data.generated_text;
@@ -54,7 +54,7 @@ export const FormContainer = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.post(`${apiEndpoint}/submit/`, {
+      const response = await axios.post(`${apiEndpoint}/api/submit/`, {
         text,
       });
       setSummary(response.data.summary);
