@@ -39,7 +39,7 @@ jobs:
           cd backend
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip uninstall django-simple-captcha
+          pip uninstall django-simple-captcha --noinput 
           pip install django-simple-captcha
       - name: Run deployment script
         env:
