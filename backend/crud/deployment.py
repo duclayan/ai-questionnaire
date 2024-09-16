@@ -5,11 +5,15 @@ from .settings import BASE_DIR
 
 SECRET_KEY = os.environ['SECRET']
 
-# Determine allowed hosts based on environment variables
-if 'WEBSITE_HOSTNAME' in os.environ or "169.254.131.9:8181" in os.environ or "cyberai.sbs" in os.environ:
-    ALLOWED_HOSTS = [os.environ['WEBSITE_HOSTNAME'], "169.254.131.9", 'cyberai.sbs' ]
-else:
-    ALLOWED_HOSTS = ["localhost", "127.0.0.1"]  # Use localhost for local development
+allowed_hosts = [
+    os.environ.get('WEBSITE_HOSTNAME'),
+    "169.254.131.9",
+    'cyberai.sbs',
+    'admx.cyberai.sbs'
+]
+
+# Filter out None values and set ALLOWED_HOSTS accordingly
+ALLOWED_HOSTS = [host for host in allowed_hosts if host] if any(host for host in allowed_hosts) else ["localhost", "127.0.0.1"]
 
 # Configure CSRF trusted origins
 CSRF_TRUSTED_ORIGINS = ['https://' + os.environ['WEBSITE_HOSTNAME']] if 'WEBSITE_HOSTNAME' in os.environ else []
