@@ -52,7 +52,7 @@ INSTALLED_APPS = [
 # ]
 CORS_ALLOW_ALL_ORIGINS = True
 # CORS_ORIGIN_ALLOW_ALL = True
-
+ALLOWED_HOSTS = ['admx.cyberai.sbs', 'cyberai.sbs']
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
