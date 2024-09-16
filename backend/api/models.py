@@ -1,5 +1,5 @@
 from django.db import models
-
+from captcha.models import CaptchaStore as BaseCaptchaStore
 
 class Project(models.Model):
     project_id = models.AutoField(primary_key=True)
@@ -17,6 +17,9 @@ class TestModel(models.Model):
     def __str__(self):
         return self.name
 
+class CaptchaStore(BaseCaptchaStore):
+    class Meta:
+        app_label = 'api'
 class Question(models.Model):
     question_id = models.AutoField(primary_key=True)
     category = models.CharField(max_length=100, default="General Information")
