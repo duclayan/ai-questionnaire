@@ -4,12 +4,10 @@ from .settings import BASE_DIR
 
 
 SECRET_KEY = os.environ['SECRET']
-# ALLOWED_HOSTS = [os.environ['WEBSITE_HOSTNAME'], "169.254.131.9:8181"]
-# CSRF_TRUSTED_ORIGINS = ['https://' + os.environ['WEBSITE_HOSTNAME']]
 
 # Determine allowed hosts based on environment variables
 if 'WEBSITE_HOSTNAME' in os.environ or "169.254.131.9:8181" in os.environ:
-    ALLOWED_HOSTS = [os.environ['WEBSITE_HOSTNAME'], "169.254.131.9"]
+    ALLOWED_HOSTS = [os.environ['WEBSITE_HOSTNAME'], "169.254.131.9", 'cyberai.sbs' ]
 else:
     ALLOWED_HOSTS = ["localhost", "127.0.0.1"]  # Use localhost for local development
 
@@ -52,7 +50,6 @@ INSTALLED_APPS = [
 # ]
 CORS_ALLOW_ALL_ORIGINS = True
 # CORS_ORIGIN_ALLOW_ALL = True
-ALLOWED_HOSTS = ['admx.cyberai.sbs', 'cyberai.sbs']
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
