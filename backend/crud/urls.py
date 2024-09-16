@@ -7,6 +7,6 @@ admin.site.site_header = "Blanco GPT Administration"
 admin.site.index_title = "Welcome to Blanco GPT Admin"
 
 urlpatterns = [  # This is the correct variable name
-    path("/", admin.site.urls),  # Admin path
+    path("", admin.site.urls),  # Admin path
     path("api/", include('api.urls')),  # Root path for ReactView
 ]
