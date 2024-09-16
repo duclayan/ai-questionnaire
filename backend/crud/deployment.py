@@ -16,8 +16,10 @@ allowed_hosts = [
 ALLOWED_HOSTS = [host for host in allowed_hosts if host] if any(host for host in allowed_hosts) else ["localhost", "127.0.0.1"]
 
 # Configure CSRF trusted origins
-CSRF_TRUSTED_ORIGINS = ['https://' + os.environ['WEBSITE_HOSTNAME']] if 'WEBSITE_HOSTNAME' in os.environ else []
+CSRF_TRUSTED_ORIGINS = ['https://admx.cyberai.sbs']
 
+if 'WEBSITE_HOSTNAME' in os.environ:
+    CSRF_TRUSTED_ORIGINS.append('https://' + os.environ['WEBSITE_HOSTNAME'])
 
 DEBUG = True
 
