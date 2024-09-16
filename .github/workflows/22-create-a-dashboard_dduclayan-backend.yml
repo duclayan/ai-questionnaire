@@ -41,7 +41,7 @@ jobs:
           pip install -r requirements.txt
           pip uninstall -y django-simple-captcha
           pip install django-simple-captcha
-            - name: Run deployment script
+      - name: Run deployment script
         env:
           # AZURE_WEBAPP_NAME: ${{ secrets.AZURE_WEBAPP_NAME }}
           SECRET: ${{ secrets.SECRET }}
