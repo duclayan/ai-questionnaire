@@ -30,7 +30,7 @@ SECRET_KEY = "django-insecure-1@rqrs8dt_ptyd@2sn_y(-vpef0u0risop95j*_2p^y&)bt6iz
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['admx.cyberai.sbs', 'cyberai.sbs']
+ALLOWED_HOSTS = []
 
 
 # Application definition
