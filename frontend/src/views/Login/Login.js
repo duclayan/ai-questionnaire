@@ -55,7 +55,7 @@ function Login() {
     }
 
     try {
-      const response = await axios.post(`${apiEndpoint}/login/`, { username, password });
+      const response = await axios.post(`${apiEndpoint}/api/login/`, { username, password });
       localStorage.setItem('token', response.data.token);
       login();
       setAttempts(0); // Reset attempts on successful login
