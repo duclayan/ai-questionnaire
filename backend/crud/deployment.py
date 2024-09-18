@@ -3,7 +3,7 @@ from .settings import *
 from .settings import BASE_DIR
 from datetime import timedelta
 
-SECRET_KEY = os.environ['SECRET',"5HihHVOFCc"]
+SECRET_KEY = os.environ['SECRET_KEY',]
 
 allowed_hosts = [
     os.environ.get('WEBSITE_HOSTNAME'),
