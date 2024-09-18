@@ -28,29 +28,19 @@ function Form() {
 
   const handleSubmit = async () => {
     try {
-      // Submit all the answers
-      const response = await axios.post(
-        `${apiEndpoint}/api/submit-answers/`,
-        allAnswers,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        },
-      );
-
       // Generate Report
       setIsLoading(true);
       const reportResponse = await axios.get(
         `${apiEndpoint}/api/generate-report/`,
         {
-          headers: { Authorization: `Bearer ${token}` }
-        },
-        {
+          headers: { Authorization: `Bearer ${token}` },
           params: {
             language: selectedLanguage,
             project_id: project_id
           },
           responseType: "blob",
-        }
+        },
+
       );
       setIsLoading(false);
 
@@ -69,9 +59,20 @@ function Form() {
     setNavbarEnabled(false);
   };
 
-  const handleAnswersChange = (answers) => {
-    setAllAnswers(answers);
-  };
+  const handleAnswersChange = async (answers) => {
+    try {
+      const response = await axios.post(
+        `${apiEndpoint}/api/submit-answers/`,
+        answers,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        },
+      );
+      setAllAnswers(answers);
+    } catch (error) {
+      console.error("Error submitting answers:", error.response ? error.response.data : error.message);
+    }
+  }
 
   const handleLanguageChange = (language) => {
     setSelectedLanguage(language);
