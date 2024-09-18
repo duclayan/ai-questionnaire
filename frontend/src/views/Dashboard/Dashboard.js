@@ -120,7 +120,7 @@ const Dashboard = () => {
                   <Typography variant="h6" className="card-title">
                     {project.name}
                   </Typography>
-                  <Typography className="card-owner">Owner: {project.owner}</Typography>
+                  <Typography className="card-owner">Owner: {project.owner_name}</Typography>
                 </Box>
                 <CardActions>
                   <IconButton aria-label="edit">
@@ -148,14 +148,6 @@ const Dashboard = () => {
             variant="standard"
             value={newProject.name}
             onChange={(e) => setNewProject({ ...newProject, name: e.target.value })}
-          />
-          <TextField
-            margin="dense"
-            label="Project Owner"
-            fullWidth
-            variant="standard"
-            value={newProject.owner}
-            onChange={(e) => setNewProject({ ...newProject, owner: e.target.value })}
           />
         </DialogContent>
         <DialogActions>

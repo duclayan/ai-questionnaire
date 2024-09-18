@@ -186,14 +186,24 @@ class ProjectsView(APIView):
 
     # List all the projects
     def get(self, request):
-        projects = Project.objects.all()
-        serializer = ProjectSerializer(projects, many=True)
-        return Response({"project_list": serializer.data}, status=status.HTTP_200_OK)
+        print("Request User:", request.user)
+        try:
+            projects = Project.objects.filter(owner=request.user.id)
+            serializer = ProjectSerializer(projects, many=True)
+            return Response({"project_list": serializer.data}, status=status.HTTP_200_OK)
+        except Project.DoesNotExist:
+            return Response({'error': 'Project not found'}, status=status.HTTP_404_NOT_FOUND)
     
     # Create a New Project
     def post(self, request):
-        serializer = ProjectSerializer(data=request.data)
-        print("Serializer:", serializer)
+        # Create a copy of request.data and add the current user
+        print("USERNAME", request.user)
+        data = request.data.copy()  # Make a mutable copy of request.data
+        data['owner'] = request.user.id  # Add the current user's ID
+        data['owner_name'] = request.user.username
+        
+        serializer = ProjectSerializer(data=data)  # Pass modified data to serializer
+
         if serializer.is_valid():
             serializer.save()
             return Response({"message": "Project created successfully", "project": serializer.data}, status=status.HTTP_201_CREATED)
