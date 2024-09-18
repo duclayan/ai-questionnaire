@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
-  AppBar,
-  Toolbar,
   Typography,
   Button,
   Container,
@@ -30,6 +28,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false);
 
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT
+  const token = localStorage.getItem('token');
   const navigate = useNavigate(); 
   const handleOpen = (project = null) => {
     if (project) {
@@ -50,11 +49,19 @@ const Dashboard = () => {
     try {
       if (editMode) {
         // Update existing project
-        const response = await axios.put(`${apiEndpoint}/api/projects/${currentProjectId}/`, newProject);
+        const response = await axios.put(`${apiEndpoint}/api/projects/${currentProjectId}/`, 
+          newProject,
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          });
         setProjects(projects.map(project => (project.project_id === currentProjectId ? response.data.project : project)));
       } else {
         // Create new project
-        const response = await axios.post(`${apiEndpoint}/api/projects/`, newProject);
+        const response = await axios.post(`${apiEndpoint}/api/projects/`, 
+          newProject,
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          });
         setProjects([...projects, response.data.project]);
         // Navigate to the new form after creating a project
         navigate(`/forms/${response.data.project.project_id}`);
@@ -67,7 +74,10 @@ const Dashboard = () => {
 
   const handleDeleteProject = async (projectId) => {
     try {
-      await axios.delete(`${apiEndpoint}/api/projects/${projectId}/`);
+      await axios.delete(`${apiEndpoint}/api/projects/${projectId}/`,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        });
       fetchProjects(); // Refresh the project list
     } catch (error) {
       console.error("Error deleting project:", error);
@@ -76,7 +86,10 @@ const Dashboard = () => {
   
   const fetchProjects = async () => {
     try {
-      const response = await axios.get(`${apiEndpoint}/api/projects`);
+      const response = await axios.get(`${apiEndpoint}/api/projects`, 
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        });
       setProjects(response.data.project_list);
     } catch (error) {
       console.error('Error fetching projects:', error);

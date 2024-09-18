@@ -55,8 +55,9 @@ function Login() {
     }
 
     try {
-      const response = await axios.post(`${apiEndpoint}/api/login/`, { username, password });
-      localStorage.setItem('token', response.data.token);
+      const response = await axios.post(`${apiEndpoint}/api/token/`, { username, password });
+      localStorage.setItem('token', response.data.access);
+      console.log('local storage:', localStorage, response)
       login();
       setAttempts(0); // Reset attempts on successful login
       setLockoutTime(null); // Clear lockout time
