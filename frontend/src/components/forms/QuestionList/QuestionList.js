@@ -31,6 +31,7 @@ export const QuestionList = ({
   ];
 
   const currentCategory = categories[currentStep];
+  const token = localStorage.getItem('token');
 
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState([]);
@@ -68,10 +69,14 @@ export const QuestionList = ({
   const fetchQuestions = async (category) => {
     try {
       const response = await axios.get(
-        `${apiEndpoint}/api/questions`, {
-        params: { currentCategory: category },
-      });
+        `${apiEndpoint}/api/questions`,        
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { currentCategory: category },
+        },
+      );
       const question_list = response.data.question_list;
+      console.log("FETCH QUESTIONS RESPONSE", response)
       setQuestions(question_list);
     } catch (error) {
       console.error("Error fetching questions:", error);
@@ -81,9 +86,11 @@ export const QuestionList = ({
   const fetchAnswers = async () => {
     try {
       const response = await axios.get(
-        `${apiEndpoint}/api/submit-answers`, {
-        params: { project_id: projectID },
-      });
+        `${apiEndpoint}/api/submit-answers`, 
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { project_id: projectID }
+        });
       const answer_list = response.data.answer_list;
       // Temporary holder for the anwers
       const initialInputValues = {};
@@ -157,13 +164,18 @@ export const QuestionList = ({
     const sample_answer = currentQuestion.sample_answer;
     setQuestionBeingCorrected(currentQuestion.question_id)
     try {
-      const response = await axios.post(`${apiEndpoint}/api/`, {
-        language,
-        text,
-        prompt_strategy,
-        question,
-        sample_answer,
-      });
+      const response = await axios.post(`${apiEndpoint}/api/`, 
+        {
+          language,
+          text,
+          prompt_strategy,
+          question,
+          sample_answer,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+      }
+        );
 
       const correctedText = response.data.generated_text;
       setAnswers((prevAnswers) => ({

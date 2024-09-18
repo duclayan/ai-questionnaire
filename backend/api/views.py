@@ -20,6 +20,10 @@ from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
+
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
 import logging
 logger = logging.getLogger(__name__)
 class MockRequest:
@@ -95,6 +99,8 @@ class UserView(APIView):
             return Response({'error': 'Invalid credentials'}, status=401)
 
 class QuestionListView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         current_category = request.query_params.get("currentCategory")
         if current_category and current_category != "Report":
@@ -111,6 +117,8 @@ class QuestionListView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 class openAIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         # Get user input
         data = request.data.get("text")
@@ -173,6 +181,9 @@ class openAIView(APIView):
         serializer = QuestionSerializer(questions, many=True)
         return Response({"question_list": serializer.data}, status=status.HTTP_200_OK)
 class ProjectsView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     # List all the projects
     def get(self, request):
         projects = Project.objects.all()
@@ -192,17 +203,6 @@ class ProjectsView(APIView):
     def put(self, request):
 
         print(request.data)
-        # try:
-        #     project = Project.objects.get(pk=pk)
-        # except Project.DoesNotExist:
-        #     return Response({'error': 'Project not found'}, status=status.HTTP_404_NOT_FOUND)
-
-        # serializer = ProjectSerializer(project, data=request.data)
-        # if serializer.is_valid():
-        #     serializer.save()
-        #     return Response({"message": "Project updated successfully", "project": serializer.data}, status=status.HTTP_200_OK)
-        # else:
-        #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # Delete a project
     def delete(self, request, pk):
@@ -215,6 +215,8 @@ class ProjectsView(APIView):
         except Project.DoesNotExist:
             return Response({'error': 'Project not found'}, status=status.HTTP_404_NOT_FOUND)
 class AnswersView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         id = request.query_params.get("project_id")

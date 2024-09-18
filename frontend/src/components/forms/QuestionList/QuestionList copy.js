@@ -106,6 +106,7 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID })=> {
 
     try {
       const response = await axios.post(`${apiEndpoint}/api/`, {
+        headers: { Authorization: `Bearer ${token}` },
         text,
         prompt_strategy,
         question,

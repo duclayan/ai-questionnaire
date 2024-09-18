@@ -10,7 +10,7 @@ function Form() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("English");
   const [autoCorrectEnabled, setAutoCorrectEnabled] = useState(true);
-
+  const token = localStorage.getItem('token');
   const totalSteps = 6;
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT
   const { project_id } = useParams();
@@ -31,13 +31,19 @@ function Form() {
       // Submit all the answers
       const response = await axios.post(
         `${apiEndpoint}/api/submit-answers/`,
-        allAnswers
+        allAnswers,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        },
       );
 
       // Generate Report
       setIsLoading(true);
       const reportResponse = await axios.get(
         `${apiEndpoint}/api/generate-report/`,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        },
         {
           params: {
             language: selectedLanguage,

@@ -10,13 +10,18 @@ export const FormContainer = () => {
   const [text, setText] = useState("");
   const [summary, setSummary] = useState("");
   const [idleTimeout, setIdleTimeout] = useState(null);
+  const token = localStorage.getItem('token');
 
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT;
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
         const response = await axios.get(
-          `${apiEndpoint}/api/questions/`
+          `${apiEndpoint}/api/questions/`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+          
         );
         setQuestions(response.data);
       } catch (error) {
@@ -42,6 +47,7 @@ export const FormContainer = () => {
     try {
       const response = await axios.post(`${apiEndpoint}/api`, {
         inputText,
+          headers: { Authorization: `Bearer ${token}` },
       });
       const correctedText = response.data.generated_text;
       console.log(response);
@@ -54,9 +60,13 @@ export const FormContainer = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.post(`${apiEndpoint}/api/submit/`, {
-        text,
-      });
+      const response = await axios.post(
+          `${apiEndpoint}/api/submit/`, 
+          { text }, // This is the data being sent
+          {
+              headers: { Authorization: `Bearer ${token}` } // Headers should be in the third argument
+          }
+      );
       setSummary(response.data.summary);
       console.log(response);
     } catch (error) {

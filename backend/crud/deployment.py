@@ -1,9 +1,10 @@
 import os 
 from .settings import *
 from .settings import BASE_DIR
+from datetime import timedelta
 
-
-SECRET_KEY = os.environ['SECRET']
+# SECRET_KEY = os.environ['SECRET_KEY']
+SECRET_KEY = "5HihHVOFCc"
 
 allowed_hosts = [
     os.environ.get('WEBSITE_HOSTNAME'),
@@ -41,6 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.auth",
     "rest_framework",
     "rest_framework.authtoken",
+    "rest_framework_simplejwt",
     "corsheaders",
     "api",
     "captcha",
@@ -50,6 +52,23 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+    'SLIDING_TOKEN_LIFETIME': timedelta(days=30),
+    'SLIDING_TOKEN_REFRESH_LIFETIME_LATE_USER': timedelta(days=1),
+    'SLIDING_TOKEN_LIFETIME_LATE_USER': timedelta(days=30),
+}
 
 # CORS_ALLOWED_ORIGINS = [
 #     "https://dduclayan-frontend-egacbucchbcgfhd8.eastus-01.azurewebsites.net",

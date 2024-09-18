@@ -1,0 +1,18 @@
+{% extends "rest_framework/base.html" %}
+
+{% block bootstrap_navbar_variant %}{% endblock %}  {# This removes the navbar #}
+
+{% block branding %}{% endblock %}  {# This removes branding links #}
+
+{% block breadcrumbs %}{% endblock %}  {# This removes breadcrumb links #}
+{% block title %}
+    Blanco GPT - API Calls {# Change this to your desired title #}
+{% endblock %} 
+{% block body %}
+<!-- {{ content|safe }}  {# Display the main content without navbar #} -->
+
+    <!-- <div class="container">
+        <h1> Hello </h1>
+        {{ content|safe }}  {# Display the main content without navbar #}
+    </div> -->
+{% endblock %}
