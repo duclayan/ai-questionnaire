@@ -14,6 +14,7 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [attempts, setAttempts] = useState(0);
   const [lockoutTime, setLockoutTime] = useState(null);
+  const [isIncorrect , setIsIncorrect] = useState(false);
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT;
@@ -26,7 +27,8 @@ function Login() {
 
   useEffect(() => {
     loadCaptchaEnginge(6); // Load captcha with 6 characters
-  }, []);
+    setIsIncorrect(false)
+  }, [isIncorrect]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -63,6 +65,8 @@ function Login() {
       navigate('/dashboard');
     } catch (error) {
       setError('Incorrect username or password');
+      setAttempts(prev => prev + 1);
+      setIsIncorrect(true)
     }
     setLoading(false);
   };
