@@ -84,23 +84,31 @@ function Login() {
           </Alert>
         )}
 
-        <TextField
-          label="Username"
-          variant="outlined"
-          fullWidth
-          margin="normal"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <TextField
-          label="Password"
-          type="password"
-          variant="outlined"
-          fullWidth
-          margin="normal"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+<TextField
+        label="Username"
+        variant="outlined"
+        fullWidth
+        margin="normal"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        InputLabelProps={{
+          shrink: true,
+        }}
+        autoComplete="username" 
+      />
+      <TextField
+        label="Password"
+        type="password"
+        variant="outlined"
+        fullWidth
+        margin="normal"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        InputLabelProps={{
+          shrink: true, 
+        }}
+        autoComplete="current-password"
+      />
 
         {/* Render the captcha */}
         <LoadCanvasTemplate />
