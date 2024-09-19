@@ -114,7 +114,6 @@ export const QuestionList = ({
   // Functions involving the input box directly 
   // This includes handling change of input, giving sample answer and gpt autocorrect
   const handleInputChangeWithIdle = (questionId, value) => {
-    console.log("Handle Input Change with Idle")
     const question = questions.find(q => q.question_id === questionId);
     handleInputChange(questionId, value, question.category);
 
@@ -124,7 +123,7 @@ export const QuestionList = ({
     }
 
     // Set a new timer for auto-correction
-    if (autoCorrectEnabled) {
+    if (autoCorrectEnabled && value.trim() !== "") {
       const timer = setTimeout(() => {
         handleAutoCorrect(question);
       }, 3000);
@@ -201,34 +200,40 @@ export const QuestionList = ({
     const question = currentQuestion.question;
     const sample_answer = currentQuestion.sample_answer;
     setQuestionBeingCorrected(currentQuestion.question_id)
-    try {
-      const response = await axios.post(`${apiEndpoint}/api/`, 
-        {
-          language,
-          text,
-          prompt_strategy,
-          question,
-          sample_answer,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` }
+    console.log("correct this text:",text.input_answer)
+    if (!text || text.input_answer.trim() === "") {
+      console.log("NOt Accepted: ", text.input_answer)
+      setQuestionBeingCorrected(null)
+    } else {
+      try {
+        const response = await axios.post(`${apiEndpoint}/api/`, 
+          {
+            language,
+            text,
+            prompt_strategy,
+            question,
+            sample_answer,
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` }
+        }
+          );
+  
+        const correctedText = response.data.generated_text;
+        setAnswers((prevAnswers) => ({
+          ...prevAnswers,
+          [currentQuestion.question_id]: {
+            input_answer: correctedText,
+            question: currentQuestion.question_id,
+            project_id: projectID,
+            category: currentCategory
+          },
+        }));
+      } catch (error) {
+        console.error("Error during auto-correct:", error);
       }
-        );
-
-      const correctedText = response.data.generated_text;
-      setAnswers((prevAnswers) => ({
-        ...prevAnswers,
-        [currentQuestion.question_id]: {
-          input_answer: correctedText,
-          question: currentQuestion.question_id,
-          project_id: projectID,
-          category: currentCategory
-        },
-      }));
-    } catch (error) {
-      console.error("Error during auto-correct:", error);
+      setQuestionBeingCorrected(null)
     }
-    setQuestionBeingCorrected(null)
   };
 
   if (loading) {
