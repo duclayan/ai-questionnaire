@@ -200,9 +200,7 @@ export const QuestionList = ({
     const question = currentQuestion.question;
     const sample_answer = currentQuestion.sample_answer;
     setQuestionBeingCorrected(currentQuestion.question_id)
-    console.log("correct this text:",text.input_answer)
     if (!text || text.input_answer.trim() === "") {
-      console.log("NOt Accepted: ", text.input_answer)
       setQuestionBeingCorrected(null)
     } else {
       try {
