@@ -20,7 +20,9 @@ export const QuestionList = ({
   handleSubmit,
   handleAutoCorrectToggle,
   selectedLanguage,
-  handleLanguageChange
+  handleLanguageChange,
+  textTimeoutEnabled, 
+  handleAutoTextTimeoutToggle
 }) => {
   const categories = [
     "General Information",
@@ -142,19 +144,55 @@ export const QuestionList = ({
       },
     }));
   };
-
+  
   const giveSampleAnswer = (currentQuestion) => {
-    const id = currentQuestion.question_id;
+    if (textTimeoutEnabled) {
+      giveSampleAnswerWithTimeout(currentQuestion);
+    } else {
+      setAnswers((prevAnswers) => ({
+        ...prevAnswers,
+        [currentQuestion.question_id]: {
+          input_answer: currentQuestion.sample_answer,
+          question: currentQuestion.question_id,
+          project_id: projectID,
+          category: currentCategory,
+        },
+      }));
+    }
+  };
+
+  const giveSampleAnswerWithTimeout = (currentQuestion) => {
     const sample_answer = currentQuestion.sample_answer;
-    setAnswers((prevAnswers) => ({
-      ...prevAnswers,
-      [id]: {
-        input_answer: sample_answer,
-        question: id,
-        project_id: projectID,
-        category: currentCategory
-      },
-    }));
+    let currentIndex = 0;
+    let currentText = '';
+
+    const typeNextCharacter = () => {
+      if (currentIndex < sample_answer.length) {
+
+        // Append next character to currentText
+        currentText += sample_answer[currentIndex];
+
+        // Update answers state with the new input_text
+        setAnswers((prevAnswers) => ({
+          ...prevAnswers,
+          [currentQuestion.question_id]: {
+            input_answer: currentText,
+            question: currentQuestion.question_id,
+            project_id: projectID,
+            category: currentCategory,
+          },
+        }));
+  
+        currentIndex++;
+        
+        setTimeout(typeNextCharacter, 1); // Adjust typing speed here (1 ms)
+      }
+    };
+  
+    typeNextCharacter(); // Start typing
+  
+    // Cleanup function to clear timeout if component unmounts
+    return () => clearTimeout(typeNextCharacter);
   };
 
   const handleAutoCorrect = async (currentQuestion) => {
@@ -223,6 +261,8 @@ export const QuestionList = ({
           handleAutoCorrectToggle={handleAutoCorrectToggle}
           language={selectedLanguage}
           handleLanguageChange={handleLanguageChange}
+          textTimeoutEnabled = {textTimeoutEnabled}
+          handleAutoTextTimeoutToggle = {handleAutoTextTimeoutToggle}
         />
 
       )}

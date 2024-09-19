@@ -10,6 +10,7 @@ function Form() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("English");
   const [autoCorrectEnabled, setAutoCorrectEnabled] = useState(true);
+  const [textTimeoutEnabled, setTextTimeoutEnabled] = useState(true);
   const token = localStorage.getItem('token');
   const totalSteps = 6;
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT
@@ -78,6 +79,10 @@ function Form() {
     setSelectedLanguage(language);
   };
 
+  const handleAutoTextTimeoutToggle = () => {
+    setTextTimeoutEnabled((prev) => !prev);
+  };
+
   const handleAutoCorrectToggle = () => {
     setAutoCorrectEnabled((prev) => !prev);
   };
@@ -103,6 +108,8 @@ function Form() {
         handleSubmit={handleSubmit}
         handleAutoCorrectToggle={handleAutoCorrectToggle}
         handleLanguageChange={handleLanguageChange}
+        textTimeoutEnabled = {textTimeoutEnabled}
+        handleAutoTextTimeoutToggle = {handleAutoTextTimeoutToggle}
       />
       <DocumentLoader isLoading={isLoading} text={"We are preparing your report"} />
     </div>
