@@ -150,17 +150,21 @@ class openAIView(APIView):
                     "role": "user",
                     "content": f"""
                     You are a company filling up a form to submit to a consulting agency.
-                    Improve the user input that is provided and return the final text. For reference here is the information
-                    question: {question}
-                    prompt strategy: {prompt},
-                    user input: {data},
-                    sample answer: {sample}
+                    Improve the user input that is provided and return the final text. 
+                    Strictly No information from the user input should be lost, sample answer is just used as a reference. 
 
+                    Make sure all the data is retained including numbers that has been mentioned. 
+                    
                     Return only the answer and no explanation for the user is required. 
                     Do not return follow up questions.
                     The text format does not include bold/itallic/underline.
 
                     Translate the whole text to {language}
+
+                    For reference here is the information
+                    question: {question}
+                    prompt strategy: {prompt},
+                    user input: {data}
                      """,
                 }
             ],
