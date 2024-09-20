@@ -165,6 +165,9 @@ class openAIView(APIView):
                     question: {question}
                     prompt strategy: {prompt},
                     user input: {data}
+
+                    This is a sample answer, you can use it for reference:
+                    {sample}
                      """,
                 }
             ],
