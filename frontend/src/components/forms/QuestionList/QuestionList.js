@@ -64,7 +64,6 @@ export const QuestionList = ({
   // When the answers change, the answerlist is updated in the main form 
   useEffect(() => {
     onAnswersChange(answers);
-    console.log("Updated Answers", answers)
   }, [answers]);
 
   // Functions : FetchQuestion
@@ -78,7 +77,6 @@ export const QuestionList = ({
         },
       );
       const question_list = response.data.question_list;
-      console.log("FETCH QUESTIONS RESPONSE", response)
       setQuestions(question_list);
     } catch (error) {
       console.error("Error fetching questions:", error);

@@ -190,7 +190,6 @@ class ProjectsView(APIView):
 
     # List all the projects
     def get(self, request):
-        print("Request User:", request.user)
         try:
             projects = Project.objects.filter(owner=request.user.id)
             serializer = ProjectSerializer(projects, many=True)
@@ -201,7 +200,6 @@ class ProjectsView(APIView):
     # Create a New Project
     def post(self, request):
         # Create a copy of request.data and add the current user
-        print("USERNAME", request.user)
         data = request.data.copy()  # Make a mutable copy of request.data
         data['owner'] = request.user.id  # Add the current user's ID
         data['owner_name'] = request.user.username
@@ -215,7 +213,6 @@ class ProjectsView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     # Edit an existing project
     def put(self, request):
-
         print(request.data)
 
     # Delete a project
@@ -234,16 +231,12 @@ class AnswersView(APIView):
 
     def get(self, request):
         id = request.query_params.get("project_id")
-        queryset = Answer.objects.all()
-        print("Current Question ID", id)
         if id:
             answers = Answer.objects.filter(project_id=id)
-            # print(f"For project {id} we have the following answrs: {answers}")
         else:
             answers = ""
 
         serializer = AnswerSerializer(answers, many=True)
-        print("serialized answer", serializer.data)
         return Response({"answer_list": serializer.data}, status=status.HTTP_200_OK)
     def post(self, request):
         data = request.data
@@ -360,8 +353,6 @@ class GenerateReportView(APIView):
         response = open_ai_view.post(mock_request)
         
         if response.status_code == 200:
-            print("RESPONSE:", response)
-
             return response
         else:
             return "Failed to generate summary"
