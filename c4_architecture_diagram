@@ -1,0 +1,22 @@
+// C4 Architecture Diagram
+digraph {
+	nodesep=1.0 rankdir=TB ranksep=1.0 splines=ortho
+	subgraph cluster_frontend {
+		color=lightblue label=Frontend style=filled
+		ReactJS [label=ReactJS color=lightgray shape=box style=filled]
+	}
+	subgraph cluster_backend {
+		color=lightcoral label=Backend style=filled
+		Django [label="Django Python" color=lightgray shape=box style=filled]
+		SQL [label="SQL Database" color=lightgray shape=box style=filled]
+		OpenAI [label="OpenAI API" color=lightgray shape=box style=filled]
+	}
+	subgraph cluster_cloud {
+		color=lightgreen label=Cloud style=filled
+		Azure [label="Azure Web App Services" color=lightgray shape=box style=filled]
+	}
+	ReactJS -> Azure [label=Deployment]
+	Azure -> Django [label="Routes Traffic"]
+	Django -> SQL [label="Data Access"]
+	Django -> OpenAI [label="AI Integration"]
+}
