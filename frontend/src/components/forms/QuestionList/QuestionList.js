@@ -5,6 +5,7 @@ import { DocumentLoader } from "../DocumentLoader/DocumentLoader";
 import { NavigationButtons } from "../NavigationButtons/NavigationButtons";
 import { AutoCorrectSettings } from "../AutoCorrectSettings/AutoCorrectSettings";
 import { InputField } from "../InputField/InputField";
+import MermaidDiagram from "../MermaidDiagram/MermaidDiagram";
 
 export const QuestionList = ({
   currentStep,
@@ -238,6 +239,7 @@ export const QuestionList = ({
 
   return (
     <Box sx={{ mt: 4 }}>
+      <MermaidDiagram/>
       {questions.map((question) => (
         <InputField
           question={question}
