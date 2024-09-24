@@ -7,6 +7,7 @@ export const StepNavigation = ({ currentStep, handleStepChange }) =>  {
     "Authentication Authorization Concept",
     "Application Design",
     "Cloud Architecture",
+    "Architecture Diagram",
     "Report"
   ];
 

@@ -5,7 +5,8 @@ import { DocumentLoader } from "../DocumentLoader/DocumentLoader";
 import { NavigationButtons } from "../NavigationButtons/NavigationButtons";
 import { AutoCorrectSettings } from "../AutoCorrectSettings/AutoCorrectSettings";
 import { InputField } from "../InputField/InputField";
-import MermaidDiagram from "../MermaidDiagram/MermaidDiagram";
+import { MermaidDiagram } from "../MermaidDiagram/MermaidDiagram";
+import { MermaidDropdown } from "../MermaidDropdown/MermaidDropdown";
 
 export const QuestionList = ({
   currentStep,
@@ -22,7 +23,7 @@ export const QuestionList = ({
   handleAutoCorrectToggle,
   selectedLanguage,
   handleLanguageChange,
-  textTimeoutEnabled, 
+  textTimeoutEnabled,
   handleAutoTextTimeoutToggle
 }) => {
   const categories = [
@@ -30,6 +31,7 @@ export const QuestionList = ({
     "Authentication and Authorization",
     "Application Architecture",
     "Cloud Architecture",
+    "Architecture Diagram",
     "Report",
   ];
 
@@ -71,7 +73,7 @@ export const QuestionList = ({
   const fetchQuestions = async (category) => {
     try {
       const response = await axios.get(
-        `${apiEndpoint}/api/questions`,        
+        `${apiEndpoint}/api/questions`,
         {
           headers: { Authorization: `Bearer ${token}` },
           params: { currentCategory: category },
@@ -87,7 +89,7 @@ export const QuestionList = ({
   const fetchAnswers = async () => {
     try {
       const response = await axios.get(
-        `${apiEndpoint}/api/submit-answers`, 
+        `${apiEndpoint}/api/submit-answers`,
         {
           headers: { Authorization: `Bearer ${token}` },
           params: { project_id: projectID }
@@ -115,7 +117,6 @@ export const QuestionList = ({
   const handleInputChangeWithIdle = (questionId, value) => {
     const question = questions.find(q => q.question_id === questionId);
     handleInputChange(questionId, value, question.category);
-
     // Clear previous timer if exists
     if (idleTimers[questionId]) {
       clearTimeout(idleTimers[questionId]);
@@ -142,15 +143,16 @@ export const QuestionList = ({
       },
     }));
   };
-  
-  const giveSampleAnswer = (currentQuestion) => {
+
+  // Modify giveSampleAnswer to accept selected answer
+  const giveSampleAnswer = (currentQuestion, selectedAnswer) => {
     if (textTimeoutEnabled) {
       giveSampleAnswerWithTimeout(currentQuestion);
     } else {
       setAnswers((prevAnswers) => ({
         ...prevAnswers,
         [currentQuestion.question_id]: {
-          input_answer: currentQuestion.sample_answer,
+          input_answer: selectedAnswer || currentQuestion.sample_answer, // Use selected answer or fallback to sample answer
           question: currentQuestion.question_id,
           project_id: projectID,
           category: currentCategory,
@@ -158,7 +160,6 @@ export const QuestionList = ({
       }));
     }
   };
-
   const giveSampleAnswerWithTimeout = (currentQuestion) => {
     const sample_answer = currentQuestion.sample_answer;
     let currentIndex = 0;
@@ -180,15 +181,15 @@ export const QuestionList = ({
             category: currentCategory,
           },
         }));
-  
+
         currentIndex++;
-        
+
         setTimeout(typeNextCharacter, 1); // Adjust typing speed here (1 ms)
       }
     };
-  
+
     typeNextCharacter(); // Start typing
-  
+
     // Cleanup function to clear timeout if component unmounts
     return () => clearTimeout(typeNextCharacter);
   };
@@ -203,7 +204,7 @@ export const QuestionList = ({
       setQuestionBeingCorrected(null)
     } else {
       try {
-        const response = await axios.post(`${apiEndpoint}/api/`, 
+        const response = await axios.post(`${apiEndpoint}/api/`,
           {
             language,
             text,
@@ -213,9 +214,9 @@ export const QuestionList = ({
           },
           {
             headers: { Authorization: `Bearer ${token}` }
-        }
-          );
-  
+          }
+        );
+
         const correctedText = response.data.generated_text;
         setAnswers((prevAnswers) => ({
           ...prevAnswers,
@@ -233,21 +234,52 @@ export const QuestionList = ({
     }
   };
 
+
   if (loading) {
     return <DocumentLoader isLoading={loading} text={"Preparing the Data"} />;
   }
 
   return (
     <Box sx={{ mt: 4 }}>
-      <MermaidDiagram/>
       {questions.map((question) => (
-        <InputField
-          question={question}
-          answers={answers}
-          handleInputChangeWithIdle={handleInputChangeWithIdle}
-          handleAutoCorrect={handleAutoCorrect}
-          giveSampleAnswer={giveSampleAnswer}
-          questionBeingCorrected={questionBeingCorrected} />
+        <>
+          {currentCategory === "Architecture Diagram" ? (
+            <>
+              <MermaidDropdown
+                onChange={(selectedAnswer) => {
+                  // Update answers state instantly when dropdown value changes
+                  setAnswers((prevAnswers) => ({
+                    ...prevAnswers,
+                    [question.question_id]: {
+                      input_answer: selectedAnswer,
+                      question: question.question_id,
+                      project_id: projectID,
+                      category: currentCategory,
+                    },
+                  }));
+                }}
+                question={question}
+                answers={answers}
+              />
+
+              <MermaidDiagram
+                diagramName='diagram'
+                question={question}
+                answers={answers}
+                token = {token}
+              />
+            </>
+          ) : null}
+
+          <InputField
+            question={question}
+            answers={answers}
+            handleInputChangeWithIdle={handleInputChangeWithIdle}
+            handleAutoCorrect={handleAutoCorrect}
+            giveSampleAnswer={(currentQuestion) => giveSampleAnswer(currentQuestion, answers[question.question_id]?.input_answer)}
+            questionBeingCorrected={questionBeingCorrected}
+          />
+        </>
       ))}
       <NavigationButtons
         navbarEnabled={navbarEnabled}
@@ -264,8 +296,8 @@ export const QuestionList = ({
           handleAutoCorrectToggle={handleAutoCorrectToggle}
           language={selectedLanguage}
           handleLanguageChange={handleLanguageChange}
-          textTimeoutEnabled = {textTimeoutEnabled}
-          handleAutoTextTimeoutToggle = {handleAutoTextTimeoutToggle}
+          textTimeoutEnabled={textTimeoutEnabled}
+          handleAutoTextTimeoutToggle={handleAutoTextTimeoutToggle}
         />
 
       )}

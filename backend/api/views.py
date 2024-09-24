@@ -7,7 +7,7 @@ from .models import *
 from .serializer import *
 from rest_framework.views import APIView
 from rest_framework import status
-
+from docx.shared import Inches
 from openai import AzureOpenAI
 from dotenv import load_dotenv
 from io import BytesIO
@@ -24,7 +24,12 @@ from rest_framework.permissions import AllowAny
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
+from rest_framework import status
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
+import base64
 import logging
+
 logger = logging.getLogger(__name__)
 class MockRequest:
     def __init__(self, data):
@@ -49,6 +54,10 @@ class DocumentGenerator:
                     heading = lines[0].strip()
                     if heading.startswith("## "):
                         heading = heading[3:].strip()
+                        ####### Add the diagram here
+                        # Get the image name for the current project_id and category
+                        # self.add_diagram_to_document(doc,image_name)
+
                     # Add the heading to the document
                     doc.add_heading(heading, level=2)  
                     
@@ -56,6 +65,9 @@ class DocumentGenerator:
                     body = "\n".join(line.strip() for line in lines[1:] if line.strip())
                     if body:
                         doc.add_paragraph(body)  # Add the body text below the heading
+
+        # Add the saved diagram image to the document
+        self.add_diagram_to_document(doc)
 
         # Save the document to a BytesIO object
         buffer = BytesIO()
@@ -66,6 +78,20 @@ class DocumentGenerator:
         response = HttpResponse(buffer.getvalue(), content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
         response['Content-Disposition'] = 'attachment; filename=report_summary.docx'
         return response
+    def add_diagram_to_document(self, doc):
+        """Add saved diagram image to Word document."""
+        try:
+            # Assuming your diagram is saved as 'diagram.png' in MEDIA_ROOT
+            file_path = os.path.join(default_storage.location, 'diagram.png')
+            if os.path.exists(file_path):
+                print("Diagram Exists")
+                # Add picture to document with specified width
+                # Adjust the width as needed (e.g., 6.0 inches)
+                doc.add_picture(file_path, width=Inches(6.0))  # Set width to 6 inches
+            else:
+                print("Diagram image not found.")
+        except Exception as e:
+            print(f"Error adding diagram to document: {e}")
 class UserView(APIView):
     permission_classes = [AllowAny]
 
@@ -359,3 +385,34 @@ class GenerateReportView(APIView):
             return response
         else:
             return "Failed to generate summary"
+        
+
+class SaveDiagram(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        # Save as userid-questionid-answerid.png
+        # image_name, question_id (foreign key), project_id (foreign key), user_id (foreign key), category
+        # Retrieve the diagram data from the request
+        diagram_data = request.data.get('diagram', None)
+        diagram_name =  request.data.get('diagramName')
+        
+        if not diagram_data:
+            return Response({"error": "No diagram data provided."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if the diagram data is in base64 format for PNG
+        if diagram_data.startswith("data:image/png;base64,"):
+            # Remove the prefix to get only the base64 string
+            diagram_data = diagram_data.replace("data:image/png;base64,", "")
+        else:
+            return Response({"error": "Invalid image format. Expected PNG."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Decode the base64 string
+            image_data = base64.b64decode(diagram_data)
+            file_name = f"{diagram_name}.png"
+            path = default_storage.save(file_name, ContentFile(image_data))
+
+            return Response({"message": "Diagram saved successfully.", "path": path}, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

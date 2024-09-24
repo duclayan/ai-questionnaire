@@ -11,4 +11,5 @@ urlpatterns = [
     path("projects/", ProjectsView.as_view(), name="projects"),
     path('projects/<int:pk>/', ProjectsView.as_view(), name='project-detail'), 
     path("login/", UserView.as_view(), name="users"),
+    path("save-diagram/", SaveDiagram.as_view(), name='save_diagram'),
 ]
