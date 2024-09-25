@@ -4,18 +4,34 @@ import { Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 // Sample data for dropdown items
 const menuItems = [
     {
-        value: "Create an echarging management system architecture diagram with angular.js as the frontend, javaspring frame work as the backend, java Eureka for service exploration, postgressql database, with typicalAWS resources. Consider typical security components such as iam, firewall, gateway, monitoring. Allcomponents inside the AWS cloud, only the user is outside of the cloud.",
-        label: "Create an echarging management system architecture diagram with angular.js as the frontend,  javaspring frame work as the backend,  java Eureka for service exploration,  postgressql database,  with typical AWS resources.  Consider typical security components such as iam,  firewall,  gateway,  monitoring.  All components inside the AWS cloud, only the user is outside of the cloud."
+        value: "Create an echarging management system architecture diagram with angular.js as the frontend, javaspring frame work as the backend, java Eureka for service exploration, postgressql database, with typical AWS resources. Consider typical security components such as iam, firewall, gateway, monitoring. All components inside the AWS cloud, only the user is outside of the cloud.",
+        label: "Architecture Diagram"
     },
     {
-        value: "Create a GenAI chatbot architecture diagram with react.js as the frontend, python FastAPI and thebackend, use typical aws resources for web app, database, storage, monitoring, include securitycomponents like iam, firewall, gateway, monitoring, security groups, amazon bedrock as the NLP andclaude as the LLM. All components inside the AWS, only the user is outside of the cloud.",
-        label: "Create a GenAI chatbot architecture diagram with react.js as the frontend,  python FastAPI and the backend,  use typical aws resources for web app,  database,  storage,  monitoring,  include security components like iam,  firewall,  gateway,  monitoring,  security groups,  amazon bedrock as the NLP and claude as the LLM.  All components inside the AWS, only the user is outside of the cloud."
+        value: "Create a GenAI chatbot architecture diagram with react.js as the frontend, python FastAPI and the backend, use typical aws resources for web app, database, storage, monitoring, include security components like iam, firewall, gateway, monitoring, security groups, amazon bedrock as the NLP and claude as the LLM. All components inside the AWS, only the user is outside of the cloud.",
+        label: "Architecture Diagram"
     },
     {
-        value: "Create a detailed description of a proxmox virtualisation solution in a data center (and transform it intomermaid.js language as a left-right diagram)",
-        label: "Create a detailed description of a proxmox virtualisation solution in a data center (and transform it intomermaid.js language as a left-right diagram)"
+        value: "Create a detailed description of a proxmox virtualisation solution in a data center (and transform it into mermaid.js language as a left-right diagram)",
+        label: "Flowchart"
     },
-    // Add more items as needed
+    {
+        value: "Create three independent sub diagrams in one picture with mermaid.js with different detail levels of SAP Hana SRM in Azure. The first one is a high-level one, the third has the most details.",
+        label: "3-Layer Diagram"
+    },
+    {
+        value: "Create a Gantt chart for a cybersecurity incident response plan that includes tasks such as preparation, detection and analysis, containment, eradication, recovery, and lessons learned. The timeline should cover a six-month period with specific start and end dates for each task.",
+        label: "Gantt Chart"
+    },
+    {
+        value: "Create a pie chart representing the distribution of various types of cyber threats faced by an organization in the past year, including malware attacks, phishing attempts, insider threats, and denial-of-service attacks.",
+        label: "Pie Chart"
+    },
+    {
+        value: "Create a quadrant chart to assess risks based on their likelihood and impact on the organization. Risks may include data breaches, system outages, compliance violations, and insider threats.",
+        label: "Quadrant Chart"
+    }
+
 ];
 
 export const MermaidDropdown = ({ onChange }) => {
