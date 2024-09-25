@@ -8,6 +8,7 @@ export const CenteredHeading = ({currentStep}) => {
     "Authentication Authorization Concept",
     "Application Design",
     "Cloud Architecture",
+    "Architecture Diagram",
     "Report"
   ];
 

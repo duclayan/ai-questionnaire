@@ -243,34 +243,6 @@ export const QuestionList = ({
     <Box sx={{ mt: 4 }}>
       {questions.map((question) => (
         <>
-          {currentCategory === "Architecture Diagram" ? (
-            <>
-              <MermaidDropdown
-                onChange={(selectedAnswer) => {
-                  // Update answers state instantly when dropdown value changes
-                  setAnswers((prevAnswers) => ({
-                    ...prevAnswers,
-                    [question.question_id]: {
-                      input_answer: selectedAnswer,
-                      question: question.question_id,
-                      project_id: projectID,
-                      category: currentCategory,
-                    },
-                  }));
-                }}
-                question={question}
-                answers={answers}
-              />
-
-              <MermaidDiagram
-                diagramName='diagram'
-                question={question}
-                answers={answers}
-                token = {token}
-              />
-            </>
-          ) : null}
-
           <InputField
             question={question}
             answers={answers}
@@ -278,7 +250,32 @@ export const QuestionList = ({
             handleAutoCorrect={handleAutoCorrect}
             giveSampleAnswer={(currentQuestion) => giveSampleAnswer(currentQuestion, answers[question.question_id]?.input_answer)}
             questionBeingCorrected={questionBeingCorrected}
+            currentCategory={currentCategory}
+            onChange={(selectedAnswer) => {
+              setAnswers((prevAnswers) => ({
+                ...prevAnswers,
+                [question.question_id]: {
+                  input_answer: selectedAnswer,
+                  question: question.question_id,
+                  project_id: projectID,
+                  category: currentCategory,
+                },
+              }));
+            }}
           />
+          {currentCategory === "Architecture Diagram" ? (
+            <>
+              <MermaidDiagram
+                diagramName='diagram'
+                question={question}
+                answers={answers}
+                token = {token}
+                apiEndpoint={apiEndpoint}
+
+              />
+            </>
+          ) : null}
+
         </>
       ))}
       <NavigationButtons

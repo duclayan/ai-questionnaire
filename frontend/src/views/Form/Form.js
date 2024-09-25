@@ -12,7 +12,7 @@ function Form() {
   const [autoCorrectEnabled, setAutoCorrectEnabled] = useState(true);
   const [textTimeoutEnabled, setTextTimeoutEnabled] = useState(true);
   const token = localStorage.getItem('token');
-  const totalSteps = 6;
+  const totalSteps = 7;
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT
   const { project_id } = useParams();
   const handleStepChange = (newStep) => {
