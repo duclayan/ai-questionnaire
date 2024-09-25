@@ -50,11 +50,12 @@ export const MermaidDropdown = ({ onChange }) => {
                 labelId="dropdown-label"
                 value={selectedValue}
                 onChange={handleChange}
-                label="Select Option"
+                label="Select Template"
                 MenuProps={{
                     PaperProps: {
                         style: {
                             maxHeight: 300,
+                            marginTop: "10px", // Set marginTop to 10px
                             overflowY: 'auto',
                         },
                     },

@@ -391,12 +391,10 @@ class SaveDiagram(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        # Save as userid-questionid-answerid.png
-        # image_name, question_id (foreign key), project_id (foreign key), user_id (foreign key), category
         # Retrieve the diagram data from the request
         diagram_data = request.data.get('diagram', None)
-        diagram_name =  request.data.get('diagramName')
-        
+        diagram_name = request.data.get('diagramName')
+
         if not diagram_data:
             return Response({"error": "No diagram data provided."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -411,6 +409,13 @@ class SaveDiagram(APIView):
             # Decode the base64 string
             image_data = base64.b64decode(diagram_data)
             file_name = f"{diagram_name}.png"
+            file_path = default_storage.path(file_name)  # Get full path of the file
+
+            # Check if the file already exists and delete it
+            if default_storage.exists(file_name):
+                default_storage.delete(file_name)
+
+            # Save the new image
             path = default_storage.save(file_name, ContentFile(image_data))
 
             return Response({"message": "Diagram saved successfully.", "path": path}, status=status.HTTP_201_CREATED)

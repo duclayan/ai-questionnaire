@@ -4,68 +4,103 @@ import axios from 'axios';
 import html2canvas from 'html2canvas';
 import './styles.css';
 import { Box, Button } from '@mui/material';
+import { DocumentLoader } from '../DocumentLoader/DocumentLoader';
 
-export const MermaidDiagram = ({ diagramName, question, answers }) => {
-  const [chart, setChart] = useState('graph TD; A-->B; B-->C; C-->A;');
+export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpoint }) => {
   const [mermaidError, setMermaidError] = useState(null);
   const [saveGraph, setSaveGraph] = useState(false);
-  const [shouldRender, setShouldRender] = useState(false);
-  const apiEndpoint = process.env.REACT_APP_API_ENDPOINT;
-  const token = localStorage.getItem('token');
+  const [loading, setLoading] = useState(false);
 
+  const sampleAnswer = ``;
+  const diagramPrompt = `Generate the executable Mermaid.js code for the 'question'.
+Output only the Mermaid.js code. Do not include any explanations, comments, or additional text. Remove the word 'mermaid' in the return answer`;
   useEffect(() => {
     mermaid.initialize({ startOnLoad: false });
-    setChart(answers[question.question_id]?.input_answer || "");
-    console.log("Current Chart", chart);
-    if (shouldRender) {
-      console.log("Diagram Content", answers);
-      renderMermaid();
-      setShouldRender(false);
-    }
-  }, [shouldRender, answers]); // Added answers to dependencies
+  }, []);
 
-  const renderMermaid = async () => {
+
+  const handleGenerateClick = async () => {
+    // Generate the chart based on the input answer
+    const currentAnswer = answers[question.question_id]?.input_answer || "";
+    console.log("User answer", currentAnswer)
+    // Render the chart after generating it
+    renderMermaid(currentAnswer);
+  };
+
+  const renderMermaid = async (currentAnswer) => {
+    // Check if currentAnswer is valid
+    if (!currentAnswer || currentAnswer.trim() === "") {
+        return; // Exit early if there's no valid answer
+    }
+
+    let generated_chart = "";
+    const test_samples = true;
+
     try {
-      const mermaidChart = document.getElementById('mermaid-chart');
-      mermaidChart.innerHTML = chart; // Set the inner HTML to the chart
-      mermaidChart.removeAttribute('data-processed');
-      await mermaid.run({ querySelector: '#mermaid-chart' });
-      setSaveGraph(true);
-      setMermaidError(null); // Reset error state on successful render
-    } catch (error) {
-      console.error('Mermaid rendering error:', error);
-      
-      // Clear the chart display and show an error message
-      const mermaidChart = document.getElementById('mermaid-chart');
-      mermaidChart.innerHTML = ''; // Clear any existing content
-      setMermaidError("Invalid Diagram"); // Set a user-friendly error message
-    }
-  };
+        if (test_samples) {
+            setLoading(true);
+            
+            // Log the full API URL for debugging
+            const apiUrl = `${apiEndpoint}/api/`;
+            console.log("Making request to:", apiUrl);
 
-  const handleGenerateClick = () => {
-    // Assuming you want to set the chart based on the input answer
-    const diagramContent = answers[question.question_id]?.input_answer || 'graph TD; A-->B; B-->C; C-->A;';
-    setChart(diagramContent); // Set the chart content
-    setShouldRender(true); // Trigger rendering
-  };
+            const response = await axios.post(apiUrl, {
+                language: "English",
+                text: currentAnswer,
+                prompt_strategy: diagramPrompt,
+                question,
+                sample_answer: sampleAnswer,
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            generated_chart = response.data.generated_text;
+            console.log("Generated Text from AI", generated_chart);
+        } else {
+            generated_chart = currentAnswer;
+        }
+
+        const mermaidChart = document.getElementById('mermaid-chart');
+        // Clear previous content
+        mermaidChart.innerHTML = ''; 
+        mermaidChart.innerHTML = generated_chart; // Set the inner HTML to the chart
+        mermaidChart.removeAttribute('data-processed');
+
+        mermaid.run({ querySelector: '#mermaid-chart' });
+        setSaveGraph(true);
+        setMermaidError(null); // Reset error state on successful render
+    } catch (error) {
+        setLoading(false);
+        
+        // Log detailed error information for debugging
+        console.error('Mermaid rendering error:', error.message);
+        // throw new Error("Invalid Mermaid syntax");
+        // setMermaidError("Invalid Diagram: "); // Set a user-friendly error message
+        setMermaidError(null); // Reset error state on successful render
+
+    } finally {
+      setMermaidError(null); // Reset error state on successful render
+
+        setLoading(false); // Ensure loading state is reset in case of success or failure
+    }
+}
 
   const saveDiagram = async () => {
     if (saveGraph) {
       try {
         // Convert the rendered Mermaid diagram to a PNG image 
         const node = document.getElementById('mermaid-chart');
-        const canvas = await html2canvas(node); 
-        const dataUrl = canvas.toDataURL('image/png'); 
-        console.log("Diagram Name", diagramName);
+        const canvas = await html2canvas(node);
+        const dataUrl = canvas.toDataURL('image/png');
 
         // API call to save the diagram
-        const response = await axios.post(
+        await axios.post(
           `${apiEndpoint}/api/save-diagram/`,
-          { diagram: dataUrl, diagramName: diagramName }, 
+          { diagram: dataUrl, diagramName },
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        console.log('Diagram saved:', response.data);
+        console.log('Diagram saved successfully.');
       } catch (error) {
         console.error('Error saving diagram:', error.response ? error.response.data : error.message);
       }
@@ -82,31 +117,27 @@ export const MermaidDiagram = ({ diagramName, question, answers }) => {
         mb: 4,
         display: "flex",
         flexDirection: "column",
-        alignItems: "center", // Center items horizontally
-        justifyContent: "center", // Center items vertically if needed
+        alignItems: "center",
+        justifyContent: "center",
         width: "100%",
         paddingTop: "1.5rem",
         maxWidth: "100rem",
         margin: "0 auto",
       }}
     >
-      <div style={{ width: '100%', textAlign: 'center' }}> {/* Center text inside */}
-          <Button variant="outlined" color="primary" size="small" onClick={handleGenerateClick}>
-            Generate
+      <div style={{ width: '100%', textAlign: 'center' }}>
+        <Button variant="outlined" color="primary" size="small" onClick={handleGenerateClick}>
+          Generate
+        </Button>
+        {saveGraph && (
+          <Button variant="outlined" color="secondary" size="small" onClick={saveDiagram} style={{ marginLeft: '10px' }}>
+            Save Diagram
           </Button>
-          {/* Conditionally render the Save button */}
-          {saveGraph && (
-            <Button variant="outlined" color="secondary" size="small" onClick={saveDiagram} style={{ marginLeft: '10px' }}>
-              Save Diagram
-            </Button>
-          )}
-          
-        <div 
-          id="mermaid-chart" 
-          className="mermaid" 
-          style={{ width: '100%', overflow: 'hidden', whiteSpace: 'nowrap' }}
-        ></div>
-    
+        )}
+        {loading && <DocumentLoader isLoading={loading} text={"Preparing the Data"} />}
+
+        <div id="mermaid-chart" className="mermaid" style={{ width: '100%', overflow: 'hidden', whiteSpace: 'nowrap' }}></div>
+
         {mermaidError && <div style={{ color: 'red' }}>Error: {mermaidError}</div>}
       </div>
     </Box>
