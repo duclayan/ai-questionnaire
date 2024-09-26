@@ -15,7 +15,9 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
   const diagramPrompt = `Generate the executable Mermaid.js code for the 'question'.
 Output only the Mermaid.js code. Do not include any explanations, comments, or additional text. Remove the word 'mermaid' in the return answer`;
   useEffect(() => {
-    mermaid.initialize({ startOnLoad: false });
+    mermaid.initialize({ 
+      startOnLoad: true, 
+      suppressErrorRendering: true  });
   }, []);
 
 
@@ -66,16 +68,26 @@ Output only the Mermaid.js code. Do not include any explanations, comments, or a
         mermaidChart.innerHTML = generated_chart; // Set the inner HTML to the chart
         mermaidChart.removeAttribute('data-processed');
 
-        mermaid.run({ querySelector: '#mermaid-chart' });
+        mermaid.run({ 
+          querySelector: '#mermaid-chart',
+          suppressErrors: true,
+          supressErrorHandling: true, 
+          supressErrorRendering: true  
+        });
+
+        // Override parseError to handle errors
+        mermaid.parseError = (error) => {
+          // console.log("MErmaid Error!!")
+          // console.error('Mermaid parsing error:', error);
+          setMermaidError('Insufficient Data has been received, or please ensure data is entered properly'); // Set custom error message
+    };
         setSaveGraph(true);
         setMermaidError(null); // Reset error state on successful render
     } catch (error) {
         setLoading(false);
-        
+ 
         // Log detailed error information for debugging
         console.error('Mermaid rendering error:', error.message);
-        // throw new Error("Invalid Mermaid syntax");
-        // setMermaidError("Invalid Diagram: "); // Set a user-friendly error message
         setMermaidError(null); // Reset error state on successful render
 
     } finally {
