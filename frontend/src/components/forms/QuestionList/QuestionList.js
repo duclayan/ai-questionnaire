@@ -125,7 +125,7 @@ export const QuestionList = ({
     // Set a new timer for auto-correction
     if (autoCorrectEnabled && value.trim() !== "") {
       const timer = setTimeout(() => {
-        handleAutoCorrect(question);
+        handleAutoCorrect(question,value);
       }, 3000);
 
       setIdleTimers((prev) => ({ ...prev, [questionId]: timer }));
@@ -194,46 +194,51 @@ export const QuestionList = ({
     return () => clearTimeout(typeNextCharacter);
   };
 
-  const handleAutoCorrect = async (currentQuestion) => {
-    const text = answers[currentQuestion.question_id];
-    const prompt_strategy = currentQuestion.prompt;
-    const question = currentQuestion.question;
-    const sample_answer = currentQuestion.sample_answer;
-    setQuestionBeingCorrected(currentQuestion.question_id)
-    if (!text || text.input_answer.trim() === "") {
-      setQuestionBeingCorrected(null)
-    } else {
-      try {
-        const response = await axios.post(`${apiEndpoint}/api/`,
-          {
-            language,
-            text,
-            prompt_strategy,
-            question,
-            sample_answer,
-          },
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
-        );
 
-        const correctedText = response.data.generated_text;
-        setAnswers((prevAnswers) => ({
-          ...prevAnswers,
-          [currentQuestion.question_id]: {
-            input_answer: correctedText,
-            question: currentQuestion.question_id,
-            project_id: projectID,
-            category: currentCategory
-          },
-        }));
-      } catch (error) {
-        console.error("Error during auto-correct:", error);
-      }
-      setQuestionBeingCorrected(null)
+  const handleAutoCorrect = async (currentQuestion, inputValue) => {
+    const existingAnswer = answers[currentQuestion.question_id];
+
+    // Update the input answer
+    if (inputValue) {
+      existingAnswer.input_answer = inputValue
     }
-  };
 
+    // Validate the input answer
+    if (!existingAnswer || !existingAnswer.input_answer.trim()==='') {
+        setQuestionBeingCorrected(null);
+        return;
+    }
+
+    setQuestionBeingCorrected(currentQuestion.question_id);
+
+    try {
+        const { data } = await axios.post(`${apiEndpoint}/api/`, {
+            language,
+            text: existingAnswer,
+            prompt_strategy: currentQuestion.prompt,
+            question: currentQuestion.question,
+            sample_answer: currentQuestion.sample_answer,
+        }, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+
+        // Update the answers state with the corrected text
+        setAnswers((prevAnswers) => ({
+            ...prevAnswers,
+            [currentQuestion.question_id]: {
+                input_answer: data.generated_text,
+                question: currentQuestion.question_id,
+                project_id: projectID,
+                category: currentCategory,
+            },
+        }));
+
+    } catch (error) {
+        console.error("Error during auto-correct:", error.message);
+    } finally {
+        setQuestionBeingCorrected(null);
+    }
+};
 
   if (loading) {
     return <DocumentLoader isLoading={loading} text={"Preparing the Data"} />;
@@ -271,6 +276,7 @@ export const QuestionList = ({
                 answers={answers}
                 token = {token}
                 apiEndpoint={apiEndpoint}
+                language={language}
 
               />
             </>

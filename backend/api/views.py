@@ -152,7 +152,6 @@ class openAIView(APIView):
         prompt = request.data.get("prompt_strategy")
         question = request.data.get("question")
         sample = request.data.get("sample_answer")
-
         # Load environment variables
         load_dotenv()
         AZURE_OPENAI_ENDPOINT= os.getenv("AZURE_OPENAI_ENDPOINT")
@@ -180,7 +179,10 @@ class openAIView(APIView):
                             For reference, here is the relevant information:
                             Question: {question}
                             Prompt Strategy: {prompt}
-                            User Input: {data}
+                            User Input: {data if data.get('input_answer') is None else data['input_answer']}
+
+                            Change the language of texts and diagram contents to {language}
+                            If can not follow the given instructions, respond with "We need more information"
                         """,
                     }
                 ]

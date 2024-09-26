@@ -6,18 +6,23 @@ import './styles.css';
 import { Box, Button } from '@mui/material';
 import { DocumentLoader } from '../DocumentLoader/DocumentLoader';
 
-export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpoint }) => {
+export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpoint,language }) => {
   const [mermaidError, setMermaidError] = useState(null);
   const [saveGraph, setSaveGraph] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const sampleAnswer = ``;
   const diagramPrompt = `Generate the executable Mermaid.js code for the 'question'.
-Output only the Mermaid.js code. Do not include any explanations, comments, or additional text. Remove the word 'mermaid' in the return answer`;
+Output only the Mermaid.js code. Do not include any explanations, comments, or additional text. Translate to target language. Remove the word 'mermaid' in the return answer`;
   useEffect(() => {
     mermaid.initialize({ 
       startOnLoad: true, 
-      suppressErrorRendering: true  });
+      suppressErrorRendering: true,     
+      theme: 'default', // Set your preferred theme
+      flowchart: {
+          useMaxWidth: true,
+          htmlLabels: true // Allow HTML labels for better language support
+      }  });
   }, []);
 
 
@@ -37,7 +42,6 @@ Output only the Mermaid.js code. Do not include any explanations, comments, or a
 
     let generated_chart = "";
     const test_samples = true;
-
     try {
         if (test_samples) {
             setLoading(true);
@@ -47,8 +51,8 @@ Output only the Mermaid.js code. Do not include any explanations, comments, or a
             console.log("Making request to:", apiUrl);
 
             const response = await axios.post(apiUrl, {
-                language: "English",
-                text: currentAnswer,
+                language: language,
+                text: answers[question.question_id],
                 prompt_strategy: diagramPrompt,
                 question,
                 sample_answer: sampleAnswer,
