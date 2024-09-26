@@ -171,32 +171,19 @@ class openAIView(APIView):
             model=AZURE_OPENAI_DEPLOYMENT,
             temperature=0.7,
             max_tokens=400,
-            messages=[
-                {
-                    "role": "user",
-                    "content": f"""
-                    You are a company filling up a form to submit to a consulting agency.
-                    Improve the user input that is provided and return the final text. 
-                    Strictly No information from the user input should be lost, sample answer is just used as a reference. 
-
-                    Make sure all the data is retained including numbers that has been mentioned. 
-                    
-                    Return only the answer and no explanation for the user is required. 
-                    Do not return follow up questions.
-                    The text format does not include bold/itallic/underline.
-
-                    Translate the whole text to {language}
-
-                    For reference here is the information
-                    question: {question}
-                    prompt strategy: {prompt},
-                    user input: {data}
-
-                    This is a sample answer, you can use it for reference:
-                    {sample}
-                     """,
-                }
-            ],
+          messages=[
+                    {
+                        "role": "user",
+                        "content": f"""
+                            Please enhance the user input provided while ensuring that all original information is preserved. The final answer should reflect any necessary improvements without losing any details from the user input.
+                            Return only the revised answer without any explanations or follow-up questions. The text format should not include bold, italic, or underline.
+                            For reference, here is the relevant information:
+                            Question: {question}
+                            Prompt Strategy: {prompt}
+                            User Input: {data}
+                        """,
+                    }
+                ]
         )
         # Extract the generated text from the response
         generated_text = response.choices[0].message.content
@@ -345,30 +332,42 @@ class GenerateReportView(APIView):
             "language": language,
             "prompt_strategy": 
             """
-            Create a concise report with the following structure:
-            Name of the Application : [insert name here]
+            Create a 5 page report with the following structure:
+
+            ### Name of the Application: [insert name here]
+
             ## Management Summary
-            Briefly mention the business function and critical controls.
+            - Provide an overview of the business functions supported by the application.
+            - Highlight critical controls in place to ensure security and compliance.
 
             ## Introduction
-            Describe the business functions and general aspects.
+            - Describe the key business functions the application serves.
+            - Discuss general aspects, including target audience and market relevance.
 
             ## Authentication/Authorization
-            Describe the authentication/authorization concept.
+            - Explain the concepts of authentication and authorization as they pertain to the application.
+            - Detail the methods used for user verification and access control.
 
             ## Application Architecture
-            Describe the application architecture and recommended controls.
+            - Outline the application's architecture, including its components and interactions.
+            - Recommend controls that should be implemented to enhance security and performance.
 
             ## Cloud Architecture Controls
-            Describe controls for the cloud architecture.
+            - Discuss specific controls relevant to cloud architecture, including data protection measures and compliance standards.
 
             ## Architecture Visualization (Backlog)
-            Visualize the architecture.
+            - Provide a visual representation of the application architecture, illustrating key components and their relationships.
 
-            Note: Integrate general information (application name, confidentiality, etc.) throughout the report.
+            ## General Information
+            - Integrate relevant general information throughout the report, such as:
+                - Application name
+                - Confidentiality requirements
+                - Regulatory compliance considerations
 
+            Ensure that each section is well-organized and clearly communicates the necessary information for a comprehensive risk advisory report.
+            Each section should have atleast 5 sentences
             """,
-            "question": "Generate a Report summary",
+            "question": "Generate a Report",
             "sample_answer": ""
         }
 
