@@ -179,7 +179,7 @@ class openAIView(APIView):
                             For reference, here is the relevant information:
                             Question: {question}
                             Prompt Strategy: {prompt}
-                            User Input: {data if data.get('input_answer') is None else data['input_answer']}
+                            User Input: {data}
 
                             Change the language of texts and diagram contents to {language}
                             If can not follow the given instructions, respond with "We need more information"
@@ -258,44 +258,91 @@ class AnswersView(APIView):
         return Response({"answer_list": serializer.data}, status=status.HTTP_200_OK)
     def post(self, request):
         data = request.data
-        answers_created = []
 
-        for  answer_id, answer in data.items():
-            question_id = answer['question']
-            project_id = answer['project_id']
-            text = answer['input_answer']
+        # Check if data is a dictionary and not empty
+        if isinstance(data, dict) and data:
+            answers_created = []  # Initialize the list to store created answers
+            for answer_id, answer in data.items():
+                print("Answer:", answer)
+                question_id = answer.get('question')
+                project_id = answer.get('project_id')
+                text = answer.get('input_answer')
 
-            try:
-                question = Question.objects.get(question_id=question_id)
-                
-                # Check if the answer already exists
-                existing_answer = Answer.objects.filter(project_id=project_id, question=question).first()
+                try:
+                    question = Question.objects.get(question_id=question_id)
 
-                if existing_answer:
-                    # Update the existing answer
-                    existing_answer.input_answer = text
-                    existing_answer.save()
-                    answers_created.append(AnswerSerializer(existing_answer).data)
-                else:
-                    # Create a new answer
-                    answer_data = {
-                        "answer_id": f"{project_id}-{question_id}",
-                        "project_id": project_id,
-                        "question": question.question_id,
-                        "input_answer": text,
-                        "category": question.category,
-                    }
-                    serializer = AnswerSerializer(data=answer_data)
+                    # Check if the answer already exists
+                    existing_answer = Answer.objects.filter(project_id=project_id, question=question).first()
 
-                    if serializer.is_valid():
-                        serializer.save()
-                        answers_created.append(serializer.data)
+                    if existing_answer:
+                        # Update the existing answer
+                        existing_answer.input_answer = text
+                        existing_answer.save()
+                        answers_created.append(AnswerSerializer(existing_answer).data)
                     else:
-                        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            except Question.DoesNotExist:
-                return Response({"error": f"Question with id {question_id} does not exist"}, status=status.HTTP_404_NOT_FOUND)
+                        # Create a new answer
+                        answer_data = {
+                            "answer_id": f"{project_id}-{question_id}",
+                            "project_id": project_id,
+                            "question": question.question_id,
+                            "input_answer": text,
+                            "category": question.category,
+                        }
+                        serializer = AnswerSerializer(data=answer_data)
 
-        return Response({"message": "Answers submitted successfully", "answers": answers_created}, status=status.HTTP_201_CREATED)
+                        if serializer.is_valid():
+                            serializer.save()
+                            answers_created.append(serializer.data)
+                        else:
+                            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                except Question.DoesNotExist:
+                    return Response({"error": f"Question with id {question_id} does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+            return Response({"message": "Answers submitted successfully", "answers": answers_created}, status=status.HTTP_201_CREATED)
+
+        # If 'data' is a list, handle it appropriately
+        elif isinstance(data, list) and data:
+            answers_created = []  # Initialize the list to store created answers
+            for answer in data:
+                question_id = answer['question']
+                project_id = answer['project_id']
+                text = answer['input_answer']
+
+                try:
+                    question = Question.objects.get(question_id=question_id)
+
+                    # Check if the answer already exists
+                    existing_answer = Answer.objects.filter(project_id=project_id, question=question).first()
+
+                    if existing_answer:
+                        # Update the existing answer
+                        existing_answer.input_answer = text
+                        existing_answer.save()
+                        answers_created.append(AnswerSerializer(existing_answer).data)
+                    else:
+                        # Create a new answer
+                        answer_data = {
+                            "answer_id": f"{project_id}-{question_id}",
+                            "project_id": project_id,
+                            "question": question.question_id,
+                            "input_answer": text,
+                            "category": question.category,
+                        }
+                        serializer = AnswerSerializer(data=answer_data)
+
+                        if serializer.is_valid():
+                            serializer.save()
+                            answers_created.append(serializer.data)
+                        else:
+                            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                except Question.DoesNotExist:
+                    return Response({"error": f"Question with id {question_id} does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+            return Response({"message": "Answers submitted successfully", "answers": answers_created}, status=status.HTTP_201_CREATED)
+
+        # If 'data' is neither a dict nor a list or is empty
+        return Response({"error": "Invalid data format. Expected a dictionary or a non-empty list."}, status=status.HTTP_400_BAD_REQUEST)
+        
 class GenerateReportView(APIView):
     def get(self, request):
         language = request.query_params.get("language")

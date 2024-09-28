@@ -67,15 +67,9 @@ export const InputField = ({
               InputProps={{
                 endAdornment: (
                   <Box sx={{ display: "flex" }}>
-                    <IconButton onClick={() => handleAutoCorrect(question)}>
-                      <CheckCircleIcon />
-                    </IconButton>
                     <IconButton>
                       <MicIcon />
                     </IconButton>
-                    {questionBeingCorrected === question.question_id && (
-                      <CircularProgress size={20} sx={{ marginLeft: 1 }} />
-                    )}
                   </Box>
                 ),
               }}

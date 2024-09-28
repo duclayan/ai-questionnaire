@@ -21,6 +21,7 @@ export const QuestionList = ({
   handleNext,
   handleSubmit,
   handleAutoCorrectToggle,
+  setAutoCorrectEnabled,
   selectedLanguage,
   handleLanguageChange,
   textTimeoutEnabled,
@@ -41,6 +42,7 @@ export const QuestionList = ({
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [tempAutoCorrectEnable, setTempAutoCorrectEnable] = useState(true);
   const [questionBeingCorrected, setQuestionBeingCorrected] = useState(null)
   const [idleTimers, setIdleTimers] = useState({});
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT
@@ -56,8 +58,17 @@ export const QuestionList = ({
   }, [projectID]);
 
   useEffect(() => {
+
     const fetchData = async () => {
       setLoading(true);
+      if (currentCategory === 'Architecture Diagram') {
+        setTempAutoCorrectEnable(autoCorrectEnabled)
+        // Disable Auto Correct in Architecture Diagram
+        // Original value is saved in tempAutoCorrectEnable
+        setAutoCorrectEnabled(false)
+      } else {
+        setAutoCorrectEnabled(tempAutoCorrectEnable)
+      }
       await fetchQuestions(currentCategory);
       setLoading(false);
     };

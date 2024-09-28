@@ -64,7 +64,7 @@ function Form() {
     try {
       const response = await axios.post(
         `${apiEndpoint}/api/submit-answers/`,
-        answers,
+        {answers},
         {
           headers: { Authorization: `Bearer ${token}` }
         },
@@ -107,6 +107,7 @@ function Form() {
         handleNext={handleNext}
         handleSubmit={handleSubmit}
         handleAutoCorrectToggle={handleAutoCorrectToggle}
+        setAutoCorrectEnabled={setAutoCorrectEnabled}
         handleLanguageChange={handleLanguageChange}
         textTimeoutEnabled = {textTimeoutEnabled}
         handleAutoTextTimeoutToggle = {handleAutoTextTimeoutToggle}
