@@ -82,7 +82,6 @@ export const QuestionList = ({ currentStep, onAnswersChange, projectID }) => {
   };
 
   const saveInputValue = (id) => {
-    console.log("TO CHANGE",  inputValues[id])
     // Save the input value to answers state
     setAnswers((prevAnswers) => {
       const existingAnswer = prevAnswers.find(answer => answer.question === id);

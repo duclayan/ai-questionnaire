@@ -50,7 +50,6 @@ export const FormContainer = () => {
           headers: { Authorization: `Bearer ${token}` },
       });
       const correctedText = response.data.generated_text;
-      console.log(response);
       setText(correctedText);
     } catch (error) {
       console.error("Error during autocorrect:", error);
@@ -68,7 +67,6 @@ export const FormContainer = () => {
           }
       );
       setSummary(response.data.summary);
-      console.log(response);
     } catch (error) {
       console.error("Error during submit:", error);
     }

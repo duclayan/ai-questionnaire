@@ -29,7 +29,6 @@ Output only the Mermaid.js code. Do not include any explanations, comments, or a
   const handleGenerateClick = async () => {
     // Generate the chart based on the input answer
     const currentAnswer = answers[question.question_id]?.input_answer || "";
-    console.log("User answer", currentAnswer)
     // Render the chart after generating it
     renderMermaid(currentAnswer);
   };
@@ -48,7 +47,6 @@ Output only the Mermaid.js code. Do not include any explanations, comments, or a
             
             // Log the full API URL for debugging
             const apiUrl = `${apiEndpoint}/api/`;
-            console.log("Making request to:", apiUrl);
 
             const response = await axios.post(apiUrl, {
                 language: language,
@@ -61,7 +59,6 @@ Output only the Mermaid.js code. Do not include any explanations, comments, or a
             });
 
             generated_chart = response.data.generated_text;
-            console.log("Generated Text from AI", generated_chart);
         } else {
             generated_chart = currentAnswer;
         }
@@ -81,7 +78,6 @@ Output only the Mermaid.js code. Do not include any explanations, comments, or a
 
         // Override parseError to handle errors
         mermaid.parseError = (error) => {
-          // console.log("MErmaid Error!!")
           // console.error('Mermaid parsing error:', error);
           setMermaidError('Insufficient Data has been received, or please ensure data is entered properly'); // Set custom error message
     };
