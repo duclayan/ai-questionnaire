@@ -60,20 +60,21 @@ function Form() {
     setNavbarEnabled(false);
   };
 
-  const handleAnswersChange = async (answers) => {
-    try {
-      const response = await axios.post(
-        `${apiEndpoint}/api/submit-answers/`,
-        {answers},
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        },
-      );
-      setAllAnswers(answers);
-    } catch (error) {
-      console.error("Error submitting answers:", error.response ? error.response.data : error.message);
-    }
-  }
+   const handleAnswersChange = async (answers) => {
+        try {
+            const response = await axios.post(
+                `${apiEndpoint}/api/submit-answers/`,
+                answers,
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+            setAllAnswers(answers);
+        } catch (error) {
+            console.error("Error submitting answers:", error.response ? error.response.data : error.message);
+        }
+    };
+
 
   const handleLanguageChange = (language) => {
     setSelectedLanguage(language);
