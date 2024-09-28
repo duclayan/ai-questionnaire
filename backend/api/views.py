@@ -152,6 +152,9 @@ class openAIView(APIView):
         prompt = request.data.get("prompt_strategy")
         question = request.data.get("question")
         sample = request.data.get("sample_answer")
+
+        print('Data Check:', data)
+
         # Load environment variables
         load_dotenv()
         AZURE_OPENAI_ENDPOINT= os.getenv("AZURE_OPENAI_ENDPOINT")
@@ -168,8 +171,8 @@ class openAIView(APIView):
         # Create a chat completion
         response = client.chat.completions.create(
             model=AZURE_OPENAI_DEPLOYMENT,
-            temperature=0.7,
-            max_tokens=400,
+            temperature=0.9,
+            max_tokens=2000,
           messages=[
                     {
                         "role": "user",
@@ -179,10 +182,14 @@ class openAIView(APIView):
                             For reference, here is the relevant information:
                             Question: {question}
                             Prompt Strategy: {prompt}
-                            User Input: {data}
 
                             Change the language of texts and diagram contents to {language}
                             If can not follow the given instructions, respond with "We need more information"
+
+                            ---
+
+                            User Input: {data if isinstance(data, str) else data['input_value']}
+
                         """,
                     }
                 ]

@@ -121,7 +121,7 @@ export const InputField = ({
             <IconButton onClick={() => giveSampleAnswer(question)}>
               <ErrorIcon />
             </IconButton>
-            {questionBeingCorrected === question.question_id && (
+            {questionBeingCorrected?.has(question.question_id) && (
               <CircularProgress size={20} sx={{ marginLeft: 1 }} />
             )}
           </Box>

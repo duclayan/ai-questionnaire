@@ -43,7 +43,7 @@ export const QuestionList = ({
   const [answers, setAnswers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [tempAutoCorrectEnable, setTempAutoCorrectEnable] = useState(true);
-  const [questionBeingCorrected, setQuestionBeingCorrected] = useState(null)
+  const [questionBeingCorrected, setQuestionBeingCorrected] = useState(new Set())
   const [idleTimers, setIdleTimers] = useState({});
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT
 
@@ -209,18 +209,23 @@ export const QuestionList = ({
   const handleAutoCorrect = async (currentQuestion, inputValue) => {
     const existingAnswer = answers[currentQuestion.question_id];
 
-    // Update the input answer
+    // Update the input answer if provided
     if (inputValue) {
-      existingAnswer.input_answer = inputValue
+        existingAnswer.input_answer = inputValue;
     }
 
     // Validate the input answer
-    if (!existingAnswer || !existingAnswer.input_answer.trim()==='') {
-        setQuestionBeingCorrected(null);
+    if (!existingAnswer || !existingAnswer.input_answer.trim()) {
+        setQuestionBeingCorrected((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(currentQuestion.question_id); // Remove from loading set
+            return newSet;
+        });
         return;
     }
 
-    setQuestionBeingCorrected(currentQuestion.question_id);
+    // Add question ID to the loading set
+    setQuestionBeingCorrected((prev) => new Set(prev).add(currentQuestion.question_id));
 
     try {
         const { data } = await axios.post(`${apiEndpoint}/api/`, {
@@ -247,10 +252,14 @@ export const QuestionList = ({
     } catch (error) {
         console.error("Error during auto-correct:", error.message);
     } finally {
-        setQuestionBeingCorrected(null);
+        // Remove question ID from loading set
+        setQuestionBeingCorrected((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(currentQuestion.question_id); // Remove from loading set
+            return newSet;
+        });
     }
-};
-
+  }
   if (loading) {
     return <DocumentLoader isLoading={loading} text={"Preparing the Data"} />;
   }
