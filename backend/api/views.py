@@ -61,8 +61,6 @@ class DocumentGenerator:
                             doc.add_paragraph(body)  # Add the body text below the heading
 
         # Add Architecture Diagram
-        doc.add_heading("Architecture Diagram", level=1)  
-
         # Add the saved diagram image to the document
         self.add_diagram_to_document(doc)
 
@@ -84,6 +82,7 @@ class DocumentGenerator:
             if os.path.exists(file_path):
                 # Add picture to document with specified width
                 # Adjust the width as needed (e.g., 6.0 inches)
+                doc.add_heading("Architecture Diagram", level=1)  
                 doc.add_picture(file_path, width=Inches(6.0))  # Set width to 6 inches
                 default_storage.delete(file_name)
             else:

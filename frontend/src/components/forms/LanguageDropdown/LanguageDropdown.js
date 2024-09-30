@@ -1,13 +1,16 @@
 import React from 'react';
-import { FormControl, Select, MenuItem } from '@mui/material';
+import { FormControl, Select, MenuItem, InputLabel } from '@mui/material';
 
 export const LanguageDropdown = ({ language, onLanguageChange }) => {
   return (
-    <FormControl size="small" sx={{ minWidth: 80 }}>
+    <FormControl size="small" sx={{ minWidth: 120 }}>
+      <InputLabel id="language-select-label">Language</InputLabel>
       <Select
+        labelId="language-select-label"
+        id="language-select"
         value={language}
+        label="Language"
         onChange={(e) => onLanguageChange(e.target.value)}
-        displayEmpty
       >
         <MenuItem value="en">English</MenuItem>
         <MenuItem value="es">Español</MenuItem>
@@ -17,4 +20,4 @@ export const LanguageDropdown = ({ language, onLanguageChange }) => {
       </Select>
     </FormControl>
   );
-};
+}
