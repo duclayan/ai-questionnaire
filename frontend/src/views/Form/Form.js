@@ -11,6 +11,7 @@ function Form() {
   const [selectedLanguage, setSelectedLanguage] = useState("English");
   const [autoCorrectEnabled, setAutoCorrectEnabled] = useState(true);
   const [textTimeoutEnabled, setTextTimeoutEnabled] = useState(true);
+  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   const token = localStorage.getItem('token');
   const totalSteps = 7;
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT
@@ -28,37 +29,46 @@ function Form() {
   };
 
   const handleSubmit = async () => {
+    let isMounted = true; // Flag to track if the component is mounted
     try {
-      // Generate Report
-      setIsLoading(true);
-      const reportResponse = await axios.get(
-        `${apiEndpoint}/api/generate-report/`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          params: {
-            language: selectedLanguage,
-            project_id: project_id
-          },
-          responseType: "blob",
-        },
+        setIsLoading(true);
+        setIsFormSubmitted(true)
+        const reportResponse = await axios.get(
+            `${apiEndpoint}/api/generate-report/`,
+            {
+                headers: { Authorization: `Bearer ${token}` },
+                params: {
+                    language: selectedLanguage,
+                    project_id: project_id
+                },
+                responseType: "blob",
+            }
+        );
 
-      );
-      setIsLoading(false);
-
-      const url = window.URL.createObjectURL(new Blob([reportResponse.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "report_summary.docx");
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+        if (isMounted) { // Check if the component is still mounted
+            setNavbarEnabled(false)
+            const url = window.URL.createObjectURL(new Blob([reportResponse.data]));
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "report_summary.docx");
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        }
 
     } catch (error) {
-      console.error("Error submitting answers:", error);
+        console.error("Error submitting answers:", error);
+    } finally {
+        if (isMounted) { // Update loading state only if mounted
+            setIsLoading(false);
+        }
     }
 
-    setNavbarEnabled(false);
-  };
+    // Cleanup function to set the mounted flag to false on unmount
+    return () => {
+        isMounted = false;
+    };
+};
 
    const handleAnswersChange = async (answers) => {
         try {
@@ -93,9 +103,12 @@ function Form() {
       <StepNavigation
         currentStep={currentStep}
         handleStepChange={handleStepChange}
+        isFormSubmitted={isFormSubmitted}
       />
       <CenteredHeading currentStep={currentStep} />
       <QuestionList
+        isFormSubmitted={isFormSubmitted}
+        setIsFormSubmitted={setIsFormSubmitted}
         currentStep={currentStep}
         onAnswersChange={handleAnswersChange}
         projectID={project_id}

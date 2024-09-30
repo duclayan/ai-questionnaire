@@ -9,11 +9,17 @@ export const NavigationButtons = ({
   handlePrevious,
   handleNext,
   handleSubmit,
+  isFormSubmitted,
+  projectId,
+  setIsFormSubmitted
 }) => {
   const isReportStep = currentStep === totalSteps - 1
   const navigate = useNavigate();
   const handleNewProject = () => { navigate('/dashboard') };
-  const handleEditProject = () => { setNavbarEnabled(true) };
+  const handleEditProject = () => { 
+    navigate(`/forms/${projectId}`)
+    setIsFormSubmitted(false)
+    setNavbarEnabled(true) };
   if (!navbarEnabled) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center" }}>
@@ -42,7 +48,7 @@ export const NavigationButtons = ({
         <Button
           variant="contained"
           onClick={handlePrevious}
-          disabled={currentStep === 0 || isReportStep}
+          disabled={currentStep === 0 || isReportStep || isFormSubmitted}
         >
           Previous
         </Button>
@@ -58,6 +64,7 @@ export const NavigationButtons = ({
           <Button
             variant="contained"
             onClick={handleSubmit}
+            disabled={isFormSubmitted}
           >
             Submit
           </Button>

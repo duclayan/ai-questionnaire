@@ -1,7 +1,7 @@
 import React from "react";
 import { Tabs, Tab, Box } from "@mui/material";
 
-export const StepNavigation = ({ currentStep, handleStepChange }) =>  {
+export const StepNavigation = ({ currentStep, handleStepChange, isFormSubmitted }) =>  {
   const steps = [
     "General Information",
     "Authentication Authorization Concept",
@@ -24,6 +24,7 @@ export const StepNavigation = ({ currentStep, handleStepChange }) =>  {
           <Tab
             key={index}
             label={step}
+            disabled={isFormSubmitted}
             sx={{
               color: currentStep === index ? "black" : "gray",
               textTransform: "none",

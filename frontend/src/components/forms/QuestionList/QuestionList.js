@@ -6,7 +6,6 @@ import { NavigationButtons } from "../NavigationButtons/NavigationButtons";
 import { AutoCorrectSettings } from "../AutoCorrectSettings/AutoCorrectSettings";
 import { InputField } from "../InputField/InputField";
 import { MermaidDiagram } from "../MermaidDiagram/MermaidDiagram";
-import { MermaidDropdown } from "../MermaidDropdown/MermaidDropdown";
 
 export const QuestionList = ({
   currentStep,
@@ -25,7 +24,9 @@ export const QuestionList = ({
   selectedLanguage,
   handleLanguageChange,
   textTimeoutEnabled,
-  handleAutoTextTimeoutToggle
+  handleAutoTextTimeoutToggle,
+  isFormSubmitted,
+  setIsFormSubmitted
 }) => {
   const categories = [
     "General Information",
@@ -44,7 +45,9 @@ export const QuestionList = ({
   const [loading, setLoading] = useState(true);
   const [tempAutoCorrectEnable, setTempAutoCorrectEnable] = useState(true);
   const [questionBeingCorrected, setQuestionBeingCorrected] = useState(new Set())
-  const [idleTimers, setIdleTimers] = useState({});
+  const [idleTimers, setIdleTimers] = useState(new Set());
+  const [isTyping, setIsTyping] = useState(true);
+
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT
 
   // Fetch answers according to the current project
@@ -126,23 +129,39 @@ export const QuestionList = ({
   // Functions involving the input box directly 
   // This includes handling change of input, giving sample answer and gpt autocorrect
   const handleInputChangeWithIdle = (questionId, value) => {
+    let isMounted = true; // Flag to track if the component is mounted
+  
     const question = questions.find(q => q.question_id === questionId);
     handleInputChange(questionId, value, question.category);
     // Clear previous timer if exists
     if (idleTimers[questionId]) {
       clearTimeout(idleTimers[questionId]);
     }
-
+  
     // Set a new timer for auto-correction
     if (autoCorrectEnabled && value.trim() !== "") {
-      const timer = setTimeout(() => {
-        handleAutoCorrect(question,value);
+      const timer = setTimeout(async () => {
+        if (isMounted) {
+          try {
+            await handleAutoCorrect(question, value);
+          } catch (error) {
+            console.error("Error in auto-correction:", error);
+          } finally {
+            if (isMounted) {
+            }
+          }
+        }
       }, 3000);
-
+  
       setIdleTimers((prev) => ({ ...prev, [questionId]: timer }));
+  
+      // Cleanup function
+      return () => {
+        isMounted = false;
+        clearTimeout(timer);
+      };
     }
   };
-
   const handleInputChange = (id, value, category, currentStep) => {
     setAnswers((prevAnswers) => ({
       ...prevAnswers,
@@ -160,10 +179,11 @@ export const QuestionList = ({
     if (textTimeoutEnabled) {
       giveSampleAnswerWithTimeout(currentQuestion);
     } else {
+        currentQuestion['input_answer'] = ''
       setAnswers((prevAnswers) => ({
         ...prevAnswers,
         [currentQuestion.question_id]: {
-          input_answer: selectedAnswer || currentQuestion.sample_answer, // Use selected answer or fallback to sample answer
+          input_answer:  currentQuestion.sample_answer || selectedAnswer, // Use selected answer or fallback to sample answer
           question: currentQuestion.question_id,
           project_id: projectID,
           category: currentCategory,
@@ -175,13 +195,12 @@ export const QuestionList = ({
     const sample_answer = currentQuestion.sample_answer;
     let currentIndex = 0;
     let currentText = '';
-
+  
     const typeNextCharacter = () => {
-      if (currentIndex < sample_answer.length) {
-
+      if (currentIndex < sample_answer.length && isTyping) {
         // Append next character to currentText
         currentText += sample_answer[currentIndex];
-
+  
         // Update answers state with the new input_text
         setAnswers((prevAnswers) => ({
           ...prevAnswers,
@@ -192,20 +211,18 @@ export const QuestionList = ({
             category: currentCategory,
           },
         }));
-
+  
         currentIndex++;
 
         setTimeout(typeNextCharacter, 1); // Adjust typing speed here (1 ms)
       }
     };
-
-    typeNextCharacter(); // Start typing
-
-    // Cleanup function to clear timeout if component unmounts
-    return () => clearTimeout(typeNextCharacter);
+  
+      typeNextCharacter(); // Start typing
+  
+      return () => clearTimeout(typeNextCharacter);
   };
-
-
+  
   const handleAutoCorrect = async (currentQuestion, inputValue) => {
     const existingAnswer = answers[currentQuestion.question_id];
 
@@ -312,6 +329,9 @@ export const QuestionList = ({
         handlePrevious={handlePrevious}
         handleNext={handleNext}
         handleSubmit={handleSubmit}
+        isFormSubmitted={isFormSubmitted}
+        setIsFormSubmitted={setIsFormSubmitted}
+        projectId={projectID}
       />
       {currentStep < totalSteps - 2 && (
         <AutoCorrectSettings

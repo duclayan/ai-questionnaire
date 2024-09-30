@@ -46,7 +46,6 @@ class DocumentGenerator:
 
         for section in sections:
             if section:  
-                print("Processing this section", section)
                 # Ensure the section is not empty
                 # Split the section into lines
                 lines = section.splitlines()
@@ -82,7 +81,6 @@ class DocumentGenerator:
             # Assuming your diagram is saved as 'diagram.png' in MEDIA_ROOT
             file_path = os.path.join(default_storage.location, 'diagram.png')
             if os.path.exists(file_path):
-                print("Diagram Exists")
                 # Add picture to document with specified width
                 # Adjust the width as needed (e.g., 6.0 inches)
                 doc.add_picture(file_path, width=Inches(6.0))  # Set width to 6 inches
@@ -150,7 +148,6 @@ class openAIView(APIView):
         prompt = request.data.get("prompt_strategy")
         question = request.data.get("question")
         sample = request.data.get("sample_answer")
-        print("This is the Data", data)
         # Load environment variables
         load_dotenv()
         AZURE_OPENAI_ENDPOINT= os.getenv("AZURE_OPENAI_ENDPOINT")
@@ -305,79 +302,17 @@ class AnswersView(APIView):
         return Response({"error": "Invalid data format."}, status=status.HTTP_400_BAD_REQUEST)
 class GenerateReportView(APIView):
     def get(self, request):
-        # language = request.query_params.get("language")
-        # project_id = request.query_params.get("project_id")
-        # project_answers = Answer.objects.filter(project_id=project_id)
-        # answers = project_answers.select_related('question').order_by('category', 'question__question_id')
-        # # doc, answers_text = self.create_document_and_text(answers)
-        # answers_text = self.create_document_and_text(answers)
+        language = request.query_params.get("language")
+        project_id = request.query_params.get("project_id")
+        project_answers = Answer.objects.filter(project_id=project_id)
+        answers = project_answers.select_related('question').order_by('category', 'question__question_id')
+        # doc, answers_text = self.create_document_and_text(answers)
+        answers_text = self.create_document_and_text(answers)
 
-        # gpt_response = self.generate_summary(answers_text, language)
-        # message = gpt_response.data.get("generated_text")
-        #     # Create an instance of the DocumentGenerator
+        gpt_response = self.generate_summary(answers_text, language)
+        message = gpt_response.data.get("generated_text")
+        # Create an instance of the DocumentGenerator
         generator = DocumentGenerator()
-        
-        message = """
-        ### General Information
-
-        Name of application: Pop Star Cafe
-
-        Contact Person: John Doe
-
-        The main business purpose of the application is to provide a platform for the school's teachers to manage and upload educational materials. It ensures compliance with specific regional regulations, such as GDPR in the EU, and mandates data storage within respective countries for regions like China and Russia. The application serves teachers in Germany, with regional requirements necessitating adherence to local data protection laws.
-
-        This confidential application includes pupils' grades, personal information, and exam questions. The confidentiality of these records must be preserved to protect pupils' academic histories. The integrity of the system is crucial to prevent tampering with exam props and results. Though not highly critical in terms of availability, the sensitive personal data within the application requires stringent encryption, access control, regular integrity checks, and secure storage solutions to maintain confidentiality and integrity.
-
-        The application is a self-developed project, individually coded based on the unique requirements of the teachers from the specified school organization.
-
-        ### Authentication and Authorization Concept
-
-        The application utilizes a built-in authentication system, with users receiving account authentication via their email addresses. The authentication mechanism includes password-based authentication and multi-factor authentication (MFA). The account creation and management processes are secured through strong password policies, encryption, strict access controls, regular security audits, secure account recovery processes, and effective logging and monitoring. Measures like CAPTCHA, email verification, approval workflows, activity alerts, 
-        and IP whitelisting prevent unauthorized account creation or modification.
-
-        Role-based access control (RBAC) is used to manage different user roles such as admin, principal, and teacher. Cookies containing tokens are used to manage and validate user roles with each request, ensuring proper authorization and access control. User credentials are stored in a hashed and salted form using the Bcrypt function. Currently, there are no protective measures for password assessment, such as account suspension policies or CAPTCHA mechanisms.
-
-        Session tokens are handled with great care to ensure secure session management. Best practices include using secure cookies, the HttpOnly and SameSite attributes, token expiry and regeneration, minimal cookie content, encryption, and server-side token validation.
-
-        ### Application Design
-
-        The main technology used for the application includes Python Django as the middle layer, ReactJS for the frontend, Azure SQL Database for data storage, and Azure Blob Storage for storing scanned files. The frontend is built with JavaScript, creating a single-page application that serves as a dashboard for teachers. This dashboard includes login and logout functionality, enabling teachers to upload materials easily.
-
-        The middle layer uses an Apache Web Server to deploy a Python Django web application. This application handles all requests from the frontend, manages workflows, interacts with various services such as Azure OpenAI and OCR, and accesses the database and blob storage.
-
-        The backend utilizes Azure Database services, employing various countermeasures to ensure security:
-
-        1. SQL Injection Prevention: Use parameterized queries and stored procedures. Regularly update and patch database management systems.
-        2. Access Control: Implement strict access controls using Azure's role-based access control (RBAC).
-        3. Encryption: Utilize Azure's built-in encryption at rest and in transit.
-        4. Audit Logging: Enable auditing and use Azure Monitor and Azure Security Center to respond to suspicious activities.
-        5. Firewall Configuration: Limit access to trusted IP addresses.
-        6. Regular Backups: Perform regular automated backups and test backup restoration procedures.
-        7. Input Validation: Validate all input data on the server side.
-        8. Compliance: Ensure compliance with relevant data protection regulations.
-        9. Security Updates: Apply regular patches and updates.
-        10. OWASP Top 10: Regularly review and address the OWASP Top 10 security risks.
-
-        The system follows a 3-tier architecture consisting of a static layer, a middle layer, and a backend layer. Libraries and dependencies are used for authentication, security validation, and workflow management.
-
-        ### Cloud Architecture
-
-        The application leverages Azure as the cloud provider, utilizing various cloud resources:
-
-        - Azure Functions: Implement network restrictions, use managed identities, enable authentication and authorization, enforce HTTPS, and apply RBAC.
-        - Application Gateway: Enable Web Application Firewall (WAF), configure SSL/TLS termination, restrict access using Network Security Groups (NSGs), and enable diagnostic logging.    
-        - Firewall: Configure application and network rules, enable threat intelligence-based filtering, monitor and log, and apply strict access control.
-        - Database: Enable encryption at rest and in transit, use automatic backups, implement Advanced Threat Protection, enforce strong authentication, and regularly update and patch.    
-        - Blob Storage: Enable encryption at rest, use private endpoints, enforce access policies, enable logging and monitoring, and configure data retention policies.
-        - Azure Kubernetes Service: Implement network policies, managed identities, RBAC, pod security policies, and use Azure Policy.
-        - Azure OpenAI Service: Enable network security, use managed identities, apply strict access control, monitor usage, and ensure encryption.
-        - Azure AI Computer Vision: Restrict access using NSGs, enable authentication and authorization, monitor and log access, and enforce data encryption.
-
-        There are no connections between the cloud resources and the company’s on-premises environment, with a preference for a fully cloud-based solution. Access to the web application is 
-        direct from the internet.
-
-        The current cloud governance model, managed by the school's IT Department, includes regular audits, clear policies and procedures, automated compliance checks, and ongoing staff training.
-        """
         # Simulate the response (in a Django view, you would return this response)
         response = generator.create_document_response(message)
         
@@ -387,7 +322,6 @@ class GenerateReportView(APIView):
         answers_text = ""
         current_category = None
         for answer in answers:
-            print(f"Category:{answer.category} // Answer: {answer.input_answer}")
             if answer.category != current_category:
                 answers_text += f"\n Section Category: {answer.category}\n"
                 current_category = answer.category
