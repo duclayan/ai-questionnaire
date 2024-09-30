@@ -79,7 +79,26 @@ Output only the Mermaid.js code. Do not include any explanations, comments, or a
         // Override parseError to handle errors
         mermaid.parseError = (error) => {
           // console.error('Mermaid parsing error:', error);
-          setMermaidError('Insufficient Data has been received, or please ensure data is entered properly'); // Set custom error message
+          setMermaidError(`Error: Unable to generate a valid diagram
+
+We encountered an issue while processing your input. This could be due to one of the following reasons:
+
+1. Insufficient or unclear information provided
+2. Complex or ambiguous relationships in the data
+3. Formatting inconsistencies in the input
+
+To resolve this issue, please try the following:
+
+1. Review your input and ensure all necessary details are included
+2. Simplify complex relationships or break them down into smaller parts
+3. Double-check the formatting and structure of your input
+4. Provide more specific or concrete examples if possible
+5. If using technical terms, ensure they are clearly defined
+6. Generate the same text again ;)
+
+If the problem persists after making these adjustments, consider rephrasing your request or breaking it down into smaller, more manageable parts.
+
+For additional assistance, please consult our documentation or reach out to our support team.`); // Set custom error message
     };
         setSaveGraph(true);
         setMermaidError(null); // Reset error state on successful render
