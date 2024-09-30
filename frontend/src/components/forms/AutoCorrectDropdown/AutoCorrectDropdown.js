@@ -1,24 +1,20 @@
 import React from 'react';
+import { FormControlLabel, Switch } from '@mui/material';
 
 const AutoCorrectDropdown = ({ autoCorrectEnabled, handleAutoCorrectToggle }) => {
-    const handleChange = (event) => {
-        const selectedValue = event.target.value;
-        handleAutoCorrectToggle(selectedValue === 'on'); // Convert the value to boolean
-    };
-
-    return (
-        <div>
-            <label htmlFor="auto-correct-select">Enable Auto Correct:</label>
-            <select
-                id="auto-correct-select"
-                value={autoCorrectEnabled ? 'on' : 'off'}
-                onChange={handleChange}
-            >
-                <option value="on">On</option>
-                <option value="off">Off</option>
-            </select>
-        </div>
-    );
+  return (
+    <FormControlLabel
+      control={
+        <Switch
+          size="small"
+          checked={autoCorrectEnabled}
+          onChange={(e) => handleAutoCorrectToggle(e.target.checked)}
+          name="autoCorrect"
+        />
+      }
+      label="Auto Correct"
+    />
+  );
 };
 
 export default AutoCorrectDropdown;

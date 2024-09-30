@@ -1,24 +1,20 @@
 import React from 'react';
+import { FormControlLabel, Switch } from '@mui/material';
 
 const AutoTextTimeout = ({ textTimeoutEnabled, handleAutoTextTimeoutToggle }) => {
-    const handleChange = (event) => {
-        const selectedValue = event.target.value;
-        handleAutoTextTimeoutToggle(selectedValue === 'on'); // Convert the value to boolean
-    };
-
-    return (
-        <div>
-            <label htmlFor="auto-text-timeout-select">Enable Auto Texttimeout:</label>
-            <select
-                id="auto-text-timeout-select"
-                value={textTimeoutEnabled ? 'on' : 'off'}
-                onChange={handleChange}
-            >
-                <option value="on">On</option>
-                <option value="off">Off</option>
-            </select>
-        </div>
-    );
+  return (
+    <FormControlLabel
+      control={
+        <Switch
+          size="small"
+          checked={textTimeoutEnabled}
+          onChange={(e) => handleAutoTextTimeoutToggle(e.target.checked)}
+          name="textTimeout"
+        />
+      }
+      label="Auto Text"
+    />
+  );
 };
 
 export default AutoTextTimeout;

@@ -12,11 +12,11 @@ const menuItems = [
         label: "Architecture Diagram"
     },
     {
-        value: "Create a detailed description of a proxmox virtualisation solution in a data center (and transform it into mermaid.js language as a left-right diagram)",
+        value: "Create a detailed description of a proxmox virtualisation solution in a data center",
         label: "Flowchart"
     },
     {
-        value: "Create three independent sub diagrams in one picture with mermaid.js with different detail levels of SAP Hana SRM in Azure. The first one is a high-level one, the third has the most details.",
+        value: "Create three independent sub diagrams in one picture  with different detail levels of SAP Hana SRM in Azure. The first one is a high-level one, the third has the most details.",
         label: "3-Layer Diagram"
     },
     {
@@ -45,7 +45,7 @@ export const MermaidDropdown = ({ onChange }) => {
 
     return (
         <FormControl fullWidth variant="outlined">
-            <InputLabel id="dropdown-label">Select Option</InputLabel>
+            <InputLabel id="dropdown-label">Select Sample Templates</InputLabel>
             <Select
                 labelId="dropdown-label"
                 value={selectedValue}

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../components/AuthContext';
 import { Alert, Button, TextField, Typography } from '@mui/material';
 import { DocumentLoader } from '../../components/forms';
@@ -16,6 +16,7 @@ function Login() {
   const [lockoutTime, setLockoutTime] = useState(null);
   const [isIncorrect , setIsIncorrect] = useState(false);
   const { login, isAuthenticated } = useAuth();
+  const location = useLocation();
   const navigate = useNavigate();
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT;
 
@@ -59,6 +60,13 @@ function Login() {
     try {
       const response = await axios.post(`${apiEndpoint}/api/token/`, { username, password });
       localStorage.setItem('token', response.data.access);
+
+      if (response.token) {
+        login(response.token);
+        const origin = location.state?.from?.pathname || '/dashboard';
+        navigate(origin);
+      }
+
       login();
       setAttempts(0); // Reset attempts on successful login
       setLockoutTime(null); // Clear lockout time
