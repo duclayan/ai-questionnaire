@@ -22,10 +22,10 @@ export const AutoCorrectSettings = ({
       alignItems: 'center',
       gap: 2
     }}>
-      {/* <AutoTextTimeout 
+      <AutoTextTimeout 
         textTimeoutEnabled={textTimeoutEnabled}
         handleAutoTextTimeoutToggle={handleAutoTextTimeoutToggle}
-      /> */}
+      />
       <AutoCorrectDropdown
         autoCorrectEnabled={autoCorrectEnabled}
         handleAutoCorrectToggle={handleAutoCorrectToggle}
