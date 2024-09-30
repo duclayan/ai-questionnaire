@@ -77,13 +77,15 @@ class DocumentGenerator:
         return response
     def add_diagram_to_document(self, doc):
         """Add saved diagram image to Word document."""
+        file_name = 'diagram.png'
         try:
             # Assuming your diagram is saved as 'diagram.png' in MEDIA_ROOT
-            file_path = os.path.join(default_storage.location, 'diagram.png')
+            file_path = os.path.join(default_storage.location, file_name)
             if os.path.exists(file_path):
                 # Add picture to document with specified width
                 # Adjust the width as needed (e.g., 6.0 inches)
                 doc.add_picture(file_path, width=Inches(6.0))  # Set width to 6 inches
+                default_storage.delete(file_name)
             else:
                 print("Diagram image not found.")
         except Exception as e:
