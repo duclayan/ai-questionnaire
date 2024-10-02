@@ -18,7 +18,7 @@ export const InputField = ({
   currentCategory
 
  }) => {
-  
+
   return (
     <Box
     key={question.question_id}
@@ -108,6 +108,7 @@ export const InputField = ({
         handleInputChangeWithIdle(question.question_id, e.target.value)
       }
       variant="outlined"
+      disabled= {questionBeingCorrected?.has(question.question_id) ? true : false}
       InputProps={{
         endAdornment: (
           <Box sx={{ display: "flex" }}>
