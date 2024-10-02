@@ -265,7 +265,7 @@ class AnswersView(APIView):
                 question_id = answer.get('question')
                 project_id = answer.get('project_id')
                 text = answer.get('input_answer')
-
+                print("Saved the new text:", text)
                 try:
                     question = Question.objects.get(question_id=question_id)
 
