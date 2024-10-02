@@ -39,7 +39,6 @@ export const QuestionList = ({
 
   const currentCategory = categories[currentStep];
   const token = localStorage.getItem('token');
-
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -59,7 +58,6 @@ export const QuestionList = ({
     };
     fetchData();
   }, [projectID]);
-
   useEffect(() => {
 
     const fetchData = async () => {
@@ -77,12 +75,10 @@ export const QuestionList = ({
     };
     fetchData();
   }, [currentStep]);
-
   // When the answers change, the answerlist is updated in the main form 
   useEffect(() => {
     onAnswersChange(answers);
   }, [answers]);
-
   // Functions : FetchQuestion
   const fetchQuestions = async (category) => {
     try {
@@ -99,7 +95,6 @@ export const QuestionList = ({
       console.error("Error fetching questions:", error);
     }
   };
-
   const fetchAnswers = async () => {
     try {
       const response = await axios.get(
@@ -125,7 +120,6 @@ export const QuestionList = ({
       setAnswers([]); // Ensure answers is an empty array on error
     }
   };
-
   // Functions involving the input box directly 
   // This includes handling change of input, giving sample answer and gpt autocorrect
   const handleInputChangeWithIdle = (questionId, value) => {
@@ -151,7 +145,7 @@ export const QuestionList = ({
             }
           }
         }
-      }, 3000);
+      }, 3000); 
   
       setIdleTimers((prev) => ({ ...prev, [questionId]: timer }));
   
@@ -173,7 +167,6 @@ export const QuestionList = ({
       },
     }));
   };
-
   // Modify giveSampleAnswer to accept selected answer
   const giveSampleAnswer = (currentQuestion, selectedAnswer) => {
     if (textTimeoutEnabled) {
@@ -222,7 +215,6 @@ export const QuestionList = ({
   
       return () => clearTimeout(typeNextCharacter);
   };
-  
   const handleAutoCorrect = async (currentQuestion, inputValue) => {
     const existingAnswer = answers[currentQuestion.question_id];
 

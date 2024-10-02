@@ -34,7 +34,6 @@ logger = logging.getLogger(__name__)
 class MockRequest:
     def __init__(self, data):
         self.data = data
-
 class DocumentGenerator:
     def create_document_response(self, gpt_response):
         doc = Document()
@@ -120,7 +119,6 @@ class UserView(APIView):
         else:
             logger.warning(f"Failed login attempt for username: {username}")
             return Response({'error': 'Invalid credentials'}, status=401)
-
 class QuestionListView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -377,8 +375,6 @@ class GenerateReportView(APIView):
             return response
         else:
             return "Failed to generate summary"
-        
-
 class SaveDiagram(APIView):
     permission_classes = [AllowAny]
 
