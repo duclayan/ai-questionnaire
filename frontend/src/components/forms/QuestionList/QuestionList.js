@@ -77,7 +77,9 @@ export const QuestionList = ({
   }, [currentStep]);
   // When the answers change, the answerlist is updated in the main form 
   useEffect(() => {
-    onAnswersChange(answers);
+    if(answers.length > 0) {
+      onAnswersChange(answers);
+    }
   }, [currentCategory]);
   // Functions : FetchQuestion
   const fetchQuestions = async (category) => {
