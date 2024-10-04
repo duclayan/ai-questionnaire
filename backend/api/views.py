@@ -169,20 +169,24 @@ class openAIView(APIView):
                     {
                         "role": "user",
                         "content": f"""
-                            Please enhance the user input provided while ensuring that all original information is preserved. The final answer should reflect any necessary improvements without losing any details from the user input.
-                            Return only the revised answer without any explanations or follow-up questions. The text format should not include bold, italic, or underline.
                             For reference, here is the relevant information:
                             Question: {question}
                             Prompt Strategy: {prompt}
-
-                            Change the language of texts and diagram contents to {language}
-                            If can not follow the given instructions, respond with "We need more information"
-
-                            Do not include any bullet points, headings, or special symbols. Just give me the information in plain text.
                             ---
-
+                            Enhance the provided content while preserving all original information. Improve the text as needed without omitting any details from the initial input. Present only the refined answer in plain text format, 
+                            without explanations, questions, formatting, bullet points, headings, or special symbols. Translate all text and diagram contents to the specified language. If unable to follow these instructions, respond 
+                            with "We need more information."
+                            ---
                             User Input: {data if isinstance(data, str) else data['input_answer']}
-
+                            Translate text to {language}
+                            ---
+                            Strictly do not include the language, question and prompt strategy in the return answer.
+                            If 
+                            ---
+                            Refine the answer so the following texts are not included in the return text:
+                             - {question}
+                             - {prompt}
+                             - translate {language}
                         """,
                     }
                 ]
