@@ -92,6 +92,7 @@ const Dashboard = () => {
         });
       setProjects(response.data.project_list);
     } catch (error) {
+      navigate(`/login`);
       console.error('Error fetching projects:', error);
     }
   };

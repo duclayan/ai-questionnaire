@@ -37,7 +37,7 @@ function App() {
             <Route path="/forms/:project_id" element={<ProtectedRoute element={<Form />} />} />
             
             {/* Redirect all unmatched routes to the dashboard */}
-            <Route path="*" element={<Navigate to="/dashboard" />} />
+            <Route path="*" element={<ProtectedRoute element={<Dashboard />} />} />
           </Routes>
         </Router>
       </AuthProvider>
