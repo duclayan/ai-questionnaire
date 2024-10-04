@@ -77,7 +77,7 @@ export const QuestionList = ({
   }, [currentStep]);
   // When the answers change, the answerlist is updated in the main form 
   useEffect(() => {
-    if(answers.length > 0) {
+    if (answers.length > 0) {
       onAnswersChange(answers);
     }
   }, [currentCategory]);
@@ -126,14 +126,14 @@ export const QuestionList = ({
   // This includes handling change of input, giving sample answer and gpt autocorrect
   const handleInputChangeWithIdle = (questionId, value) => {
     let isMounted = true; // Flag to track if the component is mounted
-  
+
     const question = questions.find(q => q.question_id === questionId);
     handleInputChange(questionId, value, question.category);
     // Clear previous timer if exists
     if (idleTimers[questionId]) {
       clearTimeout(idleTimers[questionId]);
     }
-  
+
     // Set a new timer for auto-correction
     if (autoCorrectEnabled && value.trim() !== "") {
       const timer = setTimeout(async () => {
@@ -147,10 +147,10 @@ export const QuestionList = ({
             }
           }
         }
-      }, 3000); 
-  
+      }, 3000);
+
       setIdleTimers((prev) => ({ ...prev, [questionId]: timer }));
-  
+
       // Cleanup function
       return () => {
         isMounted = false;
@@ -174,11 +174,11 @@ export const QuestionList = ({
     if (textTimeoutEnabled) {
       giveSampleAnswerWithTimeout(currentQuestion);
     } else {
-        currentQuestion['input_answer'] = ''
+      currentQuestion['input_answer'] = ''
       setAnswers((prevAnswers) => ({
         ...prevAnswers,
         [currentQuestion.question_id]: {
-          input_answer:  currentQuestion.sample_answer || selectedAnswer, // Use selected answer or fallback to sample answer
+          input_answer: currentQuestion.sample_answer || selectedAnswer, // Use selected answer or fallback to sample answer
           question: currentQuestion.question_id,
           project_id: projectID,
           category: currentCategory,
@@ -190,12 +190,15 @@ export const QuestionList = ({
     const sample_answer = currentQuestion.sample_answer;
     let currentIndex = 0;
     let currentText = '';
-  
+
+    setQuestionBeingCorrected((prev) => new Set(prev).add(currentQuestion.question_id));
+
+
     const typeNextCharacter = () => {
       if (currentIndex < sample_answer.length && isTyping) {
         // Append next character to currentText
         currentText += sample_answer[currentIndex];
-  
+
         // Update answers state with the new input_text
         setAnswers((prevAnswers) => ({
           ...prevAnswers,
@@ -206,16 +209,24 @@ export const QuestionList = ({
             category: currentCategory,
           },
         }));
-  
+
         currentIndex++;
 
         setTimeout(typeNextCharacter, 1); // Adjust typing speed here (1 ms)
+      } else {
+
+        setQuestionBeingCorrected((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(currentQuestion.question_id); // Remove from loading set
+          return newSet;
+        });
       }
+
     };
-  
-      typeNextCharacter(); // Start typing
-  
-      return () => clearTimeout(typeNextCharacter);
+
+    typeNextCharacter(); // Start typing
+
+    return () => clearTimeout(typeNextCharacter);
   };
   const handleAutoCorrect = async (currentQuestion, inputValue) => {
     const existingAnswer = answers[currentQuestion.question_id];
@@ -223,53 +234,53 @@ export const QuestionList = ({
     console.log('Input Value', inputValue)
     // Update the input answer if provided
     if (inputValue) {
-        existingAnswer.input_answer = inputValue;
+      existingAnswer.input_answer = inputValue;
     }
 
     // Validate the input answer
     if (!existingAnswer || !existingAnswer.input_answer.trim()) {
-        setQuestionBeingCorrected((prev) => {
-            const newSet = new Set(prev);
-            newSet.delete(currentQuestion.question_id); // Remove from loading set
-            return newSet;
-        });
-        return;
+      setQuestionBeingCorrected((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(currentQuestion.question_id); // Remove from loading set
+        return newSet;
+      });
+      return;
     }
 
     // Add question ID to the loading set
     setQuestionBeingCorrected((prev) => new Set(prev).add(currentQuestion.question_id));
 
     try {
-        const { data } = await axios.post(`${apiEndpoint}/api/`, {
-            language,
-            text: existingAnswer,
-            prompt_strategy: currentQuestion.prompt,
-            question: currentQuestion.question,
-            sample_answer: currentQuestion.sample_answer,
-        }, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
+      const { data } = await axios.post(`${apiEndpoint}/api/`, {
+        language,
+        text: existingAnswer,
+        prompt_strategy: currentQuestion.prompt,
+        question: currentQuestion.question,
+        sample_answer: currentQuestion.sample_answer,
+      }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-        // Update the answers state with the corrected text
-        setAnswers((prevAnswers) => ({
-            ...prevAnswers,
-            [currentQuestion.question_id]: {
-                input_answer: data.generated_text,
-                question: currentQuestion.question_id,
-                project_id: projectID,
-                category: currentCategory,
-            },
-        }));
+      // Update the answers state with the corrected text
+      setAnswers((prevAnswers) => ({
+        ...prevAnswers,
+        [currentQuestion.question_id]: {
+          input_answer: data.generated_text,
+          question: currentQuestion.question_id,
+          project_id: projectID,
+          category: currentCategory,
+        },
+      }));
 
     } catch (error) {
-        console.error("Error during auto-correct:", error.message);
+      console.error("Error during auto-correct:", error.message);
     } finally {
-        // Remove question ID from loading set
-        setQuestionBeingCorrected((prev) => {
-            const newSet = new Set(prev);
-            newSet.delete(currentQuestion.question_id); // Remove from loading set
-            return newSet;
-        });
+      // Remove question ID from loading set
+      setQuestionBeingCorrected((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(currentQuestion.question_id); // Remove from loading set
+        return newSet;
+      });
     }
   }
 
@@ -307,7 +318,7 @@ export const QuestionList = ({
                 diagramName='diagram'
                 question={question}
                 answers={answers}
-                token = {token}
+                token={token}
                 apiEndpoint={apiEndpoint}
                 language={language}
 
