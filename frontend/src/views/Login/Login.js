@@ -14,7 +14,7 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [attempts, setAttempts] = useState(0);
   const [lockoutTime, setLockoutTime] = useState(null);
-  const [isIncorrect , setIsIncorrect] = useState(false);
+  const [isIncorrect, setIsIncorrect] = useState(false);
   const { login, isAuthenticated } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -54,6 +54,7 @@ function Login() {
       }
 
       setLoading(false);
+      setCaptcha('')
       return;
     }
 
@@ -96,31 +97,31 @@ function Login() {
           </Alert>
         )}
 
-<TextField
-        label="Username"
-        variant="outlined"
-        fullWidth
-        margin="normal"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        InputLabelProps={{
-          shrink: true,
-        }}
-        autoComplete="username" 
-      />
-      <TextField
-        label="Password"
-        type="password"
-        variant="outlined"
-        fullWidth
-        margin="normal"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        InputLabelProps={{
-          shrink: true, 
-        }}
-        autoComplete="current-password"
-      />
+        <TextField
+          label="Username"
+          variant="outlined"
+          fullWidth
+          margin="normal"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          autoComplete="username"
+        />
+        <TextField
+          label="Password"
+          type="password"
+          variant="outlined"
+          fullWidth
+          margin="normal"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          autoComplete="current-password"
+        />
 
         {/* Render the captcha */}
         <LoadCanvasTemplate />
