@@ -53,7 +53,10 @@ class DocumentGenerator:
                     heading = lines[0].strip()
                     if heading.startswith("### "):
                         heading = heading[4:].strip()  # Remove '### ' prefix
-                        doc.add_heading(heading, level=1)  
+                        if (heading == 'Counter Measure'):
+                            doc.add_heading(heading, level=3)  
+                        else:
+                            doc.add_heading(heading, level=1)  
                     else:
                         body = "\n".join(line.strip() for line in lines if line.strip())
                         if body:
@@ -349,7 +352,7 @@ class GenerateReportView(APIView):
                 - Ensure Cohesion: Create a narrative that connects insights to practical implications for the client.
                 
                 ### Formatting Instructions
-                Each section header should be formatted as H3 (e.g., ### General Information).
+                Each section header should be formatted as H1 (e.g., ### General Information).
                 All other text should be presented in plain text without additional formatting (e.g., no bold or bullet points).
                 Strictly follow this order in your final response, only including sections present in the "User Input":
                 1. General Information
@@ -360,6 +363,11 @@ class GenerateReportView(APIView):
                 Refer to the "user input" for specific details to include in each section, ensuring that your final report presents a comprehensive overview of the client's risk management strategies and practices. 
                 Produce a final report format rather than a simple Q&A structure. Output should be in paragraph forms with proper sections.
                 Split sections by double new lines.
+
+                ----
+                On each section header measure add a detailed Counter Measure. 
+                Countermeasure should include reason and how it should be implemented in deep detail.
+                This subsection starts with a header 'Counter Measure' written as H1 (e.g., ### General Information).
 
             """,
             "question": "Generate a Report",
