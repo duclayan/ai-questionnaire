@@ -8,7 +8,7 @@ function Form() {
   const [allAnswers, setAllAnswers] = useState({});
   const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState("English");
+  const [selectedLanguage, setSelectedLanguage] = useState("en");
   const [autoCorrectEnabled, setAutoCorrectEnabled] = useState(true);
   const [textTimeoutEnabled, setTextTimeoutEnabled] = useState(true);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);

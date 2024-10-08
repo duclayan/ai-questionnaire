@@ -21,7 +21,6 @@ export const QuestionList = ({
   handleSubmit,
   handleAutoCorrectToggle,
   setAutoCorrectEnabled,
-  selectedLanguage,
   handleLanguageChange,
   textTimeoutEnabled,
   handleAutoTextTimeoutToggle,
@@ -230,8 +229,6 @@ export const QuestionList = ({
   };
   const handleAutoCorrect = async (currentQuestion, inputValue) => {
     const existingAnswer = answers[currentQuestion.question_id];
-    console.log("Existing Answer", existingAnswer)
-    console.log('Input Value', inputValue)
     // Update the input answer if provided
     if (inputValue) {
       existingAnswer.input_answer = inputValue;
@@ -344,7 +341,7 @@ export const QuestionList = ({
         <AutoCorrectSettings
           autoCorrectEnabled={autoCorrectEnabled}
           handleAutoCorrectToggle={handleAutoCorrectToggle}
-          language={selectedLanguage}
+          language={language}
           handleLanguageChange={handleLanguageChange}
           textTimeoutEnabled={textTimeoutEnabled}
           handleAutoTextTimeoutToggle={handleAutoTextTimeoutToggle}

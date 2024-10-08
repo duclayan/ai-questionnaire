@@ -7,7 +7,7 @@ import AutoTextTimeout from '../AutoTextTimeout/AutoTextTimeout';
 export const AutoCorrectSettings = ({
   autoCorrectEnabled, 
   handleAutoCorrectToggle, 
-  selectedLanguage, 
+  language, 
   handleLanguageChange,
   textTimeoutEnabled, 
   handleAutoTextTimeoutToggle
@@ -31,7 +31,7 @@ export const AutoCorrectSettings = ({
         handleAutoCorrectToggle={handleAutoCorrectToggle}
       />
       <LanguageDropdown 
-        language={selectedLanguage}
+        language={language}
         onLanguageChange={handleLanguageChange} 
       />
     </Box>
