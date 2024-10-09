@@ -5,11 +5,14 @@ import html2canvas from 'html2canvas';
 import './styles.css';
 import { Box, Button } from '@mui/material';
 import { DocumentLoader } from '../DocumentLoader/DocumentLoader';
+import { EnlargedImage } from './EnlargedImage';
 
 export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpoint,language }) => {
   const [mermaidError, setMermaidError] = useState(null);
   const [saveGraph, setSaveGraph] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isEnlarged, setIsEnlarged] = useState(false);
+  const [chartContent, setChartContent] = useState('');
 
   const sampleAnswer = ``;
   const diagramPrompt = `Generate the executable Mermaid.js code for the 'question'.
@@ -25,6 +28,22 @@ Output only the Mermaid.js code. Do not include any explanations, comments, or a
       }  });
   }, []);
 
+  useEffect(() => {
+    if (isEnlarged) {
+      const mermaidChart = document.getElementById('enlarged-mermaid-chart');
+      // Clear previous content
+      mermaidChart.innerHTML = ''; 
+      mermaidChart.innerHTML = chartContent; // Set the inner HTML to the chart
+      console.log("Generated Chart", chartContent)
+      mermaidChart.removeAttribute('data-processed');
+
+      mermaid.run({ 
+        querySelector: '#enlarged-mermaid-chart',
+        suppressErrors: true,
+        supressErrorHandling: true, 
+        supressErrorRendering: true  
+      });    }
+  }, [isEnlarged]);
 
   const handleGenerateClick = async () => {
     // Generate the chart based on the input answer
@@ -63,10 +82,13 @@ Output only the Mermaid.js code. Do not include any explanations, comments, or a
             generated_chart = currentAnswer;
         }
 
+        setChartContent(generated_chart) // Make accessible for the enlarged image
+
         const mermaidChart = document.getElementById('mermaid-chart');
         // Clear previous content
         mermaidChart.innerHTML = ''; 
         mermaidChart.innerHTML = generated_chart; // Set the inner HTML to the chart
+        console.log("Generated Chart", generated_chart)
         mermaidChart.removeAttribute('data-processed');
 
         mermaid.run({ 
@@ -79,26 +101,7 @@ Output only the Mermaid.js code. Do not include any explanations, comments, or a
         // Override parseError to handle errors
         mermaid.parseError = (error) => {
           // console.error('Mermaid parsing error:', error);
-          setMermaidError(`Error: Unable to generate a valid diagram
-
-We encountered an issue while processing your input. This could be due to one of the following reasons:
-
-1. Insufficient or unclear information provided
-2. Complex or ambiguous relationships in the data
-3. Formatting inconsistencies in the input
-
-To resolve this issue, please try the following:
-
-1. Review your input and ensure all necessary details are included
-2. Simplify complex relationships or break them down into smaller parts
-3. Double-check the formatting and structure of your input
-4. Provide more specific or concrete examples if possible
-5. If using technical terms, ensure they are clearly defined
-6. Generate the same text again ;)
-
-If the problem persists after making these adjustments, consider rephrasing your request or breaking it down into smaller, more manageable parts.
-
-For additional assistance, please consult our documentation or reach out to our support team.`); // Set custom error message
+          setMermaidError(`Error: Unable to generate a valid diagram, please click generate again`); // Set custom error message
     };
         setSaveGraph(true);
         setMermaidError(null); // Reset error state on successful render
@@ -131,7 +134,6 @@ For additional assistance, please consult our documentation or reach out to our 
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        console.log('Diagram saved successfully.');
       } catch (error) {
         console.error('Error saving diagram:', error.response ? error.response.data : error.message);
       }
@@ -167,8 +169,9 @@ For additional assistance, please consult our documentation or reach out to our 
         )}
         {loading && <DocumentLoader isLoading={loading} text={"Preparing the Data"} />}
 
-        <div id="mermaid-chart" className="mermaid" style={{ width: '100%', overflow: 'hidden', whiteSpace: 'nowrap' }}></div>
+        <div id="mermaid-chart" className="mermaid" style={{ width: '100%', overflow: 'hidden', whiteSpace: 'nowrap' }} onClick={() => setIsEnlarged(true)}></div>
 
+        {isEnlarged && <EnlargedImage onClose={() => setIsEnlarged(false)} />}
         {mermaidError && <div style={{ color: 'red' }}>Error: {mermaidError}</div>}
       </div>
     </Box>
