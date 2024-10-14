@@ -28,8 +28,8 @@ const menuItems = [
         label: "Pie Chart"
     },
     {
-        value: "Create a quadrant chart to assess risks based on their likelihood and impact on the organization. Risks may include data breaches, system outages, compliance violations, and insider threats.",
-        label: "Quadrant Chart"
+        value: "Create a sequence diagram  to assess risks based on their likelihood and impact on the organization. Risks may include data breaches, system outages, compliance violations, and insider threats.",
+        label: "Sequence Diagram"
     }
 
 ];
@@ -45,7 +45,7 @@ export const MermaidDropdown = ({ onChange }) => {
 
     return (
         <FormControl fullWidth variant="outlined">
-            <InputLabel id="dropdown-label">Select Sample Templates</InputLabel>
+            <InputLabel id="dropdown-label">Select Sample</InputLabel>
             <Select
                 labelId="dropdown-label"
                 value={selectedValue}
