@@ -35,6 +35,9 @@ export const InputField = ({
       paddingTop: "1.5rem",
       maxWidth: "100rem",
       margin: "0 auto",
+      marginRight: isMobile ? '1rem' : 0,
+      paddingLeft: isMobile ? '1rem' : 0,
+      paddingRight: isMobile ? '1rem' : 0,
     }}
   >
     <Grid
@@ -78,7 +81,7 @@ export const InputField = ({
             sx={{ 
               flex: isMobile ? '1 1 auto' : '5 1 100%', 
               mr: isMobile ? 0 : 2,
-              mb: isMobile ? 2 : 0 
+              mb: isMobile ? 2 : 0,
             }}
           >
             <InputLabel
@@ -87,7 +90,7 @@ export const InputField = ({
                 whiteSpace: "break-spaces",
                 position: "relative",
                 transform: "none",
-                marginBottom: 1
+                marginBottom: 1,
               }}
             >
               {question.question}
