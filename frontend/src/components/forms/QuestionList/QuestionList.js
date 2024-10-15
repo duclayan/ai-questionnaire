@@ -76,7 +76,8 @@ export const QuestionList = ({
   }, [currentStep]);
   // When the answers change, the answerlist is updated in the main form 
   useEffect(() => {
-    if (answers.length > 0) {
+    const answers_length = Object.keys(answers).length
+    if (answers_length > 0) {
       onAnswersChange(answers);
     }
   }, [currentCategory]);
