@@ -50,7 +50,7 @@ export const InputField = ({
                 whiteSpace: "break-spaces",
                 position: "relative",
                 transform: "none",
-                marginBottom: 1,
+                marginBottom: 1
               }}
             >
               {question.question}
@@ -129,7 +129,29 @@ export const InputField = ({
            
         ),
       }}
-      sx={{ mt: 1, background: "white" }}
+      sx={{
+        mt: 1,
+        '& .MuiOutlinedInput-root': {
+          backgroundColor: 'rgba(255, 255, 255, 0.5)',
+          transition: 'background-color 0.3s',
+          '&:hover, &.Mui-focused': {
+            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+          },
+          '& fieldset': {
+            borderColor: 'rgba(0, 0, 0, 0.23)',
+          },
+          '&:hover fieldset': {
+            borderColor: 'primary.main',
+          },
+          '&.Mui-focused fieldset': {
+            borderColor: 'primary.main',
+          },
+        },
+        '& .MuiInputBase-input': {
+          color: 'inherit',
+        },
+      }}
+      
     />
   </FormControl>
   }

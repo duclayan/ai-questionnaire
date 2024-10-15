@@ -90,7 +90,11 @@ const Dashboard = () => {
         {
           headers: { Authorization: `Bearer ${token}` }
         });
-      setProjects(response.data.project_list);
+        if (response) {
+          setProjects(response.data.project_list);
+        } else {
+          navigate(`/login`);
+        }
     } catch (error) {
       navigate(`/login`);
       console.error('Error fetching projects:', error);
@@ -113,23 +117,23 @@ const Dashboard = () => {
         <Button variant="contained" onClick={() => handleOpen()} sx={{ mb: 2 }}>
           Create Project
         </Button>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2}}>
           {projects.map((project) => (
             <Card key={project.project_id} variant="outlined" className="card">
               <CardContent sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Box sx={{ flexGrow: 1 }}>
-                  <Typography variant="h6" className="card-title">
+                  <Typography variant="h6" className="card-title hover-white">
                     {project.name}
                   </Typography>
-                  <Typography className="card-owner">Owner: {project.owner_name}</Typography>
+                  <Typography className="card-owner hover-white">Owner: {project.owner_name}</Typography>
                 </Box>
                 <CardActions>
-                  <IconButton aria-label="edit">
+                  <IconButton aria-label="edit" className="edit-button" sx={{ color: '#00695c' }}>
                     <Link to={`/forms/${project.project_id}`} >
                       <Edit />
                     </Link>
                   </IconButton>
-                  <IconButton aria-label="delete" sx={{ color: '#00695c' }} onClick={() => handleDeleteProject(project.project_id)}>
+                  <IconButton aria-label="delete" className="edit-button" sx={{ color: '#00695c' }} onClick={() => handleDeleteProject(project.project_id)}>
                     <Delete />
                   </IconButton>
                 </CardActions>

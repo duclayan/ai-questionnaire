@@ -53,23 +53,39 @@ export const MermaidDropdown = ({ onChange }) => {
                 label="Select Template"
                 MenuProps={{
                     PaperProps: {
-                        style: {
-                            maxHeight: 300,
-                            marginTop: "10px", // Set marginTop to 10px
-                            overflowY: 'auto',
-                        },
+                    style: {
+                        maxHeight: 300,
+                        marginTop: "10px",
+                        overflowY: 'auto',
+                    },
                     },
                 }}
-            >
+                sx={{
+                    backgroundColor: 'transparent',
+                    transition: 'background-color 0.3s',
+                    '&:hover, &.Mui-focused': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                    },
+                    '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(0, 0, 0, 0.23)',
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'primary.main',
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'primary.main',
+                    },
+                }}
+                >
                 <MenuItem value="">
                     <em>None</em>
                 </MenuItem>
                 {menuItems.map((item) => (
                     <MenuItem key={item.value} value={item.value} style={{ whiteSpace: 'pre-line' }}>
-                        {item.label}
+                    {item.label}
                     </MenuItem>
                 ))}
-            </Select>
+                </Select>
         </FormControl>
     );
 };
