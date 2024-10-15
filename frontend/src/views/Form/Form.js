@@ -105,7 +105,7 @@ function Form() {
         handleStepChange={handleStepChange}
         isFormSubmitted={isFormSubmitted}
       />
-      <CenteredHeading currentStep={currentStep} />
+      <CenteredHeading currentStep={currentStep} onStepChange={handleStepChange} />
       <QuestionList
         isFormSubmitted={isFormSubmitted}
         setIsFormSubmitted={setIsFormSubmitted}
