@@ -74,13 +74,14 @@ const Dashboard = () => {
 
   const handleDeleteProject = async (projectId) => {
     try {
-      await axios.delete(`${apiEndpoint}/api/projects/${currentProjectId}/`,
+      await axios.delete(`${apiEndpoint}/api/projects/${projectId}/`,
         {
           headers: { Authorization: `Bearer ${token}` }
         });
-      fetchProjects(); // Refresh the project list
     } catch (error) {
       console.error("Error deleting project:", error);
+    } finally {
+      fetchProjects(); // Refresh the project list
     }
   };
   
