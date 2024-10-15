@@ -129,7 +129,7 @@ export const InputField = ({
            
         ),
       }}
-      sx={{ mt: 1 }}
+      sx={{ mt: 1, background: "white" }}
     />
   </FormControl>
   }

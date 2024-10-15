@@ -9,6 +9,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/navbar/Navbar';
 import Home from './views/Home/Home';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import BackgroundCircle from './views/BackgroundCircle/BackgroundCircle';
 
 function App() {
 
@@ -24,24 +25,26 @@ function App() {
   });
 
   return (
-    <ThemeProvider theme={theme}>
-      <AuthProvider>
-        <Router>
-          <Navbar/>
-          <Routes>
-            <Route path="/" element={<ProtectedRoute element={<Dashboard />} />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/login" element={<Home />} />
-            <Route path="/form" element={<ProtectedRoute element={<Form />} />} />
-            <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
-            <Route path="/forms/:project_id" element={<ProtectedRoute element={<Form />} />} />
-            
-            {/* Redirect all unmatched routes to the dashboard */}
-            <Route path="*" element={<ProtectedRoute element={<Dashboard />} />} />
-          </Routes>
-        </Router>
-      </AuthProvider>
-    </ThemeProvider>
+      <BackgroundCircle>
+        <ThemeProvider theme={theme}>
+          <AuthProvider>
+            <Router>
+              <Navbar/>
+              <Routes>
+                <Route path="/" element={<ProtectedRoute element={<Dashboard />} />} />
+                <Route path="/home" element={<Home />} />
+                <Route path="/login" element={<Home />} />
+                <Route path="/form" element={<ProtectedRoute element={<Form />} />} />
+                <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
+                <Route path="/forms/:project_id" element={<ProtectedRoute element={<Form />} />} />
+                
+                {/* Redirect all unmatched routes to the dashboard */}
+                <Route path="*" element={<ProtectedRoute element={<Dashboard />} />} />
+              </Routes>
+            </Router>
+          </AuthProvider>
+        </ThemeProvider>
+      </BackgroundCircle>
   )
   ;
 }

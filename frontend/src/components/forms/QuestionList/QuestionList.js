@@ -286,7 +286,7 @@ export const QuestionList = ({
   }
 
   return (
-    <Box sx={{ mt: 4 }}>
+    <Box sx={{ mt: 4, paddingBottom: '100px'}}>
       {questions.map((question) => (
         <>
           <InputField
