@@ -74,7 +74,7 @@ const Dashboard = () => {
 
   const handleDeleteProject = async (projectId) => {
     try {
-      await axios.delete(`${apiEndpoint}/api/projects/${projectId}/`,
+      await axios.delete(`${apiEndpoint}/api/projects/${currentProjectId}/`,
         {
           headers: { Authorization: `Bearer ${token}` }
         });
