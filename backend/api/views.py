@@ -368,6 +368,20 @@ class GenerateReportView(APIView):
                 On each section header measure add a detailed Counter Measure. 
                 Countermeasure should include reason and how it should be implemented in deep detail.
                 This subsection starts with a header 'Counter Measure' written as H1 (e.g., ### General Information).
+                Write in bullet points with 4 lines each.
+                ---
+                Sample of Counter Measure Template (minimum of 100 words per countermeasure point):
+                Counter Measure
+                "Counter Measure
+                    1. Implementation of password reset process
+                        This process allows users to easily reset their passwords when necessary, enhancing account security by enabling regular password updates and aiding in cases when passwords are forgotten or accounts are potentially compromised.
+
+                    2. Encryption at rest for database
+                        This protective measure ensures data stored in the database is encrypted, thereby safeguarding sensitive information from unauthorized access and making data breaches less likely and less damaging.
+
+                    3. Avoid hardcoding of credentials or secrets
+                    Hardcoding credentials or secrets in the system or application code presents a significant security risk. Avoiding this practice improves overall system security by reducing the exposure and potential misuse of sensitive data.
+                "
 
             """,
             "question": "Generate a Report",
