@@ -370,19 +370,30 @@ class GenerateReportView(APIView):
                 This subsection starts with a header 'Counter Measure' written as H1 (e.g., ### General Information).
                 Write in bullet points with 4 lines each.
                 ---
-                Sample of Counter Measure Template (minimum of 100 words per countermeasure point):
+                Create a Counter Measure Template with the following specifications:
+
+                1. Include a minimum of 100 words per countermeasure point.
+                2. Only include sections where information is available.
+                3. Format the response as follows:
+
                 Counter Measure
                 "Counter Measure
-                    1. Implementation of password reset process
-                        This process allows users to easily reset their passwords when necessary, enhancing account security by enabling regular password updates and aiding in cases when passwords are forgotten or accounts are potentially compromised.
+                    1. [Title of first countermeasure]
+                        [Detailed explanation of the first countermeasure, including its purpose, implementation, and benefits to security. Ensure this explanation is at least 100 words long.]
 
-                    2. Encryption at rest for database
-                        This protective measure ensures data stored in the database is encrypted, thereby safeguarding sensitive information from unauthorized access and making data breaches less likely and less damaging.
+                    2. [Title of second countermeasure]
+                        [Detailed explanation of the second countermeasure, including its purpose, implementation, and benefits to security. Ensure this explanation is at least 100 words long.]
 
-                    3. Avoid hardcoding of credentials or secrets
-                    Hardcoding credentials or secrets in the system or application code presents a significant security risk. Avoiding this practice improves overall system security by reducing the exposure and potential misuse of sensitive data.
-                "
+                    3. [Title of third countermeasure]
+                        [Detailed explanation of the third countermeasure, including its purpose, implementation, and benefits to security. Ensure this explanation is at least 100 words long.]"
 
+                Ensure that each countermeasure explanation:
+                - Clearly states the purpose of the measure
+                - Explains how it enhances security
+                - Describes its implementation or application
+                - Mentions any potential benefits or improvements to overall system security
+
+                Use a tone that is informative and technical, suitable for a professional cybersecurity context. Number each countermeasure and maintain the given format structure.
             """,
             "question": "Generate a Report",
             "sample_answer": ""
