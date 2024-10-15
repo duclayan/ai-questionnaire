@@ -238,7 +238,8 @@ class ProjectsView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     # Edit an existing project
     def put(self, request):
-        print(request.data)
+        # print(request.data)
+        print("Edit an existing project")
 
     # Delete a project
     def delete(self, request, pk):
@@ -272,7 +273,6 @@ class AnswersView(APIView):
                 question_id = answer.get('question')
                 project_id = answer.get('project_id')
                 text = answer.get('input_answer')
-                print("Saved the new text:", text)
                 try:
                     question = Question.objects.get(question_id=question_id)
 
@@ -376,8 +376,8 @@ class GenerateReportView(APIView):
                 2. Only include sections where information is available.
                 3. Format the response as follows:
 
-                Counter Measure
-                "Counter Measure
+                ### Counter Measure
+
                     1. [Title of first countermeasure]
                         [Detailed explanation of the first countermeasure, including its purpose, implementation, and benefits to security. Ensure this explanation is at least 100 words long.]
 
