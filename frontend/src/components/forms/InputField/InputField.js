@@ -5,6 +5,8 @@ import { Box, CircularProgress, FormControl, Grid, IconButton, InputLabel, TextF
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import MicIcon from "@mui/icons-material/Mic";
 import ErrorIcon from "@mui/icons-material/Error";
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { MermaidDropdown } from "../MermaidDropdown/MermaidDropdown";
 
 export const InputField = ({ 
@@ -18,6 +20,8 @@ export const InputField = ({
   currentCategory
 
  }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
     <Box
@@ -42,8 +46,41 @@ export const InputField = ({
       <Grid item xs={12} md={8}>
       {currentCategory === "Architecture Diagram" ? (
       <>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}> {/* Flex container */}
-          <FormControl fullWidth variant="outlined" sx={{ flex: '5 1 100%', mr: 2 }}> {/* Input Field */}
+        <Box sx={{
+          display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
+          alignItems: isMobile ? 'stretch' : 'center',
+          mb: 2,
+          mt: 1,
+          '& .MuiOutlinedInput-root': {
+            backgroundColor: 'rgba(255, 255, 255, 0.5)',
+            transition: 'background-color 0.3s',
+            '&:hover, &.Mui-focused': {
+              backgroundColor: 'rgba(255, 255, 255, 0.8)',
+            },
+            '& fieldset': {
+              borderColor: 'rgba(0, 0, 0, 0.23)',
+            },
+            '&:hover fieldset': {
+              borderColor: 'primary.main',
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: 'primary.main',
+            },
+          },
+          '& .MuiInputBase-input': {
+            color: 'inherit',
+          },
+        }}>
+          <FormControl 
+            fullWidth 
+            variant="outlined" 
+            sx={{ 
+              flex: isMobile ? '1 1 auto' : '5 1 100%', 
+              mr: isMobile ? 0 : 2,
+              mb: isMobile ? 2 : 0 
+            }}
+          >
             <InputLabel
               htmlFor={`multiline-label-${question.question_id}`}
               sx={{
@@ -77,12 +114,14 @@ export const InputField = ({
             />
           </FormControl>
 
-          {/* Dropdown Component */}
           <MermaidDropdown
             onChange={onChange}
             question={question}
             answers={answers}
-            sx={{ flex: '1 1 40%' }} // Adjust width as needed
+            sx={{ 
+              flex: isMobile ? '1 1 auto' : '1 1 40%',
+              width: isMobile ? '100%' : 'auto'
+            }}
           />
         </Box>
       </>
