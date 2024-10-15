@@ -23,6 +23,7 @@ export const InputField = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
+  console.log("isMobile:", isMobile)
   return (
     <Box
     key={question.question_id}
@@ -35,9 +36,6 @@ export const InputField = ({
       paddingTop: "1.5rem",
       maxWidth: "100rem",
       margin: "0 auto",
-      marginRight: isMobile ? '1rem' : 0,
-      paddingLeft: isMobile ? '1rem' : 0,
-      paddingRight: isMobile ? '1rem' : 0,
     }}
   >
     <Grid
