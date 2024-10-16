@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { StepNavigation, CenteredHeading, QuestionList, DocumentLoader } from "../../components/forms";
 import { useParams } from 'react-router-dom';
+import {useMediaQuery, useTheme } from "@mui/material";
 function Form() {
   const [navbarEnabled, setNavbarEnabled] = useState(true);
   const [allAnswers, setAllAnswers] = useState({});
@@ -16,6 +17,8 @@ function Form() {
   const totalSteps = 7;
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT
   const { project_id } = useParams();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const handleStepChange = (newStep) => {
     setCurrentStep(newStep);
   };
@@ -104,8 +107,9 @@ function Form() {
         currentStep={currentStep}
         handleStepChange={handleStepChange}
         isFormSubmitted={isFormSubmitted}
+        isMobile={isMobile}
       />
-      <CenteredHeading currentStep={currentStep} onStepChange={handleStepChange} />
+      <CenteredHeading currentStep={currentStep} />
       <QuestionList
         isFormSubmitted={isFormSubmitted}
         setIsFormSubmitted={setIsFormSubmitted}

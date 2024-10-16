@@ -1,11 +1,7 @@
 import React from "react";
-import { Typography, Box, useMediaQuery, useTheme } from "@mui/material";
-import BurgerMenu from "../BurgerMenu/BurgerMenu";
+import { Typography, Box } from "@mui/material";
 
-export const CenteredHeading = ({ currentStep, onStepChange }) => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
+export const CenteredHeading = ({ currentStep }) => {
   const steps = [
     "General Information",
     "Authentication Authorization Concept",
@@ -16,19 +12,15 @@ export const CenteredHeading = ({ currentStep, onStepChange }) => {
   ];
 
   return (
-    <Box 
-      sx={{ 
-        display: "flex", 
-        justifyContent: "space-between", 
-        alignItems: "center", 
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
         mt: 4,
         width: '100%'
       }}
     >
-      {isMobile && (
-        <BurgerMenu steps={steps} currentStep={currentStep} onStepChange={onStepChange} />
-      )}
-      
       <Typography
         component="h1"
         align="center"
@@ -40,8 +32,6 @@ export const CenteredHeading = ({ currentStep, onStepChange }) => {
       >
         {steps[currentStep]}
       </Typography>
-      
-      {isMobile && <Box sx={{ width: 48 }} />} {/* Placeholder for spacing */}
     </Box>
   );
 }

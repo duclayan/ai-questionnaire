@@ -1,7 +1,8 @@
 import React from "react";
 import { Tabs, Tab, Box } from "@mui/material";
+import BurgerMenu from "../BurgerMenu/BurgerMenu";
 
-export const StepNavigation = ({ currentStep, handleStepChange, isFormSubmitted }) =>  {
+export const StepNavigation = ({ currentStep, handleStepChange, isFormSubmitted, isMobile }) =>  {
   const steps = [
     "General Information",
     "Authentication Authorization Concept",
@@ -12,7 +13,7 @@ export const StepNavigation = ({ currentStep, handleStepChange, isFormSubmitted 
   ];
 
   return (
-    <Box class="app-container" sx={{ width: "100%"}}>
+    (isMobile ?  (<BurgerMenu steps={steps} currentStep={currentStep} onStepChange={handleStepChange}/>): (<Box class="app-container" sx={{ width: "100%"}}>
       <Tabs
         value={currentStep}
         onChange={(event, newValue) => handleStepChange(newValue)}
@@ -32,6 +33,6 @@ export const StepNavigation = ({ currentStep, handleStepChange, isFormSubmitted 
           />
         ))}
       </Tabs>
-    </Box>
+    </Box>) )
   );
 }
