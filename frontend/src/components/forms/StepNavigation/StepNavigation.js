@@ -13,7 +13,7 @@ export const StepNavigation = ({ currentStep, handleStepChange, isFormSubmitted,
   ];
 
   return (
-    (isMobile ?  (<BurgerMenu steps={steps} currentStep={currentStep} onStepChange={handleStepChange}/>): (<Box class="app-container" sx={{ width: "100%"}}>
+    (isMobile ?  (<BurgerMenu steps={steps} currentStep={currentStep} onStepChange={handleStepChange} disabled={isFormSubmitted}/>): (<Box class="app-container" sx={{ width: "100%"}}>
       <Tabs
         value={currentStep}
         onChange={(event, newValue) => handleStepChange(newValue)}

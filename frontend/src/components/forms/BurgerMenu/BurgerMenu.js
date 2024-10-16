@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { IconButton, Menu, MenuItem, Typography } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 
-const BurgerMenu = ({ steps, currentStep, onStepChange }) => {
+const BurgerMenu = ({ steps, currentStep, onStepChange, disabled }) => {
   const [anchorEl, setAnchorEl] = useState(null);
 
   const handleClick = (event) => {
@@ -18,7 +18,7 @@ const BurgerMenu = ({ steps, currentStep, onStepChange }) => {
 
   return (
     <>
-      <IconButton onClick={handleClick} color="inherit">
+      <IconButton onClick={handleClick} color="inherit" disabled={disabled}>
         <MenuIcon />
       </IconButton>
       <Menu
