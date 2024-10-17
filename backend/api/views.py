@@ -140,6 +140,44 @@ class QuestionListView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class openAICleanVersion(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        # Get user input
+        data = request.data.get("text")
+        print("++CLEAN DATA TEXT", data)
+        # Load environment variables
+        load_dotenv()
+        AZURE_OPENAI_ENDPOINT= os.getenv("AZURE_OPENAI_ENDPOINT")
+        AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
+        AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT")
+
+        # Initialize the Azure OpenAI client
+        client = AzureOpenAI(
+            api_key=AZURE_OPENAI_API_KEY,
+            api_version="2024-02-15-preview",
+            base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
+        )
+
+        # Create a chat completion
+        response = client.chat.completions.create(
+            model=AZURE_OPENAI_DEPLOYMENT,
+            temperature=0.9,
+            max_tokens=2000,
+          messages=[{ 
+                        "role": "user",
+                        "content": f"""
+                          {data}
+                        """,
+                    }]
+        )
+        # Extract the generated text from the response
+        generated_text = response.choices[0].message.content
+
+        # Return a JSON response
+        return Response({"generated_text": generated_text})
 class openAIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
