@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import mermaid from 'mermaid';
 import axios from 'axios';
 import html2canvas from 'html2canvas';
@@ -14,6 +14,7 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
   const [isEnlarged, setIsEnlarged] = useState(false);
   const [chartContent, setChartContent] = useState('');
 
+  const chartRef = useRef(null)
   const diagramPrompts = [
     `Strictly Generate a basic (no designs) executable Mermaid.js code for the 'question'.
     Output only the Mermaid.js code. Do not include any explanations, comments, or additional text. Translate to target language. Remove the word 'mermaid' in the return answer
@@ -21,6 +22,11 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
     Return code should be execution ready for a mermaid render`
   ];;
   useEffect(() => {
+    
+    if (chartRef.current) {
+      console.log("ChartRef", chartRef.current)
+    }
+
     mermaid.initialize({ 
       startOnLoad: true, 
       suppressErrorRendering: true,     
@@ -179,8 +185,8 @@ function extractMermaidCode(text) {
 
         setChartContent(generated_chart) // Make accessible for the enlarged image
 
-        const mermaidChart = document.getElementById('mermaid-chart');
         // Clear previous content
+        const mermaidChart = chartRef.current
         mermaidChart.innerHTML = ''; 
         mermaidChart.innerHTML = generated_chart; // Set the inner HTML to the chart
         mermaidChart.removeAttribute('data-processed');
@@ -271,6 +277,35 @@ function extractMermaidCode(text) {
     }
   };
 
+  const exportAsPNG = () => {
+    console.log("Mermaid CHart", chartRef.current.querySelector('svg'))
+    const svgElement = chartRef.current.querySelector('svg');
+    const svgData = new XMLSerializer().serializeToString(svgElement);
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    const scaleFactor = 10;
+    
+    img.onload = () => {
+      canvas.width = img.width * scaleFactor;
+      canvas.height = img.height * scaleFactor;
+
+      // Fill the canvas with a white background
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+      ctx.drawImage(img, 0, 0);
+      const pngFile = canvas.toDataURL('image/png');
+      const downloadLink = document.createElement('a');
+      downloadLink.download = 'mermaid-diagram.png';
+      downloadLink.href = pngFile;
+      downloadLink.click();
+    };
+    
+    img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+  };
+
+
   return (
     <Box
       key={question.question_id}
@@ -291,13 +326,21 @@ function extractMermaidCode(text) {
           Generate
         </Button>
         {saveGraph && (
+          <>
           <Button variant="outlined" color="secondary" size="small" onClick={saveDiagram} style={{ marginLeft: '10px' }}>
-            Save Diagram
+            Add to Report
           </Button>
+
+          <Button variant="outlined" color="secondary" size="small" onClick={exportAsPNG} style={{ marginLeft: '10px' }}>
+            Download Diagram
+          </Button>
+          
+          </>
+
         )}
         {loading && <DocumentLoader isLoading={loading} text={"Preparing the Data"} />}
 
-        <div id="mermaid-chart" className="mermaid" style={{ width: '100%', overflow: 'hidden', whiteSpace: 'nowrap' }} onClick={() => setIsEnlarged(true)}></div>
+        <div id="mermaid-chart" ref={chartRef} className="mermaid" style={{ width: '100%', overflow: 'hidden', whiteSpace: 'nowrap' }} onClick={() => setIsEnlarged(true)}></div>
 
         {isEnlarged && <EnlargedImage onClose={() => setIsEnlarged(false)} />}
         {mermaidError && <div style={{ color: 'red' }}>Error: {mermaidError}</div>}

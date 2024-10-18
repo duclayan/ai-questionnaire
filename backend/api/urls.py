@@ -5,6 +5,7 @@ from .views import *
 
 urlpatterns = [
     path("", openAIView.as_view(), name="anything"),
+    path("gpt4o/", openAICleanVersion.as_view(), name="gpt4o"),
     path("questions/", QuestionListView.as_view(), name="questions"),
     path("submit-answers/", AnswersView.as_view(), name="submit_answers"),
     path("generate-report/", GenerateReportView.as_view(), name="generate_report"),
