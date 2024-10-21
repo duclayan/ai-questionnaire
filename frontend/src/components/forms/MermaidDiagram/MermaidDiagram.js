@@ -13,7 +13,9 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
   const [loading, setLoading] = useState(false);
   const [isEnlarged, setIsEnlarged] = useState(false);
   const [chartContent, setChartContent] = useState('');
-
+  const [repeatCount, setRepeatCount] = useState(0);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [repeat, setRepeat] = useState(true);
   const chartRef = useRef(null)
   const diagramPrompts = [
     `Strictly Generate a basic (no designs) executable Mermaid.js code for the 'question'.
@@ -36,7 +38,9 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
           htmlLabels: true // Allow HTML labels for better language support
       }  });
   }, []);
-
+  useEffect(() => {
+    console.log("RepeatCount", repeatCount)
+  }, [repeatCount]);
   useEffect(() => {
     if (isEnlarged) {
       const mermaidChart = document.getElementById('enlarged-mermaid-chart');
@@ -50,21 +54,18 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
         suppressErrors: true,
         supressErrorHandling: true, 
         supressErrorRendering: true  
-      });    }
+      });
+    }
   }, [isEnlarged]);
-
   const handleGenerateClick = async () => {
     // Generate the chart based on the input answer
     const currentAnswer = answers[question.question_id]?.input_answer || "";
     // Render the chart after generating it
     renderMermaid(currentAnswer);
   };
-  async function processMermaidCode(code, repeat = 0) {
-    if (repeat === 3) {
-        return null;
-    }
+  async function processMermaidCode(code) {
 
-    if (code.toLowerCase().includes("we need more information".toLowerCase())) {
+    if (!code || code.toLowerCase().includes("we need more information".toLowerCase())) {
       return null
     }
 
@@ -108,12 +109,10 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
         }
         return cleaned;
     } else {
-        cleaned = await handleMermaidError(cleaned, "This is an invalid MermaidJS Code, generate a mermaidJS code for this");
-        return processMermaidCode(cleaned, repeat + 1);
+        return null
     }
-}
-
-function extractMermaidCode(text) {
+  }
+  function extractMermaidCode(text) {
     // Try to extract Mermaid code from text description
     const mermaidBlockRegex = /```mermaid\n([\s\S]*?)\n```/;
     const match = text.match(mermaidBlockRegex);
@@ -141,100 +140,124 @@ function extractMermaidCode(text) {
     }
 
     return null;
-}
+  }
   const renderMermaid = async (currentAnswer) => {
-    // Check if currentAnswer is valid
-    if (!currentAnswer || currentAnswer.trim() === "") {
-        return; // Exit early if there's no valid answer
-    }
-
-    let generated_chart = "";
-    try {
-
-      for (let i = 0; i < diagramPrompts.length; i++) {
-        try {
-          setLoading(true);
-      
-          const apiUrl = `${apiEndpoint}/api/`;
-          const response = await axios.post(apiUrl, {
-            language: language,
-            text: i === 0 ? answers[question.question_id] : generated_chart, // Use previous result for second prompt
-            prompt_strategy: diagramPrompts[i],
-            question,
-            sample_answer: generated_chart,
-          }, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-    
-          // Process the Mermaid code asynchronously and await the result
-          generated_chart = await processMermaidCode(response.data.generated_text, 0);
-    
-          if (generated_chart === null) {
-            // If processMermaidCode returns null, it means it couldn't generate valid code
-            throw new Error("Unable to generate valid Mermaid code after multiple attempts");
-          }
-    
-        } catch (error) {
-          generated_chart = await handleMermaidError(generated_chart, error.message)
-          renderMermaid(generated_chart)
-
-        } finally {
-          setLoading(false);
-        }
+      // Check if currentAnswer is valid
+      if (!currentAnswer || currentAnswer.trim() === "") {
+        setErrorMessage("No valid answer provided");
+        return;
       }
 
-        setChartContent(generated_chart) // Make accessible for the enlarged image
-
-        // Clear previous content
-        const mermaidChart = chartRef.current
-        mermaidChart.innerHTML = ''; 
-        mermaidChart.innerHTML = generated_chart; // Set the inner HTML to the chart
-        mermaidChart.removeAttribute('data-processed');
-
-        mermaid.run({ 
-          querySelector: '#mermaid-chart',
-          suppressErrors: true,
-          supressErrorHandling: true, 
-          supressErrorRendering: true  
-        });
-
-        // Override parseError to handle errors
-        mermaid.parseError = async (error) => {
-          generated_chart = await handleMermaidError(generated_chart, error.message)
-          renderMermaid(generated_chart)
-          setMermaidError(`Error: Unable to generate a valid diagram, please click generate again`); // Set custom error message
-        };
-        setSaveGraph(true);
-        setMermaidError(null); // Reset error state on successful render
-    } catch (error) {
-        setLoading(false);
-        let errorHandled = false;
-        for (let attempt = 0; attempt < 3; attempt++) {
+      let generated_chart = "";
+      try {
+        setErrorMessage(null);
+        for (let i = 0; i < diagramPrompts.length; i++) {
           try {
-            generated_chart = await handleMermaidError(generated_chart, error.message);
-            if (generated_chart) {
-              errorHandled = true;
-              break;
-            }
-          } catch (handlerError) {
+            setLoading(true);
+            
+            const apiUrl = `${apiEndpoint}/api/`;
+            const response = await axios.post(apiUrl, {
+              language: language,
+              text: i === 0 ? answers[question.question_id] : generated_chart, // Use previous result for second prompt
+              prompt_strategy: diagramPrompts[i],
+              question,
+              sample_answer: generated_chart,
+            }, {
+              headers: { Authorization: `Bearer ${token}` }
+            });     
+            // Process the Mermaid code asynchronously and await the result
+            generated_chart = await processMermaidCode(response.data.generated_text);      
+          } catch (error) {
+            console.log("Diagram Prompts Error:", error)
+          } 
+        }
+
+        // // Override parseError to handle errors
+        // mermaid.parseError = async (error) => {
+        //   generated_chart = await handleMermaidError(generated_chart, error.message)
+        //   setMermaidError(`Error: Unable to generate a valid diagram, please click generate again`); // Set custom error message
+
+        //   // if (!generated_chart){
+        //   //   setSaveGraph(false)
+        //   //   setMermaidError(`Error: Unable to generate a valid diagram, please click generate again`); // Set custom error message
+        //   // }
+        // };
+
+        console.log("THis is the generated chart:", generated_chart)
+        if (generated_chart !== null) {
+          setChartContent(generated_chart);
+          const mermaidChart = chartRef.current;
+          mermaidChart.innerHTML = generated_chart;
+          mermaidChart.removeAttribute('data-processed');
+          try {
+            await mermaid.run({
+              querySelector: '#mermaid-chart',
+              suppressErrors: true,
+            });
+            setSaveGraph(true)
+          } catch (error) {
+            setSaveGraph(false)
+            throw error
           }
-        }
-      
-        if (!errorHandled) {
-          setMermaidError(`Error : Unable to generate a valid diagram after 3 attempts`);
-          generated_chart = null; // Reset the chart if all attempts fail
-        }
-        setMermaidError(null); // Reset error state on successful render
 
-    } finally {
-      setMermaidError(null); // Reset error state on successful render
+        } 
+      } catch (error) {
+        // console.error("RenderMermaid Error", repeatCount, error);
+        if(repeat) {
+          try{
+            generated_chart = await handleMermaidError(generated_chart, error.message)
+            setRepeat(false)
+            renderMermaid(generated_chart)
+          } catch(error) {
+            setErrorMessage("Ooops! Seems like I don't know how to do that yet. You can try rephrasing it or just generate it again.");
+            setSaveGraph(false);
+          }
+        } else {
+          setSaveGraph(false);
+          setErrorMessage("Ooops! Seems like I don't know how to do that yet. You can try rephrasing it or just generate it again.");
+  
+        }
 
-        setLoading(false); // Ensure loading state is reset in case of success or failure
-    }
-}
+        // if (repeat) {
+        //   try {
+        //     generated_chart = await handleMermaidError(generated_chart, error.message);
+        //     setRepeat(false);
+        //     await renderMermaid(generated_chart);
+        //   } catch (retryError) {
+        //     console.error("Error during retry:", retryError);
+        //     setErrorMessage("Error: Unable to generate a valid diagram after retry");
+        //     setSaveGraph(false);
+        //   }
+        // } else {
+        //   setErrorMessage("Error: Unable to generate a valid diagram, please try again");
+        //   setSaveGraph(false);
+        // }
+      } finally {
+        setLoading(false);
+        setRepeatCount(0)
+        // setSaveGraph(true);
+      }
+    };
   const handleMermaidError = async (generated_chart, error_message) => {
-    let corrected_chart = "";
+    let repeat = 0
+    let gpt_output = ``
+    let cleaned_chart = null
 
+    while (repeat < 3) {
+      gpt_output = await gptErrorHandling(generated_chart, error_message)
+      cleaned_chart = await processMermaidCode(gpt_output)
+      console.log("Handle Mermaid Error", cleaned_chart)
+      if (cleaned_chart){
+        console.log("Will return cleaned chart")
+        return cleaned_chart      
+      }
+      repeat++
+    }
+
+    return null
+    
+  }
+  const gptErrorHandling = async (generated_chart, error_message) => {
     let gpt_input = `
     Fix the error for this chart : ${generated_chart},
     Here is the error: ${error_message}
@@ -246,8 +269,7 @@ function extractMermaidCode(text) {
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      corrected_chart = processMermaidCode(response.data.generated_text,0);
-      return corrected_chart
+      return response.data.generated_text
     } catch (error) {
       setMermaidError(`Error in prompt: Unable to generate a valid diagram`);
     } 
@@ -276,7 +298,6 @@ function extractMermaidCode(text) {
       console.error("Diagram is not present/submitted");
     }
   };
-
   const exportAsPNG = () => {
     console.log("Mermaid CHart", chartRef.current.querySelector('svg'))
     const svgElement = chartRef.current.querySelector('svg');
@@ -297,15 +318,13 @@ function extractMermaidCode(text) {
       ctx.drawImage(img, 0, 0);
       const pngFile = canvas.toDataURL('image/png');
       const downloadLink = document.createElement('a');
-      downloadLink.download = 'mermaid-diagram.png';
+      downloadLink.download = 'cloudaisecurity-architecturaldiagram.png';
       downloadLink.href = pngFile;
       downloadLink.click();
     };
     
     img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
   };
-
-
   return (
     <Box
       key={question.question_id}
@@ -322,28 +341,51 @@ function extractMermaidCode(text) {
       }}
     >
       <div style={{ width: '100%', textAlign: 'center' }}>
-        <Button variant="outlined" color="primary" size="small" onClick={handleGenerateClick}>
-          Generate
-        </Button>
-        {saveGraph && (
+        {!loading && (
           <>
-          <Button variant="outlined" color="secondary" size="small" onClick={saveDiagram} style={{ marginLeft: '10px' }}>
-            Add to Report
-          </Button>
+            <Button 
+              variant="outlined" 
+              color="primary" 
+              size="small" 
+              onClick={handleGenerateClick}
+            >
+              Generate
+            </Button>
+            
+            {saveGraph && (
+              <>
+                <Button 
+                  variant="outlined" 
+                  color="secondary" 
+                  size="small" 
+                  onClick={saveDiagram} 
+                  style={{ marginLeft: '10px' }}
+                >
+                  Add to Report
+                </Button>
 
-          <Button variant="outlined" color="secondary" size="small" onClick={exportAsPNG} style={{ marginLeft: '10px' }}>
-            Download Diagram
-          </Button>
-          
+                <Button 
+                  variant="outlined" 
+                  color="secondary" 
+                  size="small" 
+                  onClick={exportAsPNG} 
+                  style={{ marginLeft: '10px' }}
+                >
+                  Download Diagram
+                </Button>
+              </>
+            )}
           </>
-
         )}
+       
         {loading && <DocumentLoader isLoading={loading} text={"Preparing the Data"} />}
+
 
         <div id="mermaid-chart" ref={chartRef} className="mermaid" style={{ width: '100%', overflow: 'hidden', whiteSpace: 'nowrap' }} onClick={() => setIsEnlarged(true)}></div>
 
         {isEnlarged && <EnlargedImage onClose={() => setIsEnlarged(false)} />}
-        {mermaidError && <div style={{ color: 'red' }}>Error: {mermaidError}</div>}
+
+        {errorMessage && <div style={{ color: 'black' }}>{errorMessage}</div>}
       </div>
     </Box>
   );

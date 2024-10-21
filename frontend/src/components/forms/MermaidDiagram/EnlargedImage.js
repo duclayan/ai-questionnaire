@@ -8,10 +8,10 @@ export const EnlargedImage = ({ onClose }) => {
           left: 0,
           width: '100%',
           height: '100%',
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          backgroundColor: 'white',
           display: 'flex',
           justifyContent: 'center',
-          alignItems: 'center',
+          // alignItems: 'center',
           zIndex: 1000,
         }}
         onClick={onClose}
@@ -22,14 +22,17 @@ export const EnlargedImage = ({ onClose }) => {
             className="mermaid" 
             style={{ 
             width: '95%', 
-            height: '95%', 
             backgroundColor: 'white',
             padding: '10px',
             // boxSizing: 'border-box',
             overflow: 'auto', // Changed from 'hidden' to 'auto'
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
+            // display: 'flex',
+            // justifyContent: 'center',
+            // alignItems: 'center',
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
           }} ></div>
       </div>
     );
