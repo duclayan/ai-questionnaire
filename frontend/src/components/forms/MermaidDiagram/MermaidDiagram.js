@@ -55,7 +55,10 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
     // Generate the chart based on the input answer
     const currentAnswer = answers[question.question_id]?.input_answer || "";
     // Render the chart after generating it
-    setErrorMessage('')
+    setErrorMessage(null)
+    if(chartRef) {
+      chartRef.current.innerHTML = ""
+    }
     setRepeat(true)
     renderMermaid(currentAnswer);
   };
@@ -144,10 +147,11 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
       setErrorMessage("No valid answer provided");
       return;
     }
-  
+    let mermaidChart = chartRef.current
     let generated_chart = "";
     setSaveGraph(false)
     try {
+      mermaidChart.innerHTML = ''
       for (let i = 0; i < diagramPrompts.length; i++) {
         try {
           setLoading(true);
@@ -179,7 +183,7 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
         console.error("Mermaid parse error:", mermaidError);
       };
     
-      const mermaidChart = chartRef.current;
+      
       mermaidChart.innerHTML = generated_chart;
       mermaidChart.removeAttribute('data-processed');
       
@@ -219,7 +223,7 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
           }
 
         } catch (retryError) {
-          setErrorMessage("Failed to generate diagram after retry2.");
+          setErrorMessage("Failed to generate diagram after retry.");
           setSaveGraph(false);
         }
       }
@@ -362,27 +366,28 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
             </Button>
             
             {saveGraph && (
-              <>
-                <Button 
-                  variant="outlined" 
-                  color="secondary" 
-                  size="small" 
-                  onClick={saveDiagram} 
-                  style={{ marginLeft: '10px' }}
-                >
-                  Add to Report
-                </Button>
 
-                <Button 
-                  variant="outlined" 
-                  color="secondary" 
-                  size="small" 
-                  onClick={exportAsPNG} 
-                  style={{ marginLeft: '10px' }}
-                >
-                  Download Diagram
-                </Button>
-              </>
+                <>
+                  <Button 
+                    variant="outlined" 
+                    color="secondary" 
+                    size="small" 
+                    onClick={saveDiagram} 
+                    style={{ marginLeft: '10px' }}
+                  >
+                    Add to Report
+                  </Button>
+
+                  <Button 
+                    variant="outlined" 
+                    color="secondary" 
+                    size="small" 
+                    onClick={exportAsPNG} 
+                    style={{ marginLeft: '10px' }}
+                  >
+                    Download Diagram
+                  </Button>
+                </>
             )}
           </>
         )}
