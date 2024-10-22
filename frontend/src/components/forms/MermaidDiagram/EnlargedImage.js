@@ -22,14 +22,15 @@ export const EnlargedImage = ({ onClose }) => {
             className="mermaid" 
             style={{ 
             width: '95%', 
+            maxHeight: '80%',
+            paddingTop: "20px",
             backgroundColor: 'white',
-            padding: '10px',
-            // boxSizing: 'border-box',
+            boxSizing: 'border-box',
             overflow: 'auto', // Changed from 'hidden' to 'auto'
             // display: 'flex',
             // justifyContent: 'center',
             // alignItems: 'center',
-            position: "absolute",
+            position: "relative",
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",

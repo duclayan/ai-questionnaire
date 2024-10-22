@@ -23,7 +23,6 @@ export const InputField = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  console.log("isMobile:", isMobile)
   return (
     <Box
     key={question.question_id}
