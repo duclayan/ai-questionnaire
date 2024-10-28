@@ -10,6 +10,7 @@ import Navbar from './components/navbar/Navbar';
 import Home from './views/Home/Home';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import BackgroundCircle from './views/BackgroundCircle/BackgroundCircle';
+import FileUploadComponent from './components/forms/FileUploadDocument/FileUploadComponent';
 
 function App() {
 
@@ -31,6 +32,7 @@ function App() {
             <Router>
               <Navbar/>
               <Routes>
+                <Route path="/file-upload" element={<FileUploadComponent/>} />
                 <Route path="/" element={<ProtectedRoute element={<Dashboard />} />} />
                 <Route path="/home" element={<Home />} />
                 <Route path="/login" element={<Home />} />

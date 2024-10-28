@@ -29,11 +29,19 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 import base64
 import logging
-
+import json 
+from rest_framework.parsers import MultiPartParser
+from django.shortcuts import get_object_or_404
+import os
+from django.conf import settings
 logger = logging.getLogger(__name__)
 class MockRequest:
     def __init__(self, data):
         self.data = data
+from rest_framework.parsers import MultiPartParser, FormParser
+import os
+from django.conf import settings
+from django.db import IntegrityError
 class DocumentGenerator:
     def create_document_response(self, gpt_response):
         doc = Document()
@@ -127,10 +135,12 @@ class QuestionListView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
         current_category = request.query_params.get("currentCategory")
-        if current_category and current_category != "Report":
+        if current_category == 'all':
+            questions = Question.objects.all()
+        elif current_category and current_category != "Report":
             questions = Question.objects.filter(category=current_category)
         else:
-            questions = ""
+            questions = Question.objects.none()
 
         serializer = QuestionSerializer(questions, many=True)
         return Response({"question_list": serializer.data}, status=status.HTTP_200_OK)
@@ -484,3 +494,92 @@ class SaveDiagram(APIView):
             return Response({"message": "Diagram saved successfully.", "path": path}, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class ProcessDocumentView(APIView):
+    permission_classes = [AllowAny]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request):
+        file = request.FILES.get('file')
+        question = request.data.get('question')
+        if not file:
+            return Response({'error': 'No file uploaded'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Save the file temporarily
+            file_path = os.path.join(settings.MEDIA_ROOT, file.name)
+            with open(file_path, 'wb+') as destination:
+                for chunk in file.chunks():
+                    destination.write(chunk)
+
+            # Read the file content
+            with open(file_path, 'r') as f:
+                text = f.read()
+
+            # Create a mock request with the data
+            prompt_text = {"text": f" Answer the question : '{question}' according to the following information : {text} --- If the question is not in the data, return ''"} 
+
+            mock_request = MockRequest(prompt_text)
+            azure_open_ai = openAICleanVersion()
+            #Process the text with Azure OpenAI
+            result = azure_open_ai.post(mock_request)
+
+            if result.status_code == 200:
+                print("RESULT", result)
+                return result
+            else:
+                return "Failed to generate summary"
+            # return Response({'result': result})
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        finally:
+            # Delete the temporary file
+            if os.path.exists(file_path):
+                os.remove(file_path)
+
+    def put(self, request):
+        data = json.loads(request.body)
+        ref_answers = data.get('ref_answers')
+        project_id = data.get('project_id')
+        fill_all = data.get('fill_all', False)
+
+        # Validate input
+        if not isinstance(ref_answers, list):
+            return Response({"error": "ref_answers must be a list"}, status=status.HTTP_400_BAD_REQUEST)
+
+        project = get_object_or_404(Project, project_id=project_id)
+        updated_answers = []
+
+        for ref in ref_answers:
+            try:
+                question = Question.objects.get(question_id=ref['question_id'])
+                try:
+                    answer = Answer.objects.create(
+                        answer_id =  f"{project_id}-{question.question_id}",
+                        question=question,
+                        project_id=project,
+                        input_answer=ref['ref_answer']
+                    )
+                except IntegrityError:
+                    # Handle the duplicate case, e.g., by updating the existing answer
+                    answer = Answer.objects.get(answer_id = f"{project_id}-{question.question_id}")
+
+                isempty = True if ref.get('ref_answer', '').strip() != '' else False
+                if (fill_all or not answer.input_answer) and isempty:
+                    answer.input_answer = ref['ref_answer'].strip()
+                    answer.save(update_fields=['input_answer'])
+                else:
+                    if(not answer.input_answer):
+                        answer.input_answer = ref['ref_answer'].strip()
+                        answer.save(update_fields=['input_answer'])
+
+
+            except Question.DoesNotExist:
+                print(f"Question with id {ref['question_id']} does not exist")
+            except KeyError as e:
+                print(f"Missing key in ref: {e}")
+
+        return Response({
+            "message": "Answers updated successfully",
+            "updated_answers": updated_answers
+        }, status=status.HTTP_200_OK)
