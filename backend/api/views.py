@@ -505,7 +505,7 @@ class ProcessDocumentView(APIView):
 
         try:
             # Save the file temporarily
-            file_path = os.path.join(settings.MEDIA_ROOT, file.name)
+            file_path = os.path.join(default_storage.location, file.name)
             with open(file_path, 'wb+') as destination:
                 for chunk in file.chunks():
                     destination.write(chunk)
