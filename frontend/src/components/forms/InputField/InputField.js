@@ -1,7 +1,7 @@
 // src/components/forms/InputField/InputField.js
 import React from "react";
 import "./InputField.css";
-import { Box, CircularProgress, FormControl, Grid, IconButton, InputLabel, TextField } from "@mui/material";
+import { Box, CircularProgress, FormControl, Grid, IconButton, InputLabel, TextField, Tooltip } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import MicIcon from "@mui/icons-material/Mic";
 import ErrorIcon from "@mui/icons-material/Error";
@@ -104,9 +104,11 @@ export const InputField = ({
               InputProps={{
                 endAdornment: (
                   <Box sx={{ display: "flex" }}>
-                    <IconButton>
-                      <MicIcon />
-                    </IconButton>
+                    <Tooltip title="Voice recording to text is currently available. We're working on adding this feature in a future update. For now, please use text input." arrow>
+                      <IconButton>
+                        <MicIcon />
+                      </IconButton>
+                    </Tooltip>
                   </Box>
                 ),
               }}
@@ -152,15 +154,21 @@ export const InputField = ({
         endAdornment: (
           <Box sx={{ display: "flex" }}>
             
-            <IconButton onClick={() => handleAutoCorrect(question)}>
-              <CheckCircleIcon />
-            </IconButton>
-            <IconButton>
-              <MicIcon />
-            </IconButton>
-            <IconButton onClick={() => giveSampleAnswer(question)}>
-              <ErrorIcon />
-            </IconButton>
+            <Tooltip title="This is the correction button. It enables you to enhance the text in the input box, translate text, and transform bullet points into more complex paragraphs." arrow>
+              <IconButton onClick={() => handleAutoCorrect(question)}>
+                <CheckCircleIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Voice recording to text is currently available. We're working on adding this feature in a future update. For now, please use text input." arrow>
+              <IconButton>
+                <MicIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Unsure how to formulate your answer? Click this button to receive a sample response, which you can then refine using our correction button for improvements." arrow>
+              <IconButton onClick={() => giveSampleAnswer(question)}>
+                <ErrorIcon />
+              </IconButton>
+            </Tooltip>
             {questionBeingCorrected?.has(question.question_id) && (
               <CircularProgress size={20} sx={{ marginLeft: 1 }} />
             )}

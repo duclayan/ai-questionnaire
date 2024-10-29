@@ -210,7 +210,7 @@ onAnswersChange
                       id="contained-button-file"
                     />
                     <label htmlFor="contained-button-file">
-                      <Tooltip title="Select a document to upload. The current version only accepts .txt file format" arrow>
+                      <Tooltip title="To upload a document, please select a file. The current version only accepts the following formats: .txt, .pdf, and .docx." arrow>
                         <Button variant="contained" component="span">
                           Upload File
                         </Button>
@@ -231,6 +231,7 @@ onAnswersChange
                     </Grid>
                   )}
                   <Grid item>
+                  <Tooltip title="Retrieve answers for questions addressable by your document's content." arrow>
                     <Button 
                       type="submit"
                       variant="outlined" 
@@ -239,6 +240,7 @@ onAnswersChange
                     >
                       Process Document
                     </Button>
+                  </Tooltip>
                   </Grid> 
                 </Grid>
               </form>
@@ -252,6 +254,7 @@ onAnswersChange
               <Grid item xs={12}>
                 <Grid container spacing={2} justifyContent="center">
                   <Grid item>
+                  <Tooltip title="Generated answers will overwrite all existing content in the input boxes." arrow>
                     <Button 
                       variant="outlined" 
                       color="primary" 
@@ -260,8 +263,10 @@ onAnswersChange
                     >
                       Overwrite Answers
                     </Button>
+                  </Tooltip>
                   </Grid>
                   <Grid item>
+                  <Tooltip title="Generated answers will appear only in your empty input box." arrow>
                     <Button 
                       variant="outlined" 
                       color="primary" 
@@ -270,6 +275,7 @@ onAnswersChange
                     >
                       Fill Empty Input Fields
                     </Button>
+                  </Tooltip>
                   </Grid>
                 </Grid>
               </Grid>
