@@ -64,84 +64,57 @@ onAnswersChange
   };
 
   function cleanChatGPTResponse(text) {
-    let cleanedText = text.trim();
-    console.log("Text in GPT:", text);
+    let cleanedText= text.trim();
+    const lastBraceIndex = cleanedText.lastIndexOf('}');
 
-    // Remove code block markers if present
+    console.log("Text in GPT:", text)
+
     if (cleanedText.startsWith('```json') && cleanedText.endsWith('```')) {
         cleanedText = cleanedText.slice(7, -3).trim();
-    } else if (cleanedText.startsWith('```') && cleanedText.endsWith('```')) {
+    } 
+    else if (cleanedText.startsWith('```') && cleanedText.endsWith('```')) {
         cleanedText = cleanedText.slice(3, -3).trim();
-    } else if (cleanedText.startsWith('```json')) {
-        cleanedText = cleanedText.slice(7).trim();
-    } else if (cleanedText.startsWith('```')) {
-        cleanedText = cleanedText.slice(3).trim();
+    }
+    else if (cleanedText.startsWith('```json')) {
+      cleanedText = cleanedText.slice(7).trim();
+      if (lastBraceIndex !== -1) {
+        cleanedText = cleanedText.substring(0, lastBraceIndex + 1) + ']';
+      }
     }
 
-    // Ensure the text starts with an opening bracket
+    else if (cleanedText.startsWith('```')) {
+      cleanedText = cleanedText.slice(3).trim();
+      if (lastBraceIndex !== -1) {
+        cleanedText = cleanedText.substring(0, lastBraceIndex + 1) + ']';
+      }
+    }
+    
     if (!cleanedText.startsWith('[')) {
-        cleanedText = '[' + cleanedText;
+      return
     }
 
-    // Ensure the text ends with a closing bracket
     if (!cleanedText.endsWith(']')) {
-        cleanedText = cleanedText + ']';
+      const lastBraceIndex = cleanedText.lastIndexOf('}');
+      if (lastBraceIndex !== -1) {
+          cleanedText = cleanedText.substring(0, lastBraceIndex + 1) + ']';
+      } else {
+          cleanedText += ']';
+      }
     }
 
+    console.log("Cleaned Text:", text)
     try {
-        // Try to parse the JSON
-        let data = JSON.parse(cleanedText);
-        
-        // Check if the last object is complete
-        if (data.length > 0 && typeof data[data.length - 1] === 'object') {
-            const lastObject = data[data.length - 1];
-            const expectedKeys = ["question_id", "category", "ref_answer"];
-            if (!expectedKeys.every(key => key in lastObject)) {
-                // If the last object is incomplete, remove it
-                data.pop();
-            }
-        }
-        
-        // Convert back to a JSON string
-        cleanedText = JSON.stringify(data, null, 2);
-        console.log("Cleaned Text:", cleanedText);
-        setStatusMessage(`Success in processing ${file.name}`);
-        setResult(true);
-        return data;
+        cleanedText = JSON.parse(cleanedText)
+        setStatusMessage(`Success in processing ${file.name}`)
+        setResult(true)
+        return cleanedText;
     } catch (error) {
-        // If JSON is still invalid, try to fix it
-        cleanedText = cleanedText.replace(/,\s*$/, '');  // Remove trailing comma if present
-        cleanedText = cleanedText.replace(/}\s*$/, '}]');  // Ensure proper closing of the last object and the array
-        
-        try {
-            // Try to parse the fixed JSON
-            let data = JSON.parse(cleanedText);
-            
-            // Check if the last object is complete
-            if (data.length > 0 && typeof data[data.length - 1] === 'object') {
-                const lastObject = data[data.length - 1];
-                const expectedKeys = ["question_id", "category", "ref_answer"];
-                if (!expectedKeys.every(key => key in lastObject)) {
-                    // If the last object is incomplete, remove it
-                    data.pop();
-                }
-            }
-            
-            // Convert back to a JSON string
-            cleanedText = JSON.stringify(data, null, 2);
-            console.log("Cleaned Text:", cleanedText);
-            setStatusMessage(`Success in processing ${file.name}`);
-            setResult(true);
-            return data;
-        } catch (error) {
-            // If still invalid, return an error message
-            console.error("Error parsing JSON:", error);
-            setStatusMessage("Please try processing again, I'm having a hard time understanding it.");
-            setResult(false);
-            return "Error: Unable to parse or fix the JSON.";
-        }
+        // If parsing fails, return the cleaned text as is
+        setStatusMessage("Please try processing again, I'm having a hard time to undesrtand it.")
+        setResult(false)
+        return cleanedText;
     }
-}
+  }
 
   const handleSubmit = async (event) => {
     setIsLoading(true);
