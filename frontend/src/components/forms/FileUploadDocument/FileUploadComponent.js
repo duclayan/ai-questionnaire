@@ -54,7 +54,12 @@ onAnswersChange
       );
       const question_list = response.data.question_list;
 
-      setQuestionList(question_list);
+      const cleanedQuestionList = question_list.map(item => {
+        const { sample_answer, prompt, ...rest } = item;
+        return rest;
+      });
+
+      setQuestionList(cleanedQuestionList);
     } catch (error) {
       console.error("Error fetching questions:", error);
     }
