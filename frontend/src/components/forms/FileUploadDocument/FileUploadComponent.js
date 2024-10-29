@@ -39,7 +39,7 @@ onAnswersChange
     const prompt = `
     Return in JSON Format (just return the json do not include 'json' return as plaintext).
     In reference to the file, Add the 'ref_answer' and remove other attributes aside from 'question_id' and 'category'.
-    Answer the question from this list, ignore 'sample_answer' and 'prompt': ${obj}`
+    Answer each the question from this array: ${obj}`
     setQuestion(prompt)
   }, [questionList]);
 
@@ -142,6 +142,7 @@ onAnswersChange
       setIsLoading(false);
       return;
     }
+
   
     try {
       const formData = new FormData();
@@ -154,6 +155,8 @@ onAnswersChange
         },
       });
   
+      console.log("Questions entered:", question)
+      console.log("File Entered", file)
       const cleaned_text = cleanChatGPTResponse(response.data.generated_text);
       setRefAnswers(cleaned_text);
     } catch (error) {
