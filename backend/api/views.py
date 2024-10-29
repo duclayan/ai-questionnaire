@@ -157,7 +157,6 @@ class openAICleanVersion(APIView):
     def post(self, request):
         # Get user input
         data = request.data.get("text")
-        print("++CLEAN DATA TEXT", data)
         # Load environment variables
         load_dotenv()
         AZURE_OPENAI_ENDPOINT= os.getenv("AZURE_OPENAI_ENDPOINT")
@@ -286,7 +285,6 @@ class ProjectsView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     # Edit an existing project
     def put(self, request):
-        # print(request.data)
         print("Edit an existing project")
 
     # Delete a project
@@ -525,7 +523,6 @@ class ProcessDocumentView(APIView):
             result = azure_open_ai.post(mock_request)
 
             if result.status_code == 200:
-                print("RESULT", result)
                 return result
             else:
                 return "Failed to generate summary"
@@ -564,15 +561,20 @@ class ProcessDocumentView(APIView):
                     # Handle the duplicate case, e.g., by updating the existing answer
                     answer = Answer.objects.get(answer_id = f"{project_id}-{question.question_id}")
 
-                isempty = True if ref.get('ref_answer', '').strip() != '' else False
-                if (fill_all or not answer.input_answer) and isempty:
+                isNotEmpty = True if ref.get('ref_answer', '').strip() != '' else False
+
+                if (fill_all or not answer.input_answer) and isNotEmpty:
                     answer.input_answer = ref['ref_answer'].strip()
                     answer.save(update_fields=['input_answer'])
                     updated_answer_ids.append(answer)
-                elif(not answer.input_answer):
+                else:
+                    if(len(answer.input_answer) < 1):   
                         answer.input_answer = ref['ref_answer'].strip()
                         answer.save(update_fields=['input_answer'])
                         updated_answer_ids.append(answer)
+                    else:
+                        updated_answer_ids.append(answer)
+
 
             except Question.DoesNotExist:
                 print(f"Question with id {ref['question_id']} does not exist")
