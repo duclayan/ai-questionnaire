@@ -532,7 +532,7 @@ class ProcessDocumentView(APIView):
         finally:
             # Delete the temporary file
             if os.path.exists(file_path):
-                os.remove(file_path)
+                default_storage.delete(file_path)
 
     def put(self, request):
         data = json.loads(request.body)
