@@ -97,7 +97,7 @@ onAnswersChange
     if (!cleanedText.endsWith(']')) {
       const lastBraceIndex = cleanedText.lastIndexOf('}');
       if (lastBraceIndex !== -1) {
-          cleanedText = cleanedText.substring(0, lastBraceIndex + 1) + ']';
+          cleanedText = cleanedText.substring(0, lastBraceIndex) + ']';
       } else {
           cleanedText += ']';
       }
