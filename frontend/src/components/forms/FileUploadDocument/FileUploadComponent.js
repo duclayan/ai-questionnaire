@@ -103,7 +103,7 @@ onAnswersChange
       }
     }
 
-    console.log("Cleaned Text:", text)
+    console.log("Cleaned Text:", cleanedText)
     try {
         cleanedText = JSON.parse(cleanedText)
         setStatusMessage(`Success in processing ${file.name}`)
