@@ -38,7 +38,8 @@ onAnswersChange
     const obj = JSON.stringify(questionList)
     const prompt = `
     Return in JSON Format (just return the json do not include 'json' return as plaintext).
-    In reference to the file, Add the 'ref_answer' and remove other attributes aside from 'question_id' and 'category' for each of these question in this list answer the question : ${obj}`
+    In reference to the file, Add the 'ref_answer' and remove other attributes aside from 'question_id' and 'category'.
+    Answer the question from this list, ignore 'sample_answer' and 'prompt': ${obj}`
     setQuestion(prompt)
   }, [questionList]);
 
@@ -88,7 +89,7 @@ onAnswersChange
         cleanedText = cleanedText.substring(0, lastBraceIndex + 1) + ']';
       }
     }
-    
+
     if (!cleanedText.startsWith('[')) {
       return
     }
