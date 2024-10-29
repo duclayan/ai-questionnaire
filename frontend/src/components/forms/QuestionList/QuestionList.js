@@ -6,6 +6,7 @@ import { NavigationButtons } from "../NavigationButtons/NavigationButtons";
 import { AutoCorrectSettings } from "../AutoCorrectSettings/AutoCorrectSettings";
 import { InputField } from "../InputField/InputField";
 import { MermaidDiagram } from "../MermaidDiagram/MermaidDiagram";
+import FileUploadComponent from "../FileUploadDocument/FileUploadComponent";
 
 export const QuestionList = ({
   currentStep,
@@ -28,6 +29,7 @@ export const QuestionList = ({
   setIsFormSubmitted
 }) => {
   const categories = [
+    "Upload File",
     "General Information",
     "Authentication and Authorization",
     "Application Architecture",
@@ -282,12 +284,21 @@ export const QuestionList = ({
     }
   }
 
+  const handleDocumentSubmit = async (answers) => {
+    setAnswers(answers)
+  }
   if (loading) {
     return <DocumentLoader isLoading={loading} text={"Preparing the Data"} />;
   }
 
   return (
     <Box sx={{ mt: 4, paddingBottom: '100px'}}>
+          {currentCategory === "Upload File" ? (
+            <>
+              <FileUploadComponent project_id={projectID} onAnswersChange={handleDocumentSubmit}/>
+            </>
+          ) : null}
+
       {questions.map((question) => (
         <>
           <InputField

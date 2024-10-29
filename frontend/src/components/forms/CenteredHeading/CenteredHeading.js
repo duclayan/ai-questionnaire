@@ -3,6 +3,7 @@ import { Typography, Box } from "@mui/material";
 
 export const CenteredHeading = ({ currentStep }) => {
   const steps = [
+    "Upload File",
     "General Information",
     "Authentication Authorization Concept",
     "Application Design",

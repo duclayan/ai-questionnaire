@@ -548,7 +548,7 @@ class ProcessDocumentView(APIView):
             return Response({"error": "ref_answers must be a list"}, status=status.HTTP_400_BAD_REQUEST)
 
         project = get_object_or_404(Project, project_id=project_id)
-        updated_answers = []
+        updated_answer_ids = []
 
         for ref in ref_answers:
             try:
@@ -568,18 +568,23 @@ class ProcessDocumentView(APIView):
                 if (fill_all or not answer.input_answer) and isempty:
                     answer.input_answer = ref['ref_answer'].strip()
                     answer.save(update_fields=['input_answer'])
-                else:
-                    if(not answer.input_answer):
+                    updated_answer_ids.append(answer)
+                elif(not answer.input_answer):
                         answer.input_answer = ref['ref_answer'].strip()
                         answer.save(update_fields=['input_answer'])
-
+                        updated_answer_ids.append(answer)
 
             except Question.DoesNotExist:
                 print(f"Question with id {ref['question_id']} does not exist")
             except KeyError as e:
                 print(f"Missing key in ref: {e}")
+            serialized_answers = AnswerSerializer(updated_answer_ids, many=True)
+            updated_answers_dict = {}
+            for answer in serialized_answers.data:
+                question_id = answer['question']  # Assuming 'question' field contains the question_id
+                updated_answers_dict[question_id] = answer
 
         return Response({
             "message": "Answers updated successfully",
-            "updated_answers": updated_answers
+            "updated_answers": updated_answers_dict
         }, status=status.HTTP_200_OK)

@@ -4,6 +4,7 @@ import BurgerMenu from "../BurgerMenu/BurgerMenu";
 
 export const StepNavigation = ({ currentStep, handleStepChange, isFormSubmitted, isMobile }) =>  {
   const steps = [
+    "Upload File",
     "General Information",
     "Authentication Authorization Concept",
     "Application Design",

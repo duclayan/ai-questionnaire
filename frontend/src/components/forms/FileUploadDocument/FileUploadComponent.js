@@ -2,12 +2,16 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { DocumentLoader } from '../DocumentLoader/DocumentLoader';
 
-function FileUploadComponent() {
+export const FileUploadComponent = ({
+project_id,
+onAnswersChange
+}) => {
   const [file, setFile] = useState(null);
   const [questionList, setQuestionList] = useState([]);
   const [refAnswers, setRefAnswers] = useState([]);
   const [question, setQuestion] = useState('');
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState(false);
+  const [statusMessage, setStatusMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT;
   const token = localStorage.getItem('token');
@@ -50,10 +54,6 @@ function FileUploadComponent() {
     setFile(event.target.files[0]);
   };
 
-  const handleQuestionChange = (event) => {
-    setQuestion(event.target.value);
-  };
-
   function cleanChatGPTResponse(text) {
     let cleanedText= text.trim();
     const lastBraceIndex = cleanedText.lastIndexOf('}');
@@ -81,9 +81,13 @@ function FileUploadComponent() {
     }
 
     try {
-        return JSON.parse(cleanedText);
+        cleanedText = JSON.parse(cleanedText)
+        setResult(true)
+        return cleanedText;
     } catch (error) {
         // If parsing fails, return the cleaned text as is
+        setStatusMessage("Please try processing again, I'm having a hard time to undesrtand it.")
+        setResult(false)
         return cleanedText;
     }
   }
@@ -96,6 +100,7 @@ function FileUploadComponent() {
     // Handle Empty File
     if (!file) {
       alert('Please select a file');
+      setIsLoading(false)
       return;
     }
 
@@ -115,14 +120,13 @@ function FileUploadComponent() {
 
       // Cleaned text from the response
       const cleaned_text = cleanChatGPTResponse(response.data.generated_text)
-      console.log("Final Text:", cleaned_text)
       setRefAnswers(cleaned_text)
-      setResult(JSON.stringify(cleaned_text))
-
       // Save to the answers
     } catch (error) {
+      setStatusMessage("Please try processing again, I'm having a hard time to undesrtand it")
       console.error('Error processing file:', error);
       alert('Error processing file');
+      setIsLoading(false)
     }      
     setIsLoading(false)
   };
@@ -132,7 +136,7 @@ function FileUploadComponent() {
     try {
       const response = await axios.put(`${apiEndpoint}/api/process-document/`, 
         {
-          project_id: 16, 
+          project_id: project_id, 
           ref_answers: refAnswers,
           fill_all: fill_all,
         },
@@ -143,11 +147,13 @@ function FileUploadComponent() {
         }
       );
 
-      console.log("Update Successful", response.data)
-
+      onAnswersChange(response.data.updated_answers)
+      setStatusMessage("Update is successful")
+      setResult(false)
     } catch (error) {
       console.error('Error processing file:', error);
       alert('Error processing file');
+      setIsLoading(false)
     }      
 
     setIsLoading(false)
@@ -160,14 +166,17 @@ function FileUploadComponent() {
         <button type="submit">Process Document</button>
       </form>
 
-      <button type="button" onClick={() => handleAnswerFilling(true)}>Overwrite Answers</button>
-      <button type="button" onClick={() => handleAnswerFilling(false)}>Fill Empty Input Fields</button>
       <DocumentLoader isLoading={isLoading} text={"Processing the Data"}  />
 
       {result && (
         <div>
-          <h3>Result:</h3>
-          <p>{result}</p>
+            <button type="button" onClick={() => handleAnswerFilling(true)}>Overwrite Answers</button>
+            <button type="button" onClick={() => handleAnswerFilling(false)}>Fill Empty Input Fields</button>
+        </div>
+      )}
+      {statusMessage && (
+        <div>
+           {statusMessage}
         </div>
       )}
     </div>
