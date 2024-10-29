@@ -14,7 +14,7 @@ function Form() {
   const [textTimeoutEnabled, setTextTimeoutEnabled] = useState(true);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   const token = localStorage.getItem('token');
-  const totalSteps = 7;
+  const totalSteps = 8;
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT
   const { project_id } = useParams();
   const theme = useTheme();

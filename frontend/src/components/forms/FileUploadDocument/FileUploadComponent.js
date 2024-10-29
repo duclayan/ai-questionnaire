@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { DocumentLoader } from '../DocumentLoader/DocumentLoader';
+import { 
+  Button, 
+  Grid, 
+  Typography, 
+  Box, 
+  Container,
+  TextField,
+  Tooltip
+} from '@mui/material';
 
 export const FileUploadComponent = ({
 project_id,
@@ -82,6 +91,7 @@ onAnswersChange
 
     try {
         cleanedText = JSON.parse(cleanedText)
+        setStatusMessage(`Success in processing ${file.name}`)
         setResult(true)
         return cleanedText;
     } catch (error) {
@@ -95,7 +105,8 @@ onAnswersChange
   const handleSubmit = async (event) => {
 
     setIsLoading(true)
-
+    setResult(false)
+    setStatusMessage('')
     event.preventDefault();
     // Handle Empty File
     if (!file) {
@@ -160,26 +171,93 @@ onAnswersChange
   };
 
   return (
-    <div>
-      <form onSubmit={handleSubmit}>
-        <input type="file" onChange={handleFileChange} />
-        <button type="submit">Process Document</button>
-      </form>
+      <Container maxWidth="sm">
+        <Box sx={{ mt: 4 }}>
+          <Grid container direction="column" spacing={3} alignItems="center">
+            <Grid item xs={12}>
+              <form onSubmit={handleSubmit}>
+                <Grid container direction="column" spacing={2} alignItems="center">
+                  <Grid item>
+                    <input
+                      type="file"
+                      onChange={handleFileChange}
+                      style={{ display: 'none' }}
+                      id="contained-button-file"
+                    />
+                    <label htmlFor="contained-button-file">
+                      <Tooltip title="Select a document to upload. The current version only accepts .txt file format" arrow>
+                        <Button variant="contained" component="span">
+                          Upload File
+                        </Button>
+                      </Tooltip>
+                    </label>
+                  </Grid>
 
-      <DocumentLoader isLoading={isLoading} text={"Processing the Data"}  />
-
-      {result && (
-        <div>
-            <button type="button" onClick={() => handleAnswerFilling(true)}>Overwrite Answers</button>
-            <button type="button" onClick={() => handleAnswerFilling(false)}>Fill Empty Input Fields</button>
-        </div>
-      )}
-      {statusMessage && (
-        <div>
-           {statusMessage}
-        </div>
-      )}
-    </div>
+                  {file && (
+                    <Grid item>
+                      <TextField
+                        variant="outlined"
+                        size="small"
+                        value={file.name}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                      />
+                    </Grid>
+                  )}
+                  <Grid item>
+                    <Button 
+                      type="submit"
+                      variant="outlined" 
+                      color="primary" 
+                      size="medium"
+                    >
+                      Process Document
+                    </Button>
+                  </Grid> 
+                </Grid>
+              </form>
+            </Grid>
+  
+            <Grid item xs={12}>
+              <DocumentLoader isLoading={isLoading} text={"Processing the Data"} />
+            </Grid>
+  
+            {result && (
+              <Grid item xs={12}>
+                <Grid container spacing={2} justifyContent="center">
+                  <Grid item>
+                    <Button 
+                      variant="outlined" 
+                      color="primary" 
+                      size="medium" 
+                      onClick={() => handleAnswerFilling(true)}
+                    >
+                      Overwrite Answers
+                    </Button>
+                  </Grid>
+                  <Grid item>
+                    <Button 
+                      variant="outlined" 
+                      color="primary" 
+                      size="medium" 
+                      onClick={() => handleAnswerFilling(false)}
+                    >
+                      Fill Empty Input Fields
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Grid>
+            )}
+  
+            {statusMessage && (
+              <Grid item xs={12}>
+                <Typography align="center">{statusMessage}</Typography>
+              </Grid>
+            )}
+          </Grid>
+        </Box>
+      </Container>
   );
 }
 
