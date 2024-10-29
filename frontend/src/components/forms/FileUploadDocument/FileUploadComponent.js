@@ -103,45 +103,47 @@ onAnswersChange
   }
 
   const handleSubmit = async (event) => {
-
-    setIsLoading(true)
-    setResult(false)
-    setStatusMessage('')
+    setIsLoading(true);
+    setResult(false);
+    setStatusMessage('');
     event.preventDefault();
     // Handle Empty File
     if (!file) {
       alert('Please select a file');
-      setIsLoading(false)
+      setIsLoading(false);
       return;
     }
-
+    // Check file type
+    const allowedExtensions = ['.docx', '.pdf', '.pptx', '.txt', '.md'];
+    const fileExtension = file.name.split('.').pop().toLowerCase();
+    
+    if (!allowedExtensions.includes(`.${fileExtension}`)) {
+      alert('Please select a Word document, PDF, PowerPoint presentation, or text file.');
+      setIsLoading(false);
+      return;
+    }
+  
     try {
       const formData = new FormData();
       formData.append('file', file);
-      // Get the questions is in json format
       formData.append('question', question);
-
-      // Process Document - saves the file, calls gpt to put the question and file, return answer in json format
-      // Return: ref_answer, question_id, category
+  
       const response = await axios.post(`${apiEndpoint}/api/process-document/`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-
-      // Cleaned text from the response
-      const cleaned_text = cleanChatGPTResponse(response.data.generated_text)
-      setRefAnswers(cleaned_text)
-      // Save to the answers
+  
+      const cleaned_text = cleanChatGPTResponse(response.data.generated_text);
+      setRefAnswers(cleaned_text);
     } catch (error) {
-      setStatusMessage("Please try processing again, I'm having a hard time to undesrtand it")
+      setStatusMessage("Please try processing again, I'm having a hard time understanding it");
       console.error('Error processing file:', error);
       alert('Error processing file');
-      setIsLoading(false)
-    }      
-    setIsLoading(false)
+    } finally {
+      setIsLoading(false);
+    }
   };
-
   const handleAnswerFilling = async (fill_all) => {
     setIsLoading(true)
     try {

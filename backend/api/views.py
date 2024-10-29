@@ -40,6 +40,9 @@ class MockRequest:
         self.data = data
 from rest_framework.parsers import MultiPartParser, FormParser
 import os
+import docx
+import PyPDF2
+import tempfile
 from django.conf import settings
 from django.db import IntegrityError
 class DocumentGenerator:
@@ -504,35 +507,43 @@ class ProcessDocumentView(APIView):
             return Response({'error': 'No file uploaded'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # Save the file temporarily
-            file_path = os.path.join(default_storage.location, file.name)
-            with open(file_path, 'wb+') as destination:
+            # Create a temporary file
+            with tempfile.NamedTemporaryFile(delete=False) as temp_file:
                 for chunk in file.chunks():
-                    destination.write(chunk)
+                    temp_file.write(chunk)
+                temp_file_path = temp_file.name
 
-            # Read the file content
-            with open(file_path, 'r') as f:
-                text = f.read()
+            # Read the file content based on its type
+            file_extension = os.path.splitext(file.name)[1].lower()
+            if file_extension == '.docx':
+                doc = docx.Document(temp_file_path)
+                text = '\n'.join([paragraph.text for paragraph in doc.paragraphs])
+            elif file_extension == '.pdf':
+                with open(temp_file_path, 'rb') as pdf_file:
+                    pdf_reader = PyPDF2.PdfReader(pdf_file)
+                    text = '\n'.join([page.extract_text() for page in pdf_reader.pages])
+            else:  # Assume it's a text file
+                with open(temp_file_path, 'r', encoding='utf-8') as f:
+                    text = f.read()
 
             # Create a mock request with the data
-            prompt_text = {"text": f" Answer the question : '{question}' according to the following information : {text} --- If the question is not in the data, return ''"} 
+            prompt_text = {"text": f"Answer the question: '{question}' according to the following information: {text} --- If the question is not in the data, return ''"}
 
             mock_request = MockRequest(prompt_text)
             azure_open_ai = openAICleanVersion()
-            #Process the text with Azure OpenAI
+            # Process the text with Azure OpenAI
             result = azure_open_ai.post(mock_request)
 
             if result.status_code == 200:
                 return result
             else:
-                return "Failed to generate summary"
-            # return Response({'result': result})
+                return Response({'error': 'Failed to generate summary'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         finally:
             # Delete the temporary file
-            if os.path.exists(file_path):
-                default_storage.delete(file_path)
+            if os.path.exists(temp_file_path):
+                os.unlink(temp_file_path)
 
     def put(self, request):
         data = json.loads(request.body)
