@@ -66,8 +66,8 @@ onAnswersChange
   function cleanChatGPTResponse(text) {
     let cleanedText= text.trim();
     const lastBraceIndex = cleanedText.lastIndexOf('}');
-    
 
+    console.log("Text in GPT:", text)
 
     if (cleanedText.startsWith('```json') && cleanedText.endsWith('```')) {
         cleanedText = cleanedText.slice(7, -3).trim();
@@ -89,6 +89,7 @@ onAnswersChange
       }
     }
 
+    console.log("Cleaned Text:", text)
     try {
         cleanedText = JSON.parse(cleanedText)
         setStatusMessage(`Success in processing ${file.name}`)
