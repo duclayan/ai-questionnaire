@@ -28,6 +28,9 @@ class Question(models.Model):
     prompt = models.TextField()
     sample_answer = models.TextField()
 
+    class Meta:
+        ordering = ["question_id"]
+        
     def __str__(self):
         return self.question
 
