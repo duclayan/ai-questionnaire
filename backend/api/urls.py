@@ -11,7 +11,10 @@ urlpatterns = [
     path("submit-answers/", AnswersView.as_view(), name="submit_answers"),
     path("generate-report/", GenerateReportView.as_view(), name="generate_report"),
     path("projects/", ProjectsView.as_view(), name="projects"),
-    path('projects/<int:pk>/', ProjectsView.as_view(), name='project-detail'), 
+    path("projects/<int:pk>/", ProjectsView.as_view(), name="project-detail"),
     path("login/", UserView.as_view(), name="users"),
-    path("save-diagram/", SaveDiagram.as_view(), name='save_diagram'),
+    path("save-diagram/", SaveDiagram.as_view(), name="save_diagram"),
+    path("documents/", DocumentView.as_view(), name="document-list"),
+    path("documents/<int:pk>/", DocumentDetailView.as_view(), name="document-detail"),
+    path("ask/", QuestionView.as_view(), name="ask-question"),
 ]

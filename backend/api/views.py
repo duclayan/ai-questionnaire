@@ -41,10 +41,27 @@ class MockRequest:
 from rest_framework.parsers import MultiPartParser, FormParser
 import os
 import docx
-import PyPDF2
-import tempfile
+from PyPDF2 import PdfReader
 from django.conf import settings
 from django.db import IntegrityError
+from django.http import Http404
+
+from langchain_community.document_loaders import UnstructuredFileLoader
+from langchain.text_splitter import CharacterTextSplitter
+# from langchain_community.embeddings import AzureOpenAIEmbeddings
+# from langchain_community.vectorstores import FAISS
+# from langchain_community.chains import RetrievalQA
+
+from langchain_openai import AzureOpenAIEmbeddings, AzureChatOpenAI
+import bs4
+from langchain import hub
+from langchain_chroma import Chroma
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain.chains import RetrievalQA
+
+from langchain_community.document_loaders import PyPDFLoader
 class DocumentGenerator:
     def create_document_response(self, gpt_response):
         doc = Document()
@@ -153,7 +170,6 @@ class QuestionListView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
 class openAICleanVersion(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -495,7 +511,6 @@ class SaveDiagram(APIView):
             return Response({"message": "Diagram saved successfully.", "path": path}, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
 class ProcessDocumentView(APIView):
     permission_classes = [AllowAny]
     parser_classes = [MultiPartParser, FormParser]
@@ -586,7 +601,6 @@ class ProcessDocumentView(APIView):
                     else:
                         updated_answer_ids.append(answer)
 
-
             except Question.DoesNotExist:
                 print(f"Question with id {ref['question_id']} does not exist")
             except KeyError as e:
@@ -601,3 +615,161 @@ class ProcessDocumentView(APIView):
             "message": "Answers updated successfully",
             "updated_answers": updated_answers_dict
         }, status=status.HTTP_200_OK)
+class DocumentView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        documents = RagDocument.objects.all()
+        serializer = RagDocumentSerializer(documents, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        file = request.FILES.get('file')
+        if not file:
+            return Response({'error': 'No file provided'}, status=status.HTTP_400_BAD_REQUEST)
+        document = RagDocument.objects.create(file=file)
+        document.save()
+        # document = RagDocument.objects.create(file=file)
+        
+        # serializer = RagDocumentSerializer(data={'file': file})
+        # if serializer.is_valid():
+        #     document = serializer.save()
+
+        #     # Process the uploaded file using LangChain
+        #     loader = UnstructuredFileLoader(document.file.path)
+        #     documents = loader.load()
+
+        #     # Split the document into chunks
+        #     text_splitter = CharacterTextSplitter(
+        #         chunk_size=1000, chunk_overlap=200, add_start_index=True
+        #     )
+        #     texts = text_splitter.split_documents(documents)
+
+        #     # Create embeddings and store in vector database
+        #     embeddings = AzureOpenAIEmbeddings(
+        #         azure_deployment=os.getenv(
+        #             "RAG_AZURE_OPENAI_EMBEDDING_DEPLOYMENT_NAME"
+        #         ),
+        #         openai_api_version=os.getenv("RAG_API_VERSION"),
+        #     )
+        #     vectorstore = Chroma.from_documents(documents=texts, embedding=embeddings)
+
+        #     # Save the vectorstore (you might want to implement a more robust storage solution)
+        #     # document.vectorstore = vectorstore  # Uncomment if you have a field for this
+        #     # document.save()  # Uncomment if you save the vectorstore in the document
+
+        #     retriever = vectorstore.as_retriever(
+        #         search_type="similarity", search_kwargs={"k": 6}
+        #     )
+        #     document.vectorstore = vectorstore
+        #     document.save()
+
+        #     return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_201_CREATED)
+        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class DocumentDetailView(APIView):
+    permission_classes = [AllowAny]
+
+    def get_object(self, pk):
+        try:
+            return RagDocument.objects.get(pk=pk)
+        except RagDocument.DoesNotExist:
+            raise Http404("Document not found")
+
+    def get(self, request, pk):
+        document = self.get_object(pk)
+        serializer = RagDocumentSerializer(document)
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        document = self.get_object(pk)
+        serializer = RagDocumentSerializer(document, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        document = self.get_object(pk)
+        document.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+class QuestionView(APIView):
+    permission_classes = [AllowAny]
+    def extract_text_from_pdf(pdf_file):
+        reader = PdfReader(pdf_file)
+        text = ""
+        for page in reader.pages:
+            text += page.extract_text() + "\n"
+        return text
+
+
+    def post(self, request):
+        question = request.data.get("question")
+        document_id = request.data.get("document_id")
+        text = ""
+
+        load_dotenv()
+        import io
+        try:
+            document = RagDocument.objects.get(pk=document_id)
+            pdf_file = f"media/{document.file}"
+            reader = PdfReader(pdf_file)
+
+            for page in reader.pages:
+                text += page.extract_text() + "\n"
+
+        except RagDocument.DoesNotExist:
+            return Response(
+                {"error": "Document not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        llm = AzureChatOpenAI(
+            azure_endpoint=os.getenv("RAG_AZURE_OPENAI_ENDPOINT"),
+            openai_api_version=os.getenv("RAG_API_VERSION"),
+            deployment_name=os.getenv("RAG_AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"),
+            openai_api_key=os.getenv("RAG_AZURE_OPENAI_API_KEY"),
+            openai_api_type=os.getenv("RAG_OPEN_API_TYPE"),
+        )
+
+        prompt = hub.pull("rlm/rag-prompt")
+
+        def format_docs(docs):
+            return "\n\n".join(doc.page_content for doc in docs)
+
+        from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=1000, chunk_overlap=200, add_start_index=True
+        )
+        all_splits = text_splitter.split_text(text)
+
+        # Initialize Azure OpenAI embeddings
+        embeddings = AzureOpenAIEmbeddings(
+            deployment=os.getenv("RAG_AZURE_OPENAI_EMBEDDING_DEPLOYMENT_NAME"),
+            model=os.getenv("RAG_AZURE_OPENAI_EMBEDDING_MODEL"),
+            openai_api_version= os.getenv("RAG_API_VERSION"),
+            api_key= os.getenv("RAG_AZURE_OPENAI_API_KEY"),
+            azure_endpoint= os.getenv("RAG_AZURE_OPENAI_ENDPOINT")
+        )
+
+        vectorstore = Chroma.from_texts(texts=all_splits, embedding=embeddings)
+        # vectorstore = Chroma.from_documents(texts=splits, embedding=embeddings)
+        retriever = vectorstore.as_retriever(
+            search_type="similarity", search_kwargs={"k": 6}
+        )
+
+        rag_chain = (
+            {"context": retriever | format_docs, "question": RunnablePassthrough()}
+            | prompt
+            | llm
+            | StrOutputParser()
+        )
+
+        answer_collection = []
+        for chunk in rag_chain.stream(question):
+            answer_collection += chunk
+            # print(chunk, end="", flush=True)
+        result = "".join(answer_collection)
+        print(result)
+        return Response({"answer": result})

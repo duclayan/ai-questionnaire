@@ -11,6 +11,7 @@ import Home from './views/Home/Home';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import BackgroundCircle from './views/BackgroundCircle/BackgroundCircle';
 import FileUploadComponent from './components/forms/FileUploadDocument/FileUploadComponent';
+import ChatComponent from './views/ChatComponent/ChatComponent';
 
 function App() {
 
@@ -39,7 +40,7 @@ function App() {
                 <Route path="/form" element={<ProtectedRoute element={<Form />} />} />
                 <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
                 <Route path="/forms/:project_id" element={<ProtectedRoute element={<Form />} />} />
-                
+                <Route path="/chat" element={<ChatComponent/>} />
                 {/* Redirect all unmatched routes to the dashboard */}
                 <Route path="*" element={<ProtectedRoute element={<Dashboard />} />} />
               </Routes>

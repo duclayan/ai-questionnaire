@@ -28,3 +28,7 @@ class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField()
     captcha = CaptchaField()
+class RagDocumentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RagDocument
+        fields = ["id", "file", "uploaded_at"]
