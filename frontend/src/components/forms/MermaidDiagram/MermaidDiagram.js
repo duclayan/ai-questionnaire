@@ -336,7 +336,15 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
     
     img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
   };
-
+  const exportAsSVG = () => {
+    const svgElement = chartRef.current.querySelector("svg");
+    const svgData = new XMLSerializer().serializeToString(svgElement);
+    const blob = new Blob([svgData], {type: "image/svg+xml"});
+    const downloadLink = document.createElement("a");
+    downloadLink.download = "cloudaisecurity-architecturaldiagram.svg";
+    downloadLink.href = URL.createObjectURL(blob);
+    downloadLink.click();
+  };
   return (
     
     <Box
@@ -385,7 +393,17 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
                     onClick={exportAsPNG} 
                     style={{ marginLeft: '10px' }}
                   >
-                    Download Diagram
+                    Download PNG Diagram
+                  </Button>
+
+                  <Button 
+                    variant="outlined" 
+                    color="secondary" 
+                    size="small" 
+                    onClick={exportAsSVG} 
+                    style={{ marginLeft: '10px' }}
+                  >
+                    Download SVG Diagram
                   </Button>
                 </>
             )}
