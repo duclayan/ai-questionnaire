@@ -14,6 +14,7 @@ import {
   CardContent,
   CardActions,
   Box,
+  Tooltip,
 } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
 import { Link, useNavigate  } from 'react-router-dom';
@@ -129,14 +130,19 @@ const Dashboard = () => {
                   <Typography className="card-owner hover-white">Owner: {project.owner_name}</Typography>
                 </Box>
                 <CardActions>
-                  <IconButton aria-label="edit" className="edit-button" sx={{ color: '#00695c' }}>
-                    <Link to={`/forms/${project.project_id}`} >
-                      <Edit />
-                    </Link>
-                  </IconButton>
-                  <IconButton aria-label="delete" className="edit-button" sx={{ color: '#00695c' }} onClick={() => handleDeleteProject(project.project_id)}>
-                    <Delete />
-                  </IconButton>
+                  <Tooltip title="Edit/Update" arrow>
+                    <IconButton aria-label="edit" className="edit-button" sx={{ color: '#00695c' }}>
+                      <Link to={`/forms/${project.project_id}`} >
+                        <Edit />
+                      </Link>
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Delete Project" arrow>
+
+                    <IconButton aria-label="delete" className="edit-button" sx={{ color: '#00695c' }} onClick={() => handleDeleteProject(project.project_id)}>
+                      <Delete />
+                    </IconButton>
+                  </Tooltip>
                 </CardActions>
               </CardContent>
             </Card>

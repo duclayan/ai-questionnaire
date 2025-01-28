@@ -38,7 +38,8 @@ onAnswersChange
     const obj = JSON.stringify(questionList)
     const prompt = `
     Return in JSON Format (just return the json do not include 'json' return as plaintext).
-    In reference to the file, Add the 'ref_answer' and remove other attributes aside from 'question_id' and 'category' for each of these question in this list answer the question : ${obj}`
+    In reference to the file, Add the 'ref_answer' and remove other attributes aside from 'question_id' and 'category'.
+    Answer each the question from this array: ${obj}`
     setQuestion(prompt)
   }, [questionList]);
 
@@ -53,7 +54,12 @@ onAnswersChange
       );
       const question_list = response.data.question_list;
 
-      setQuestionList(question_list);
+      const cleanedQuestionList = question_list.map(item => {
+        const { sample_answer, prompt, ...rest } = item;
+        return rest;
+      });
+
+      setQuestionList(cleanedQuestionList);
     } catch (error) {
       console.error("Error fetching questions:", error);
     }
@@ -66,8 +72,8 @@ onAnswersChange
   function cleanChatGPTResponse(text) {
     let cleanedText= text.trim();
     const lastBraceIndex = cleanedText.lastIndexOf('}');
-    
 
+    console.log("Text in GPT:", text)
 
     if (cleanedText.startsWith('```json') && cleanedText.endsWith('```')) {
         cleanedText = cleanedText.slice(7, -3).trim();
@@ -89,6 +95,20 @@ onAnswersChange
       }
     }
 
+    if (!cleanedText.startsWith('[')) {
+      return
+    }
+
+    if (!cleanedText.endsWith(']')) {
+      const lastBraceIndex = cleanedText.lastIndexOf('}');
+      if (lastBraceIndex !== -1) {
+          cleanedText = cleanedText.substring(0, lastBraceIndex) + ']';
+      } else {
+          cleanedText += ']';
+      }
+    }
+
+    console.log("Cleaned Text:", cleanedText)
     try {
         cleanedText = JSON.parse(cleanedText)
         setStatusMessage(`Success in processing ${file.name}`)
@@ -122,6 +142,7 @@ onAnswersChange
       setIsLoading(false);
       return;
     }
+
   
     try {
       const formData = new FormData();
@@ -134,6 +155,8 @@ onAnswersChange
         },
       });
   
+      console.log("Questions entered:", question)
+      console.log("File Entered", file)
       const cleaned_text = cleanChatGPTResponse(response.data.generated_text);
       setRefAnswers(cleaned_text);
     } catch (error) {
@@ -187,7 +210,7 @@ onAnswersChange
                       id="contained-button-file"
                     />
                     <label htmlFor="contained-button-file">
-                      <Tooltip title="Select a document to upload. The current version only accepts .txt file format" arrow>
+                      <Tooltip title="To upload a document, please select a file. The current version only accepts the following formats: .txt, .pdf, and .docx." arrow>
                         <Button variant="contained" component="span">
                           Upload File
                         </Button>
@@ -208,6 +231,7 @@ onAnswersChange
                     </Grid>
                   )}
                   <Grid item>
+                  <Tooltip title="Retrieve answers for questions addressable by your document's content." arrow>
                     <Button 
                       type="submit"
                       variant="outlined" 
@@ -216,6 +240,7 @@ onAnswersChange
                     >
                       Process Document
                     </Button>
+                  </Tooltip>
                   </Grid> 
                 </Grid>
               </form>
@@ -229,6 +254,7 @@ onAnswersChange
               <Grid item xs={12}>
                 <Grid container spacing={2} justifyContent="center">
                   <Grid item>
+                  <Tooltip title="Generated answers will overwrite all existing content in the input boxes." arrow>
                     <Button 
                       variant="outlined" 
                       color="primary" 
@@ -237,8 +263,10 @@ onAnswersChange
                     >
                       Overwrite Answers
                     </Button>
+                  </Tooltip>
                   </Grid>
                   <Grid item>
+                  <Tooltip title="Generated answers will appear only in your empty input box." arrow>
                     <Button 
                       variant="outlined" 
                       color="primary" 
@@ -247,6 +275,7 @@ onAnswersChange
                     >
                       Fill Empty Input Fields
                     </Button>
+                  </Tooltip>
                   </Grid>
                 </Grid>
               </Grid>
