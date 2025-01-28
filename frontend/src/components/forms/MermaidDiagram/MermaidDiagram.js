@@ -156,7 +156,7 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
         try {
           setLoading(true);
           
-          const apiUrl = `${apiEndpoint}/api/`;
+          const apiUrl = `${apiEndpoint}/api/gpt-omini/`;
           const response = await axios.post(apiUrl, {
             language: language,
             text: i === 0 ? answers[question.question_id] : generated_chart,
@@ -275,7 +275,7 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
     Here is the error: ${error_message}
     `
     try {
-      const apiUrl = `${apiEndpoint}/api/gpt4o/`;
+      const apiUrl = `${apiEndpoint}/api/gpt-omini/`;
       const response = await axios.post(apiUrl, {
         text: gpt_input
       }, {
