@@ -157,6 +157,7 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
           setLoading(true);
           
           const apiUrl = `${apiEndpoint}/api/gpt-omini/`;
+          console.log("GPT Using: OMINI")
           const response = await axios.post(apiUrl, {
             language: language,
             text: i === 0 ? answers[question.question_id] : generated_chart,
