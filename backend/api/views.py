@@ -176,8 +176,11 @@ class openAICleanVersion(APIView):
         # Create a chat completion
         response = client.chat.completions.create(
             model=AZURE_OPENAI_DEPLOYMENT,
-            temperature=0.9,
-            max_tokens=2000,
+            # removing temperature and max_completion changed to max_completion_tokens
+            # this is to accommodate to the new change of azureopenai error saying this method
+            # is depreciated
+            # temperature=0.9,
+            max_completion_tokens=2000,
           messages=[{ 
                         "role": "user",
                         "content": f"""
@@ -190,6 +193,70 @@ class openAICleanVersion(APIView):
 
         # Return a JSON response
         return Response({"generated_text": generated_text})
+class openAICleanVersion_O1MINI(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def _build_prompt(self, data, language=None, prompt=None, question=None, sample=None):
+        """Build the appropriate prompt based on available data"""
+        if all(v is None for v in [language, prompt, question, sample]):
+            # If only data is provided, send just the data
+            return f"""
+            Strictly return only mermaidjs code in plaintext. No explanations or other texts included
+            ---
+                {data}
+            """
+            
+        # Default prompt for mermaid translation
+        return f"""
+            Create mermaidjs code for this only return the mermaidjs code in plain text and no other text included. Translate it to {language}:
+            {data}
+        """
+
+    def post(self, request):
+        # Get user input
+        data = request.data.get("text")
+        language = request.data.get("language")
+        prompt = request.data.get("prompt_strategy")
+        question = request.data.get("question")
+        sample = request.data.get("sample_answer")
+
+        # Load environment variables
+        load_dotenv()
+        AZURE_OPENAI_ENDPOINT = os.getenv("O1MINI_AZURE_OPENAI_ENDPOINT")
+        AZURE_OPENAI_API_KEY = os.getenv("O1MINI_AZURE_OPENAI_API_KEY")
+        AZURE_OPENAI_DEPLOYMENT = os.getenv("O1MINI_AZURE_OPENAI_DEPLOYMENT")
+
+        client = AzureOpenAI(
+            api_key=AZURE_OPENAI_API_KEY,
+            api_version="2024-08-01-preview",
+            base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
+        )
+
+        # Build the appropriate prompt
+        content = self._build_prompt(
+            data=data,
+            language=language,
+            prompt=prompt,
+            question=question,
+            sample=sample
+        )
+
+        # Create a chat completion
+        response = client.chat.completions.create(
+            model=AZURE_OPENAI_DEPLOYMENT,
+            messages=[{
+                "role": "user",
+                "content": content
+            }]
+        )
+
+        # Extract the generated text from the response
+        generated_text = response.choices[0].message.content
+
+        # Return a JSON response
+        return Response({"generated_text": generated_text})
+
 class openAIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -246,7 +313,6 @@ class openAIView(APIView):
         )
         # Extract the generated text from the response
         generated_text = response.choices[0].message.content
-
         # Return a JSON response
         return Response({"generated_text": generated_text})
     def get(self, request):

@@ -156,7 +156,8 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
         try {
           setLoading(true);
           
-          const apiUrl = `${apiEndpoint}/api/`;
+          const apiUrl = `${apiEndpoint}/api/gpt-omini/`;
+          console.log("GPT Using: OMINI")
           const response = await axios.post(apiUrl, {
             language: language,
             text: i === 0 ? answers[question.question_id] : generated_chart,
@@ -275,7 +276,7 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
     Here is the error: ${error_message}
     `
     try {
-      const apiUrl = `${apiEndpoint}/api/gpt4o/`;
+      const apiUrl = `${apiEndpoint}/api/gpt-omini/`;
       const response = await axios.post(apiUrl, {
         text: gpt_input
       }, {
@@ -336,7 +337,15 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
     
     img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
   };
-
+  const exportAsSVG = () => {
+    const svgElement = chartRef.current.querySelector("svg");
+    const svgData = new XMLSerializer().serializeToString(svgElement);
+    const blob = new Blob([svgData], {type: "image/svg+xml"});
+    const downloadLink = document.createElement("a");
+    downloadLink.download = "cloudaisecurity-architecturaldiagram.svg";
+    downloadLink.href = URL.createObjectURL(blob);
+    downloadLink.click();
+  };
   return (
     
     <Box
@@ -385,7 +394,17 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
                     onClick={exportAsPNG} 
                     style={{ marginLeft: '10px' }}
                   >
-                    Download Diagram
+                    Download PNG Diagram
+                  </Button>
+
+                  <Button 
+                    variant="outlined" 
+                    color="secondary" 
+                    size="small" 
+                    onClick={exportAsSVG} 
+                    style={{ marginLeft: '10px' }}
+                  >
+                    Download SVG Diagram
                   </Button>
                 </>
             )}
