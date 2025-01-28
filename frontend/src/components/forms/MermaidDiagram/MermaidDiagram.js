@@ -93,13 +93,13 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
 
     // Check if the code starts with a valid diagram type
     const startsWithValidType = validTypes.some(type => 
-        cleaned.toLowerCase().startsWith(type.toLowerCase())
+      cleaned.toLowerCase().startsWith(type.toLowerCase())
     );
 
     // Check for common Mermaid.js syntax
     const hasMermaidSyntax = /(\w+)(\[.*?\]|\(.*?\))(\s*-->|\s*---)/.test(cleaned) || 
-                             /subgraph\s+\w+/.test(cleaned) || 
-                             /\w+>.*?:\s*.*?$/.test(cleaned);
+      /subgraph\s+\w+/.test(cleaned) ||
+      /\w+>.*?:\s*.*?$/.test(cleaned);
 
     // If it's valid Mermaid code, ensure it starts with a diagram type
     if (startsWithValidType || hasMermaidSyntax) {

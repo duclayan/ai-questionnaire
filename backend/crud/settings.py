@@ -13,6 +13,17 @@ AZURE_OPENAI_ENDPOINT= os.getenv("AZURE_OPENAI_ENDPOINT")
 AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
 AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT")
 
+#Azure OpenAI-mini Configuration 
+O1MINI_AZURE_OPENAI_API_KEY = os.getenv('O1MINI_AZURE_OPENAI_API_KEY')
+O1MINI_AZURE_OPENAI_ENDPOINT = os.getenv('O1MINI_AZURE_OPENAI_ENDPOINT')
+O1MINI_AZURE_OPENAI_DEPLOYMENT = os.getenv('O1MINI_AZURE_OPENAI_DEPLOYMENT')
+
+#Initialitation O1 Mini Client Azure OpenAI
+O1MINI_AZURE_OAI_CLIENT = AzureOpenAI(
+            api_key=AZURE_OPENAI_API_KEY,
+            api_version="2024-08-01-preview",
+            base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
+        )
 # Initialize the Azure OpenAI client
 AZURE_OAI_CLIENT = AzureOpenAI(
     api_key=AZURE_OPENAI_API_KEY,
