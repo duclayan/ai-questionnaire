@@ -11,7 +11,7 @@ import Home from './views/Home/Home';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import BackgroundCircle from './views/BackgroundCircle/BackgroundCircle';
 import FileUploadComponent from './components/forms/FileUploadDocument/FileUploadComponent';
-
+import { SVGPage } from './components/drawio/SVGPage';
 function App() {
 
   const theme = createTheme({
@@ -35,6 +35,8 @@ function App() {
                 <Route path="/file-upload" element={<FileUploadComponent/>} />
                 <Route path="/" element={<ProtectedRoute element={<Dashboard />} />} />
                 <Route path="/home" element={<Home />} />
+                <Route path="/editor" element={<SVGPage/>} />
+
                 <Route path="/login" element={<Home />} />
                 <Route path="/form" element={<ProtectedRoute element={<Form />} />} />
                 <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
