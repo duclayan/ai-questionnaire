@@ -12,6 +12,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import BackgroundCircle from './views/BackgroundCircle/BackgroundCircle';
 import FileUploadComponent from './components/forms/FileUploadDocument/FileUploadComponent';
 import { SVGPage } from './components/drawio/SVGPage';
+import { DrawioPage } from './components/drawio/DrawioPage';
 function App() {
 
   const theme = createTheme({
@@ -36,6 +37,7 @@ function App() {
                 <Route path="/" element={<ProtectedRoute element={<Dashboard />} />} />
                 <Route path="/home" element={<Home />} />
                 <Route path="/editor" element={<SVGPage/>} />
+                <Route path="/editor-v2" element={<DrawioPage/>} />
 
                 <Route path="/login" element={<Home />} />
                 <Route path="/form" element={<ProtectedRoute element={<Form />} />} />

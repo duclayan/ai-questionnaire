@@ -159,11 +159,13 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
           const apiUrl = `${apiEndpoint}/api/gpt-omini/`;
           console.log("GPT Using: OMINI")
           const response = await axios.post(apiUrl, {
-            language: language,
-            text: i === 0 ? answers[question.question_id] : generated_chart,
-            prompt_strategy: diagramPrompts[i],
-            question,
-            sample_answer: generated_chart,
+            // language: language,
+            // text: i === 0 ? answers[question.question_id] : generated_chart,
+
+            text:currentAnswer,
+            // prompt_strategy: diagramPrompts[i],
+            // question,
+            // sample_answer: generated_chart,
           }, {
             headers: { Authorization: `Bearer ${token}` }
           });     
@@ -276,7 +278,7 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
     Here is the error: ${error_message}
     `
     try {
-      const apiUrl = `${apiEndpoint}/api/gpt-omini/`;
+      const apiUrl = `${apiEndpoint}/api/gpt-omini`;
       const response = await axios.post(apiUrl, {
         text: gpt_input
       }, {

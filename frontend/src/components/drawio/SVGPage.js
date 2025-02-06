@@ -3,12 +3,13 @@ import axios from 'axios';
 import mermaid from 'mermaid';
 import { 
   Box, TextField, Button, Container, 
-  Typography, Modal, IconButton 
+  Typography, Modal, IconButton, 
+  Grid
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
 import { CircularProgress } from '@mui/material';
-
+import { DocumentLoader } from '../forms/DocumentLoader/DocumentLoader';
 export const SVGPage = () => {
 
 // Sample Data
@@ -26,100 +27,101 @@ export const SVGPage = () => {
     </mxfile>
             `;
   const mermaid_xml = `
-    <mxfile host="app.diagrams.net" modified="2025-01-28T16:10:00.000Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" etag="abcdefghijklmnop" version="21.0.0" type="device">
-      <diagram id="pQsEFA-4h3Cu0HHXUz_q" name="Kong API Gateway Flow">
-        <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
-          <root>
-            <mxCell id="0" />
-            <mxCell id="1" parent="0" />
-            <mxCell id="2" value="Client/Application" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-              <mxGeometry x="340" y="40" width="120" height="60" as="geometry" />
-            </mxCell>
-            <mxCell id="3" value="Kong API Gateway" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-              <mxGeometry x="340" y="160" width="120" height="60" as="geometry" />
-            </mxCell>
-            <mxCell id="4" value="Authentication Plugin" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-              <mxGeometry x="120" y="280" width="120" height="60" as="geometry" />
-            </mxCell>
-            <mxCell id="5" value="Rate Limiting Plugin" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-              <mxGeometry x="280" y="280" width="120" height="60" as="geometry" />
-            </mxCell>
-            <mxCell id="6" value="Load Balancer" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-              <mxGeometry x="440" y="280" width="120" height="60" as="geometry" />
-            </mxCell>
-            <mxCell id="7" value="Logging Plugin" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-              <mxGeometry x="600" y="280" width="120" height="60" as="geometry" />
-            </mxCell>
-            <mxCell id="8" value="Monitoring Plugin" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-              <mxGeometry x="600" y="160" width="120" height="60" as="geometry" />
-            </mxCell>
-            <mxCell id="9" value="Upstream Service 1" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-              <mxGeometry x="320" y="400" width="120" height="60" as="geometry" />
-            </mxCell>
-            <mxCell id="10" value="Upstream Service 2" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-              <mxGeometry x="440" y="400" width="120" height="60" as="geometry" />
-            </mxCell>
-            <mxCell id="11" value="Upstream Service 3" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-              <mxGeometry x="560" y="400" width="120" height="60" as="geometry" />
-            </mxCell>
-            <mxCell id="12" value="" style="endArrow=classic;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="2" target="3">
-              <mxGeometry width="50" height="50" relative="1" as="geometry">
-                <mxPoint x="390" y="420" as="sourcePoint" />
-                <mxPoint x="440" y="370" as="targetPoint" />
-              </mxGeometry>
-            </mxCell>
-            <mxCell id="13" value="" style="endArrow=classic;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="3" target="4">
-              <mxGeometry width="50" height="50" relative="1" as="geometry">
-                <mxPoint x="390" y="420" as="sourcePoint" />
-                <mxPoint x="440" y="370" as="targetPoint" />
-              </mxGeometry>
-            </mxCell>
-            <mxCell id="14" value="" style="endArrow=classic;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="3" target="5">
-              <mxGeometry width="50" height="50" relative="1" as="geometry">
-                <mxPoint x="390" y="420" as="sourcePoint" />
-                <mxPoint x="440" y="370" as="targetPoint" />
-              </mxGeometry>
-            </mxCell>
-            <mxCell id="15" value="" style="endArrow=classic;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="3" target="6">
-              <mxGeometry width="50" height="50" relative="1" as="geometry">
-                <mxPoint x="390" y="420" as="sourcePoint" />
-                <mxPoint x="440" y="370" as="targetPoint" />
-              </mxGeometry>
-            </mxCell>
-            <mxCell id="16" value="" style="endArrow=classic;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="3" target="7">
-              <mxGeometry width="50" height="50" relative="1" as="geometry">
-                <mxPoint x="390" y="420" as="sourcePoint" />
-                <mxPoint x="440" y="370" as="targetPoint" />
-              </mxGeometry>
-            </mxCell>
-            <mxCell id="17" value="" style="endArrow=classic;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="3" target="8">
-              <mxGeometry width="50" height="50" relative="1" as="geometry">
-                <mxPoint x="390" y="420" as="sourcePoint" />
-                <mxPoint x="440" y="370" as="targetPoint" />
-              </mxGeometry>
-            </mxCell>
-            <mxCell id="18" value="" style="endArrow=classic;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="6" target="9">
-              <mxGeometry width="50" height="50" relative="1" as="geometry">
-                <mxPoint x="390" y="420" as="sourcePoint" />
-                <mxPoint x="440" y="370" as="targetPoint" />
-              </mxGeometry>
-            </mxCell>
-            <mxCell id="19" value="" style="endArrow=classic;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="6" target="10">
-              <mxGeometry width="50" height="50" relative="1" as="geometry">
-                <mxPoint x="390" y="420" as="sourcePoint" />
-                <mxPoint x="440" y="370" as="targetPoint" />
-              </mxGeometry>
-            </mxCell>
-            <mxCell id="20" value="" style="endArrow=classic;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="6" target="11">
-              <mxGeometry width="50" height="50" relative="1" as="geometry">
-                <mxPoint x="390" y="420" as="sourcePoint" />
-                <mxPoint x="440" y="370" as="targetPoint" />
-              </mxGeometry>
-            </mxCell>
-          </root>
-        </mxGraphModel>
-      </diagram>
-    </mxfile>
+ <mxfile host="app.diagrams.net" modified="2023-01-29T12:00:00.000Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36" etag="example_etag" version="15.8.2" type="device">
+  <diagram id="prtHgNgQTEPvFCAcTncT" name="Page-1">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="Client/Application" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="200" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="Kong API Gateway" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="240" y="200" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="Authentication Plugin" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="440" y="120" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="Rate Limiting Plugin" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="440" y="200" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="Load Balancer" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="440" y="280" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="Upstream Service 1" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="640" y="200" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="Upstream Service 2" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="640" y="280" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="Upstream Service 3" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="640" y="360" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="Logging Plugin" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="240" y="360" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="Monitoring Plugin" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="240" y="440" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="" style="endArrow=classic;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="2" target="3">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="390" y="420" as="sourcePoint" />
+            <mxPoint x="440" y="370" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="13" value="" style="endArrow=classic;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="3" target="4">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="390" y="420" as="sourcePoint" />
+            <mxPoint x="440" y="370" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="14" value="" style="endArrow=classic;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="3" target="5">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="390" y="420" as="sourcePoint" />
+            <mxPoint x="440" y="370" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="15" value="" style="endArrow=classic;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="3" target="6">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="390" y="420" as="sourcePoint" />
+            <mxPoint x="440" y="370" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="16" value="" style="endArrow=classic;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="6" target="7">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="390" y="420" as="sourcePoint" />
+            <mxPoint x="440" y="370" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="17" value="" style="endArrow=classic;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="6" target="8">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="390" y="420" as="sourcePoint" />
+            <mxPoint x="440" y="370" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="18" value="" style="endArrow=classic;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="6" target="9">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="390" y="420" as="sourcePoint" />
+            <mxPoint x="440" y="370" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="19" value="" style="endArrow=classic;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="3" target="10">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="390" y="420" as="sourcePoint" />
+            <mxPoint x="440" y="370" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="20" value="" style="endArrow=classic;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="3" target="11">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="390" y="420" as="sourcePoint" />
+            <mxPoint x="440" y="370" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
+
     
               `
   const mermaidcode = `
@@ -160,13 +162,19 @@ export const SVGPage = () => {
   const [editorOpen, setEditorOpen] = useState(false);
   const [editorLoading, setEditorLoading] = useState(true);
   const [drawioXml, setDrawioXml] = useState('');
-  const [updatedXml, setUpdatedXml] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const [inputType, setInputType] = useState('')
   const drawioIframeRef = useRef(null);
+  const token = localStorage.getItem('token');
+  const apiEndpoint = process.env.REACT_APP_API_ENDPOINT
 
   // Initialize Draw.io editor when it loads
   const handleDrawioLoad = () => {
     setEditorLoading(false);
     const iframe = drawioIframeRef.current;
+    // const generate_xml = generateXML(mermaidCode)
+    // setDrawioXml(generate_xml)
     if (iframe && drawioXml) {
       // Wait a bit for the editor to be ready
       setTimeout(() => {
@@ -177,27 +185,6 @@ export const SVGPage = () => {
       }, 1000);
     }
   };
-
-//   // Handle messages from Draw.io - V1
-//   useEffect(() => {
-//     const handleMessage = (event) => {
-//       if (typeof event.data === 'string') {
-//         try {
-//           const msg = JSON.parse(event.data);
-//           if (msg.event === 'save') {
-//             setDrawioXml(msg.xml);
-//             setEditorOpen(false);
-//           }
-//         } catch (e) {
-//           console.error('Error parsing Draw.io message:', e);
-//         }
-//       }
-//     };
-
-//     window.addEventListener('message', handleMessage);
-//     return () => window.removeEventListener('message', handleMessage);
-//   }, []);
-
   // Handle messages from Draw.io V2
   useEffect(() => {
     const handleMessage = (event) => {
@@ -210,11 +197,12 @@ export const SVGPage = () => {
               console.log("Msg", msg)
               console.log("XML File", msg.xml)
             // This value will then be sent to the gpt
+              generateMermaidJS(msg.xml, "Convert")
                 // 1. Call the GPT to ask for the MermaidJSCode
                 // 2. SetMermaidJS Code to new code
             // The GPT will generate the matching mermaid js file 
             // The new mermaidjs file will be rendered upon save
-              setMermaidCode(new_mermaidcode)
+              // setMermaidCode(new_mermaidcode)
             }
             setEditorOpen(false);
           }
@@ -227,39 +215,58 @@ export const SVGPage = () => {
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
   }, []);
-  // const generateXMLCode = async (code) => {
-  //   // This generates the XML Code from the given code
-  //   const prompt = ""
-  //   try {
-  //     const apiUrl = `${apiEndpoint}/api/gpt-omini/`;
-  //     const response = await axios.post(apiUrl, {
-  //       text: `${prompt}. This is the code: ${code}`
-  //     }, {
-  //       headers: { Authorization: `Bearer ${token}` }
-  //     });
-  //     return response.data.generated_text
-  //   } catch (error) {
-  //     setMermaidError(`Error in prompt: Unable to generate a valid diagram`);
-  //   } 
-  // };
 
-  // const generateMermaidJSCode = async (typeOfDiagram) => {
-  //   try {
-  //     setMermaidCode(mermaidcode);
-  //     setDrawioXml(mermaid_xml);
-  //   } catch (error) {
-  //     console.error('Error:', error);
-  //   }
-  // };
+  const generateXML = async (code) => {
+    // This generates the XML Code from the given code
+    const prompt = `Convert MermaidJS Code to XML Code readable by DrawIO. Strictly return only the code content without any code block formatting.`
 
-  const generateDiagram = async (typeOfDiagram) => {
     try {
-      setMermaidCode(mermaidcode);
-      setDrawioXml(mermaid_xml);
+      const apiUrl = `${apiEndpoint}/api/gpt-omini/`;
+      const response = await axios.post(apiUrl, {
+        text: `${prompt}. Sample return code : ${default_xml} . This is the code to convert: ${code}`
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = response.data.generated_text
+      setDrawioXml(data)
+      return response.data.generated_text
+    } catch (error) {
+      // setMermaidError(`Error in prompt: Unable to generate a valid diagram`);
+    } 
+  };
+
+  const generateMermaidJS = async (code, input_type) => {
+    setIsLoading(true)
+    // This generates the XML Code from the given code
+    // Input type : "convert" if from XML File,  "generate" if from User Prompt
+    const prompt = `${input_type} the following description into Mermaid JS code for a graph diagram. Provide only the code content without any Mermaid JS tags 
+    or code block formatting. The code should start directly with the graph definition`
+
+    try {
+      console.log("mermaidjs is loading", isLoading)
+      const apiUrl = `${apiEndpoint}/api/gpt-omini/`;
+      const response = await axios.post(apiUrl, {
+        text: `${prompt}. This is the data: ${code}`
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const result = response.data.generated_text
+      setMermaidCode(result)
+    } catch (error) {
+      // setMermaidError(`Error in prompt: Unable to generate a valid diagram`);
+    } 
+    setIsLoading(false)
+  };
+
+  const generateDiagram = async () => {
+    try {
+      // Generate MermaidJS Code from the prompt that the user input
+      generateMermaidJS(prompt, "convert")
     } catch (error) {
       console.error('Error:', error);
     }
   };
+
 
   useEffect(() => {
     mermaid.initialize({ startOnLoad: false });
@@ -272,15 +279,18 @@ export const SVGPage = () => {
       }
     };
     if (mermaidCode) {
+      const generatedXML = generateXML(mermaidCode)
+      setDrawioXml(generatedXML)
+      console.log("GeneratedXML", generatedXML)
       renderDiagram();
     }
+
   }, [mermaidCode]);
 
   return (
     <Container>
       <Box my={4}>
-        <Typography variant="h4">Mermaid Diagram Generator</Typography>
-        
+        <Typography variant="h4">Get a preview of your Diagram</Typography>
         <Box my={2}>
           <TextField
             fullWidth
@@ -299,18 +309,20 @@ export const SVGPage = () => {
             Generate Diagram
           </Button>
         </Box>
-
+        <Grid item xs={12}>
+              <DocumentLoader isLoading={isLoading} text={"Processing the Data"} />
+        </Grid>
         {svgCode && (
           <Box my={4}>
             <Box display="flex" alignItems="center" gap={2}>
               <Typography variant="h6">Preview</Typography>
-              <Button
+              {/* <Button
                 variant="outlined"
                 startIcon={<EditIcon />}
                 onClick={() => setEditorOpen(true)}
               >
                 Edit in Draw.io
-              </Button>
+              </Button> */}
             </Box>
             <div dangerouslySetInnerHTML={{ __html: svgCode }} />
           </Box>
@@ -358,7 +370,7 @@ export const SVGPage = () => {
           </Box>
         </Modal>
 
-        {mermaidCode && (
+        {/* {mermaidCode && (
           <Box my={4}>
             <Typography variant="h6">Mermaid Code</Typography>
             <TextField
@@ -370,7 +382,7 @@ export const SVGPage = () => {
               sx={{ mt: 2, fontFamily: 'monospace' }}
             />
           </Box>
-        )}
+        )} */}
       </Box>
     </Container>
   );

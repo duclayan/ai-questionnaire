@@ -208,10 +208,11 @@ class openAICleanVersion_O1MINI(APIView):
             """
             
         # Default prompt for mermaid translation
-        return f"""
-            Create mermaidjs code for this only return the mermaidjs code in plain text and no other text included. Translate it to {language}:
-            {data}
-        """
+        # return f"""
+        #     Create mermaidjs code for this only return the mermaidjs code in plain text and no other text included. Translate it to {language}:
+        #     {data}
+        # """
+        return data
 
     def post(self, request):
         # Get user input
