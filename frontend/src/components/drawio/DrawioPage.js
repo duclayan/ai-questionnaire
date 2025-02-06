@@ -7,6 +7,8 @@ import {
   Container,
   Typography,
   Grid,
+  Select,
+  MenuItem,
 } from "@mui/material";
 
 import { CircularProgress } from "@mui/material";
@@ -27,7 +29,22 @@ export const DrawioPage = () => {
   const drawioIframeRef = useRef(null);
   const token = localStorage.getItem("token");
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT;
+  const [selectedSample, setSelectedSample] = useState('');
 
+  const samples = {
+    sample1: "Create a GenAI chatbot architecture diagram with react.js as the frontend, python FastAPI and the backend, use typical aws resources for web app, database, storage, monitoring, include security components like iam, firewall, gateway, monitoring, security groups, amazon bedrock as the NLP and claude as the LLM. All components inside the AWS, only the user is outside of the cloud.",
+    sample2: "Create an echarging management system architecture diagram with angular.js as the frontend, javaspring frame work as the backend, java Eureka for service exploration, postgressql database, with typical AWS resources. Consider typical security components such as iam, firewall, gateway, monitoring. All components inside the AWS cloud, only the user is outside of the cloud."
+  };
+
+  const handleSampleChange = (event) => {
+    const selected = event.target.value;
+    setSelectedSample(selected);
+    if (selected === 'sample1') {
+      setPrompt(samples.sample1);
+    } else if (selected === 'sample2') {
+      setPrompt(samples.sample2);
+    }
+  };
   // Initialize Draw.io editor when it loads
   const handleDrawioLoad = () => {
     setEditorLoading(false);; // 1 minute timeout
@@ -159,6 +176,18 @@ export const DrawioPage = () => {
       <Box my={4}>
         <Typography variant="h4"> Diagram Generator</Typography>
         <Box my={2}>
+
+          <Select
+            value={selectedSample}
+            onChange={handleSampleChange}
+            displayEmpty
+            fullWidth
+            sx={{ mb: 2 }}
+          >
+            <MenuItem value="" disabled>Select a sample</MenuItem>
+            <MenuItem value="sample1">Sample 1</MenuItem>
+            <MenuItem value="sample2">Sample 2</MenuItem>
+          </Select>
           <TextField
             fullWidth
             label="Enter diagram description"
