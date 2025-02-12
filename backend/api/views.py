@@ -179,8 +179,9 @@ class openAICleanVersion(APIView):
             # removing temperature and max_completion changed to max_completion_tokens
             # this is to accommodate to the new change of azureopenai error saying this method
             # is depreciated
+            # Removed the max_completion completely when using O1 Models
             # temperature=0.9,
-            max_completion_tokens=2000,
+            # max_completion_tokens=2000,
           messages=[{ 
                         "role": "user",
                         "content": f"""
@@ -600,7 +601,6 @@ class ProcessDocumentView(APIView):
             azure_open_ai = openAICleanVersion()
             # Process the text with Azure OpenAI
             result = azure_open_ai.post(mock_request)
-
             if result.status_code == 200:
                 return result
             else:
