@@ -13,6 +13,7 @@ import BackgroundCircle from './views/BackgroundCircle/BackgroundCircle';
 import FileUploadComponent from './components/forms/FileUploadDocument/FileUploadComponent';
 import { SVGPage } from './components/drawio/SVGPage';
 import { DrawioPage } from './components/drawio/DrawioPage';
+import { DrawioPageTest } from './components/drawio/DrawioPageCopy';
 function App() {
 
   const theme = createTheme({
@@ -38,6 +39,8 @@ function App() {
                 <Route path="/home" element={<Home />} />
                 <Route path="/editor" element={<SVGPage/>} />
                 <Route path="/editor-v2" element={<DrawioPage/>} />
+                {/* Testing Page */}
+                <Route path="/test" element={<DrawioPageTest/> } /> 
 
                 <Route path="/login" element={<Home />} />
                 <Route path="/form" element={<ProtectedRoute element={<Form />} />} />

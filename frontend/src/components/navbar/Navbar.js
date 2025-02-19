@@ -58,6 +58,8 @@ const Navbar = () => {
                 >
                   <MenuItem onClick={() => { navigate('/editor'); handleEditorMenuClose(); }}>Beta Diagram Direct</MenuItem>
                   <MenuItem onClick={() => { navigate('/editor-v2'); handleEditorMenuClose(); }}>Beta Editor DrawIO</MenuItem>
+                  <MenuItem onClick={() => { navigate('/test'); handleEditorMenuClose(); }}>Beta Flowdiagram DrawIO</MenuItem>
+
                 </Menu>
                 <Button color="inherit" onClick={() => navigate('/dashboard')}>Dashboard</Button>
                 <Button color="inherit" onClick={handleLogoutClick}>Logout</Button>
