@@ -14,6 +14,8 @@ import FileUploadComponent from './components/forms/FileUploadDocument/FileUploa
 import { SVGPage } from './components/drawio/SVGPage';
 import { DrawioPage } from './components/drawio/DrawioPage';
 import { DrawioPageTest } from './components/drawio/DrawioPageCopy';
+import { DrawioPageAqua } from './components/drawio/DrawioPageAqua';
+import { DrawioPageV2 } from './components/drawio/DrawioPageV2';
 function App() {
 
   const theme = createTheme({
@@ -41,6 +43,9 @@ function App() {
                 <Route path="/editor-v2" element={<DrawioPage/>} />
                 {/* Testing Page */}
                 <Route path="/test" element={<DrawioPageTest/> } /> 
+                <Route path="/editor-v3" element={<DrawioPageAqua/>} /> 
+                <Route path="/editor-v2-1" element={<DrawioPageV2/>} />
+
 
                 <Route path="/login" element={<Home />} />
                 <Route path="/form" element={<ProtectedRoute element={<Form />} />} />
