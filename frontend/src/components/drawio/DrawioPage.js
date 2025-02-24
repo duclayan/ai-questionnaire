@@ -13,7 +13,7 @@ import {
 
 import { CircularProgress } from "@mui/material";
 import { DocumentLoader } from "../forms/DocumentLoader/DocumentLoader";
-import { default_aws, default_azure, default_xml, default_gcp } from "./xmlSampleData";
+import { default_xml } from "./xmlSampleData";
 import { saveAs } from 'file-saver';
 export const DrawioPage = () => {
  
@@ -31,33 +31,19 @@ export const DrawioPage = () => {
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT;
   const [selectedSample, setSelectedSample] = useState('');
 
-  const samples = [
-    {
-      "text": "Create a GenAI chatbot architecture diagram with react.js as the frontend, python FastAPI and the backend, use typical aws resources for web app, database, storage, monitoring, include security components like iam, firewall, gateway, monitoring, security groups, amazon bedrock as the NLP and claude as the LLM. All components inside the AWS, only the user is outside of the cloud.",
-      "prompt": default_aws,
-      "title": "Architecture Diagram"
-    },
-    {
-      "text": "Create an echarging management system architecture diagram with angular.js as the frontend, javaspring frame work as the backend, java Eureka for service exploration, postgressql database, with typical AWS resources. Consider typical security components such as iam, firewall, gateway, monitoring. All components inside the AWS cloud, only the user is outside of the cloud.",
-      "type": default_aws,
-      "title": "Amazon Web Services"
-    },
-    {
-      "text": "Create a GCP architecture diagram illustrating a data processing pipeline for event data, including Cloud Bigtable, App Engine, Pub/Sub, Compute Engine, and BigQuery. Cloud Bigtable will be utilized for storing processed events with a time series. App Engine to invoke events and to push data to devices and BigQuery is used for warehousing execution results. The events are stored in json format",
-      "type": default_gcp,
-      "title": "GCP"
-    },
-    {
-      "text": "Create an Azure architecture diagram illustrating a real-time data processing pipeline. The pipeline should include Azure VM, Azure Storage, Azure SQL, Azure functions and AZure AD. Show the connection of user.",
-      "type": default_azure,
-      "title": "Microsoft Azure Webservices"
-    }
-  ]
+  const samples = {
+    sample1: "Create a GenAI chatbot architecture diagram with react.js as the frontend, python FastAPI and the backend, use typical aws resources for web app, database, storage, monitoring, include security components like iam, firewall, gateway, monitoring, security groups, amazon bedrock as the NLP and claude as the LLM. All components inside the AWS, only the user is outside of the cloud.",
+    sample2: "Create an echarging management system architecture diagram with angular.js as the frontend, javaspring frame work as the backend, java Eureka for service exploration, postgressql database, with typical AWS resources. Consider typical security components such as iam, firewall, gateway, monitoring. All components inside the AWS cloud, only the user is outside of the cloud."
+  };
 
   const handleSampleChange = (event) => {
     const selected = event.target.value;
     setSelectedSample(selected);
-    setPrompt(selected.text)
+    if (selected === 'sample1') {
+      setPrompt(samples.sample1);
+    } else if (selected === 'sample2') {
+      setPrompt(samples.sample2);
+    }
   };
   // Initialize Draw.io editor when it loads
   const handleDrawioLoad = () => {
@@ -69,10 +55,10 @@ export const DrawioPage = () => {
       const timeoutId = setTimeout(() => {
         setEditorOpen(false)
         console.log("Took too long to open")
-      }, 100000)
+      }, 10000)
 
       if (iframe && drawioXml && editorOpen) {
-        // Render the DrawIO Diagram
+
         setTimeout(() => {
           iframe.contentWindow.postMessage(
             JSON.stringify({ action: "load", xml: drawioXml }),
@@ -80,19 +66,21 @@ export const DrawioPage = () => {
           );
         }, 1000);
 
-        // Handling DrawIO Error
+  
         window.addEventListener('message', event => {
           if (event.data?.event === 'error') {
+            console.log('Draw.io error:', event.data);
             setEditorOpen(false)
             setDrawioError(true)
             throw new Error('Draw.io error');
-          } 
+          } else {
+            clearTimeout(timeoutId)
+          }
         });
-
-        // Clear Timeout
-        clearTimeout(timeoutId)
       }
     } catch (error) {
+      setEditorOpen(false);
+      console.log("error:",error)
       alert('Unable to handle information');
     }
   };
@@ -132,36 +120,31 @@ export const DrawioPage = () => {
   const generateXML = async (code) => {
     // This generates the XML Code from the given code
     const prompt = `Generate XML Code readable by DrawIO. Strictly return only the code content without any code block formatting.`;
-    const sample = selectedSample.prompt ? selectedSample.prompt : default_xml
-    const technology =  selectedSample.title ? selectedSample.title : "AWS"
 
-    console.log("Selected Sample:", selectedSample)
-    const apiUrl = `${apiEndpoint}/api/gpt-omini/`;
+    try {
+      const apiUrl = `${apiEndpoint}/api/gpt-omini/`;
       const response = await axios.post(
         apiUrl,
         {
-          text: `${prompt}. Use Drawio Cloud - ${technology} icons to represent tools. Ensure to include paths. If not available don't put any icon. Keep it simple but highly accurate and professional level. Sample return code : ${sample}. This is the code to convert: ${code}`,
+          text: `${prompt}. Sample return code : ${default_xml} . This is the code to convert: ${code}`,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
         },
       );
       const data = response.data.generated_text;
-      return data;
+      setDrawioXml(data);
+      setIsLoading(false)
+      return response.data.generated_text;
+    } catch (error) {
+    }
   };
 
   const generateDiagram = async () => {
     try {
       setEditorOpen(false);
       setIsLoading(true);
-      try {
-        const xml = await generateXML(prompt);
-        setDrawioXml(xml)
-      } catch (error) {
-        console.log("Error has been encountered:", error)
-      }
-      setIsLoading(false)
-
+      generateXML(prompt);
     } catch (error) {
       console.error("Error:", error);
       // **WRITE A CODE HERE TO ADDRESS THE ERROR**
@@ -171,7 +154,6 @@ export const DrawioPage = () => {
   };
   useEffect(() => {
     if (drawioXml) {
-      console.log("Generated XML", drawioXml)
       setEditorOpen(true);
       setIsLoading(false);
     }
@@ -184,17 +166,15 @@ export const DrawioPage = () => {
         <Box my={2}>
 
           <Select
-            value={selectedSample.title}
-            placeholder={selectedSample.title}
+            value={selectedSample}
             onChange={handleSampleChange}
             displayEmpty
             fullWidth
             sx={{ mb: 2 }}
           >
-              <MenuItem value="" disabled> Select a sample </MenuItem>
-             {samples.map((sample) => (
-                  <MenuItem  key={sample.id} value={sample}> {sample.title}</MenuItem>
-              ))}
+            <MenuItem value="" disabled>Select a sample</MenuItem>
+            <MenuItem value="sample1">Sample 1</MenuItem>
+            <MenuItem value="sample2">Sample 2</MenuItem>
           </Select>
           <TextField
             fullWidth
@@ -255,20 +235,6 @@ export const DrawioPage = () => {
                 <CircularProgress />
               </Box>
             )}
-          </Box>
-        )}
-
-        {mermaidCode && (
-          <Box my={4}>
-            <Typography variant="h6">Mermaid Code</Typography>
-            <TextField
-              fullWidth
-              multiline
-              rows={8}
-              value={mermaidCode}
-              onChange={(e) => setMermaidCode(e.target.value)}
-              sx={{ mt: 2, fontFamily: "monospace" }}
-            />
           </Box>
         )}
       </Box>
