@@ -68,9 +68,7 @@ export const DrawioPageV2 = () => {
 
       const timeoutId = setTimeout(() => {
         setEditorOpen(false)
-        console.log("Took too long to open")
       }, 10000)
-      console.log("DrawioXML: ", drawioXml)
 
       if (iframe && drawioXml && editorOpen) {
         // Render the DrawIO Diagram
@@ -104,7 +102,6 @@ export const DrawioPageV2 = () => {
       if (typeof event.data === "string") {
         try {
           const msg = JSON.parse(event.data);
-          console.log("DrawIO Message:", msg)
           if (msg.event === "save" || msg.event === "exit") {
             if (msg.xml) {
               setDrawioXml(msg.xml);
@@ -142,7 +139,6 @@ export const DrawioPageV2 = () => {
       },
     );
     const data = response.data.generated_text;
-    console.log("Data:", data)
     return data;
   }
   const getTechnology = async (code) => {
@@ -166,9 +162,7 @@ export const DrawioPageV2 = () => {
       sample_element = sample_gcp_element
       icons = gcp_images
     } else {
-      console.log("General")
     }
-    console.log(icons, sample_element)
     const prompt = `
     Generate XML Code readable by DrawIO. Strictly return only the code content without any code block formatting.
 
@@ -187,7 +181,6 @@ export const DrawioPageV2 = () => {
     --
     This is the code to convert: ${code}`
 
-    console.log("Selected Sample:", selectedSample)
     const apiUrl = `${apiEndpoint}/api/gpt-omini/`;
       const response = await axios.post(
         apiUrl,
@@ -223,7 +216,6 @@ export const DrawioPageV2 = () => {
   };
   useEffect(() => {
     if (drawioXml) {
-      console.log("Generated XML", drawioXml)
       setEditorOpen(true);
       setIsLoading(false);
     }

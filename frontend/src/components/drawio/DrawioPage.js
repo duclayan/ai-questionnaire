@@ -54,7 +54,6 @@ export const DrawioPage = () => {
 
       const timeoutId = setTimeout(() => {
         setEditorOpen(false)
-        console.log("Took too long to open")
       }, 10000)
 
       if (iframe && drawioXml && editorOpen) {
@@ -69,7 +68,6 @@ export const DrawioPage = () => {
   
         window.addEventListener('message', event => {
           if (event.data?.event === 'error') {
-            console.log('Draw.io error:', event.data);
             setEditorOpen(false)
             setDrawioError(true)
             throw new Error('Draw.io error');
@@ -80,7 +78,6 @@ export const DrawioPage = () => {
       }
     } catch (error) {
       setEditorOpen(false);
-      console.log("error:",error)
       alert('Unable to handle information');
     }
   };
@@ -91,7 +88,6 @@ export const DrawioPage = () => {
       if (typeof event.data === "string") {
         try {
           const msg = JSON.parse(event.data);
-          console.log("DrawIO Message:", msg)
           if (msg.event === "save" || msg.event === "exit") {
             if (msg.xml) {
               setDrawioXml(msg.xml);
