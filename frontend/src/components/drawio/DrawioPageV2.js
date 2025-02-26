@@ -18,13 +18,13 @@ import { saveAs } from 'file-saver';
 export const DrawioPageV2 = () => {
  
   const [prompt, setPrompt] = useState("");
-  const [mermaidCode, setMermaidCode] = useState("");
   const [editorOpen, setEditorOpen] = useState(false);
   const [editorLoading, setEditorLoading] = useState(true);
   const [drawioXml, setDrawioXml] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [drawioError, setDrawioError] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [pages, setPages] = useState([])
 
   const drawioIframeRef = useRef(null);
   const token = localStorage.getItem("token");
@@ -95,7 +95,20 @@ export const DrawioPageV2 = () => {
       alert('Unable to handle information');
     }
   };
+  // Everytime a Page is Added, it is rendered
+  useEffect(() => {
+      if (drawioIframeRef.current && pages.length > 0) {
+        const xmlPages = pages.map(xml => `<diagram>${xml}</diagram>`).join('');
+        const fullXml = `<mxfile>${xmlPages}</mxfile>`;
   
+        setTimeout(() => {
+          drawioIframeRef.current.contentWindow.postMessage(
+            JSON.stringify({ action: 'load', xml: fullXml }),
+            '*'
+          );
+        }, 1000);
+      }
+    }, [pages]);
   // Handle messages from Draw.io V2
   useEffect(() => {
     const handleMessage = (event) => {
@@ -152,13 +165,13 @@ export const DrawioPageV2 = () => {
     const technology =  await getTechnology(code)
     let icons = ''
     let sample_element= ''
-    if (technology == 'AWS') {
+    if (technology === 'AWS') {
       sample_element = sample_aws_element
       icons = aws_images
-    } else if (technology == 'Azure') {
+    } else if (technology === 'Azure') {
       sample_element = sample_azure_element
       icons = azure_images
-    } else if (technology == 'GCP') {
+    } else if (technology === 'GCP') {
       sample_element = sample_gcp_element
       icons = gcp_images
     } else {
@@ -197,7 +210,6 @@ export const DrawioPageV2 = () => {
 
   const generateDiagram = async () => {
     try {
-      setEditorOpen(false);
       setIsLoading(true);
       try {
         const xml = await generateXML(prompt);
@@ -216,6 +228,7 @@ export const DrawioPageV2 = () => {
   };
   useEffect(() => {
     if (drawioXml) {
+      setPages(prevPages => [...prevPages, drawioXml.trim()]);
       setEditorOpen(true);
       setIsLoading(false);
     }
