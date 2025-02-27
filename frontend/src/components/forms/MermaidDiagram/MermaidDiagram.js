@@ -278,7 +278,7 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
     Here is the error: ${error_message}
     `
     try {
-      const apiUrl = `${apiEndpoint}/api/gpt-omini`;
+      const apiUrl = `${apiEndpoint}/api/gpt-omini/`;
       const response = await axios.post(apiUrl, {
         text: gpt_input
       }, {
