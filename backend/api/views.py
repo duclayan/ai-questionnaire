@@ -198,22 +198,16 @@ class openAICleanVersion_O1MINI(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     
-    def _build_prompt(self, data, language=None, prompt=None, question=None, sample=None):
+    def _build_prompt(self, data, gpt_type, language=None, prompt=None, question=None, sample=None):
         """Build the appropriate prompt based on available data"""
-        if all(v is None for v in [language, prompt, question, sample]):
-            # If only data is provided, send just the data
+        if gpt_type == "clean":
+            return data
+        else:
             return f"""
             Strictly return only mermaidjs code in plaintext. No explanations or other texts included
             ---
                 {data}
             """
-            
-        # Default prompt for mermaid translation
-        # return f"""
-        #     Create mermaidjs code for this only return the mermaidjs code in plain text and no other text included. Translate it to {language}:
-        #     {data}
-        # """
-        return data
 
     def post(self, request):
         # Get user input
@@ -222,6 +216,7 @@ class openAICleanVersion_O1MINI(APIView):
         prompt = request.data.get("prompt_strategy")
         question = request.data.get("question")
         sample = request.data.get("sample_answer")
+        gpt_type = request.data.get("gpt_type")
 
         # Load environment variables
         load_dotenv()
@@ -238,6 +233,7 @@ class openAICleanVersion_O1MINI(APIView):
         # Build the appropriate prompt
         content = self._build_prompt(
             data=data,
+            gpt_type=gpt_type,
             language=language,
             prompt=prompt,
             question=question,
