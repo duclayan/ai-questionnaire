@@ -25,6 +25,7 @@ export const DrawioPageV2 = () => {
   const [drawioError, setDrawioError] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [pages, setPages] = useState([])
+  const [currentStatus, setCurrentStatus] = useState("")
 
   const drawioIframeRef = useRef(null);
   const token = localStorage.getItem("token");
@@ -146,6 +147,8 @@ export const DrawioPageV2 = () => {
       apiUrl,
       {
         text: prompt,
+        gpt_type: "clean"
+
       },
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -161,8 +164,18 @@ export const DrawioPageV2 = () => {
   }
   const generateXML = async (code) => {
     // This generates the XML Code from the given code
+    const delayedSetStatus = (status, delay) => {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          setCurrentStatus(status);
+          resolve();
+        }, delay);
+      });
+    };
     const sample = selectedSample.prompt ? selectedSample.prompt : default_xml
+    setCurrentStatus("Analyzing the type of Diagram")
     const technology =  await getTechnology(code)
+    setCurrentStatus(`Technology Detected as : ${technology}`)
     let icons = ''
     let sample_element= ''
     if (technology === 'AWS') {
@@ -194,11 +207,14 @@ export const DrawioPageV2 = () => {
     --
     This is the code to convert: ${code}`
 
+    await delayedSetStatus(`Identifying the appropriate diagram`, 3000);
+
     const apiUrl = `${apiEndpoint}/api/gpt-omini/`;
       const response = await axios.post(
         apiUrl,
         {
           text: prompt,
+          gpt_type: "clean",
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -271,7 +287,7 @@ export const DrawioPageV2 = () => {
           </Button>
         </Box>
         <Grid item xs={12}>
-          <DocumentLoader isLoading={isLoading} text={"Processing the Data"} />
+          <DocumentLoader isLoading={isLoading} text={currentStatus} />
         </Grid>
         {drawioError && (
             <Grid item xs={12}> Please try to generate a diagram again.</Grid>
