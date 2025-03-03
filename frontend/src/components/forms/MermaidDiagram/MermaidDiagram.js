@@ -5,9 +5,9 @@ import html2canvas from 'html2canvas';
 import './styles.css';
 import { Box, Button } from '@mui/material';
 import { DocumentLoader } from '../DocumentLoader/DocumentLoader';
+import { SaveGraphButtons } from './SaveGraphButtons';
 import { EnlargedImage } from './EnlargedImage';
-
-export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpoint }) => {
+export const MermaidDiagram = ({ isReportPage, prompt, diagramName, question, answers, token, apiEndpoint }) => {
   const [saveGraph, setSaveGraph] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isEnlarged, setIsEnlarged] = useState(false);
@@ -21,7 +21,6 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
     Return code should be execution ready for a mermaid render`
   ];;
   useEffect(() => {
-
     mermaid.initialize({
       startOnLoad: true,
       suppressErrorRendering: true,
@@ -50,13 +49,16 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
   }, [isEnlarged]);
   const handleGenerateClick = async () => {
     // Generate the chart based on the input answer
-    const currentAnswer = answers[question.question_id]?.input_answer || "";
+    const userPrompt = isReportPage 
+    ? answers[question.question_id]?.input_answer || ""
+    : prompt;
+  
     // Render the chart after generating it
     setErrorMessage(null)
     if (chartRef) {
       chartRef.current.innerHTML = ""
     }
-    renderMermaid(currentAnswer);
+    renderMermaid(userPrompt);
   };
   async function processMermaidCode(code) {
 
@@ -135,9 +137,9 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
 
     return null;
   }
-  const renderMermaid = async (currentAnswer, isRetry = false) => {
+  const renderMermaid = async (currentPrompt, isRetry = false) => {
     // Check if currentAnswer is valid
-    if (!currentAnswer || currentAnswer.trim() === "") {
+    if (!currentPrompt || currentPrompt.trim() === "") {
       setErrorMessage("No valid answer provided");
       return;
     }
@@ -153,7 +155,7 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
           const apiUrl = `${apiEndpoint}/api/gpt-omini/`;
           console.log("GPT Using: OMINI")
           const response = await axios.post(apiUrl, {
-            text: currentAnswer,
+            text: currentPrompt,
           }, {
             headers: { Authorization: `Bearer ${token}` }
           });
@@ -331,7 +333,7 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
   return (
 
     <Box
-      key={question.question_id}
+      key={isReportPage? question.question_id : "diagramPage"}
       sx={{
         mb: 4,
         display: "flex",
@@ -357,38 +359,12 @@ export const MermaidDiagram = ({ diagramName, question, answers, token, apiEndpo
             </Button>
 
             {saveGraph && (
-
-              <>
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  size="small"
-                  onClick={saveDiagram}
-                  style={{ marginLeft: '10px' }}
-                >
-                  Add to Report
-                </Button>
-
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  size="small"
-                  onClick={exportAsPNG}
-                  style={{ marginLeft: '10px' }}
-                >
-                  Download PNG Diagram
-                </Button>
-
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  size="small"
-                  onClick={exportAsSVG}
-                  style={{ marginLeft: '10px' }}
-                >
-                  Download SVG Diagram
-                </Button>
-              </>
+              <SaveGraphButtons
+                isReportPage = {isReportPage}
+                saveDiagram = {saveDiagram}
+                exportAsPNG = {exportAsPNG}
+                exportAsSVG = {exportAsSVG}
+              />
             )}
           </>
         )}

@@ -324,13 +324,12 @@ export const QuestionList = ({
           {currentCategory === "Architecture Diagram" ? (
             <>
               <MermaidDiagram
+                isReportPage={true}
                 diagramName='diagram'
                 question={question}
                 answers={answers}
                 token={token}
                 apiEndpoint={apiEndpoint}
-                language={language}
-
               />
             </>
           ) : null}

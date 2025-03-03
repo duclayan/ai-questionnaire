@@ -10,6 +10,7 @@ import {
   Grid
 } from '@mui/material';
 import { DocumentLoader } from '../forms/DocumentLoader/DocumentLoader';
+import { MermaidDiagram } from '../forms/MermaidDiagram/MermaidDiagram';
 export const MermaidWithInputBox = () => {
   const [prompt, setPrompt] = useState('');
   const [mermaidCode, setMermaidCode] = useState('');
@@ -20,7 +21,7 @@ export const MermaidWithInputBox = () => {
   const token = localStorage.getItem('token');
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT
   const apiUrl = `${apiEndpoint}/api/gpt-omini/`;
-  
+
 
   const generateMermaidJS = async (userPrompt) => {
     const prompt = `
@@ -28,9 +29,9 @@ export const MermaidWithInputBox = () => {
     Provide only the code content without any Mermaid JS tags 
     or code block formatting. The code should start directly with the graph definition`
     const finalPrompt = `${prompt}. This is the data: ${userPrompt}`
-    const response = await axios.post(apiUrl, 
-      {text: finalPrompt}, 
-      {headers: { Authorization: `Bearer ${token}`}}
+    const response = await axios.post(apiUrl,
+      { text: finalPrompt },
+      { headers: { Authorization: `Bearer ${token}` } }
     );
     const result = response.data.generated_text
 
@@ -78,26 +79,16 @@ export const MermaidWithInputBox = () => {
             multiline
             rows={3}
           />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={generateDiagram}
-            sx={{ mt: 2 }}
-          >
-            Generate Diagram
-          </Button>
         </Box>
-        <Grid item xs={12}>
-          <DocumentLoader isLoading={isLoading} text={"Processing the Data"} />
-        </Grid>
-        <Box my={4}>
-          <Box display="flex" alignItems="center" gap={2}>
-            <Typography variant="h6">{title}</Typography>
-          </Box>
-          {svgCode && (
-            <div dangerouslySetInnerHTML={{ __html: svgCode }} />
-          )}
-        </Box>
+
+        <MermaidDiagram
+          isReportPage={false}
+          diagramName='mermaid'
+          isDiagram={false}
+          token={token}
+          prompt={prompt}
+          apiEndpoint={apiEndpoint}
+        />
       </Box>
     </Container>
   );
