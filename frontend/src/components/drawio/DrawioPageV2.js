@@ -96,8 +96,7 @@ export const DrawioPageV2 = () => {
       const xmlPages = pages.map((xml, index) => {
         const pageNumber = index + 1;
         const pageId = `page-${pageNumber}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-        console.log("PageID:", pageId)
-        return `<diagram id="${pageId}" name="Page-${pageNumber}">${xml}</diagram>`;
+        return `<diagram id="${pageId}" name="${pageNumber}">${xml}</diagram>`;
       }).join('');
       const fullXml = `<mxfile>${xmlPages}</mxfile>`;
   
@@ -308,7 +307,7 @@ export const DrawioPageV2 = () => {
               ref={drawioIframeRef}
               title="drawio-editor"
               onLoad={handleDrawioLoad}
-              src="https://embed.diagrams.net/?embed=1&proto=json&spin=1"
+              src="https://embed.diagrams.net/?embed=1&spin=1&modified=unsavedChanges&proto=json"
               style={{
                 width: "100%",
                 height: "100%",
