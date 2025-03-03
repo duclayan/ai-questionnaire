@@ -11,13 +11,12 @@ import Home from './views/Home/Home';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import BackgroundCircle from './views/BackgroundCircle/BackgroundCircle';
 import FileUploadComponent from './components/forms/FileUploadDocument/FileUploadComponent';
-import { SVGPage } from './components/drawio/SVGPage';
+import { MermaidWithInputBox } from './components/drawio/MermaidWithInputBox';
 import { DrawioPage } from './components/drawio/DrawioPage';
 import { DrawioPageTest } from './components/drawio/DrawioPageCopy';
 import { DrawioPageAqua } from './components/drawio/DrawioPageAqua';
 import { DrawioPageV2 } from './components/drawio/DrawioPageV2';
 function App() {
-
   const theme = createTheme({
     palette: {
       primary: {
@@ -39,7 +38,7 @@ function App() {
                 <Route path="/file-upload" element={<FileUploadComponent/>} />
                 <Route path="/" element={<ProtectedRoute element={<Dashboard />} />} />
                 <Route path="/home" element={<Home />} />
-                <Route path="/editor" element={<SVGPage/>} />
+                <Route path="/editor" element={<MermaidWithInputBox/>} />
                 <Route path="/editor-v2" element={<DrawioPage/>} />
                 {/* Testing Page */}
                 <Route path="/test" element={<DrawioPageTest/> } /> 
