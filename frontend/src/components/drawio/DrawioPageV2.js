@@ -44,11 +44,6 @@ export const DrawioPageV2 = () => {
       "title": "Amazon Web Services"
     },
     {
-      "text": "Create a GCP architecture diagram illustrating a data processing pipeline for event data, including Cloud Bigtable, App Engine, Pub/Sub, Compute Engine, and BigQuery. Cloud Bigtable will be utilized for storing processed events with a time series. App Engine to invoke events and to push data to devices and BigQuery is used for warehousing execution results. The events are stored in json format",
-      "type": default_gcp,
-      "title": "GCP"
-    },
-    {
       "text": "Create an Azure architecture diagram illustrating a real-time data processing pipeline. The pipeline should include Azure VM, Azure Storage, Azure SQL, Azure functions and AZure AD. Show the connection of user.",
       "type": default_azure,
       "title": "Microsoft Azure Webservices"
