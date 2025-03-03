@@ -41,7 +41,7 @@ export const MermaidWithInputBox = () => {
     try {
       const { svg } = await mermaid.render('mermaid-svg', mermaidCode);
       setSvgCode(svg);
-      setTitle("Digaram Preview:")
+      setTitle("Diagram Preview:")
     } catch (err) {
       setTitle("Please revise your input and try generating the diagram again.")
     }
