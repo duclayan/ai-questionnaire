@@ -13,10 +13,10 @@ import {
 
 import { CircularProgress } from "@mui/material";
 import { DocumentLoader } from "../forms/DocumentLoader/DocumentLoader";
-import { default_aws, default_azure, default_xml, default_gcp, azure_images, aws_images, sample_aws_element, sample_azure_element, gcp_images, sample_gcp_element } from "./xmlSampleData";
+import { default_aws, default_azure, default_xml, azure_images, aws_images, sample_aws_element, sample_azure_element, gcp_images, sample_gcp_element } from "./xmlSampleData";
 import { saveAs } from 'file-saver';
 export const DrawioPageV2 = () => {
- 
+
   const [prompt, setPrompt] = useState("");
   const [editorOpen, setEditorOpen] = useState(false);
   const [editorLoading, setEditorLoading] = useState(true);
@@ -49,7 +49,6 @@ export const DrawioPageV2 = () => {
       "title": "Microsoft Azure Webservices"
     }
   ]
-
   const handleSampleChange = (event) => {
     const selected = event.target.value;
     setSelectedSample(selected);
@@ -58,7 +57,7 @@ export const DrawioPageV2 = () => {
   // Initialize Draw.io editor when it loads
   const handleDrawioLoad = () => {
     setEditorLoading(false);; // 1 minute timeout
-  
+
     try {
       const iframe = drawioIframeRef.current;
 
@@ -81,7 +80,7 @@ export const DrawioPageV2 = () => {
             setEditorOpen(false)
             setDrawioError(true)
             throw new Error('Draw.io error');
-          } 
+          }
         });
 
         // Clear Timeout
@@ -93,18 +92,24 @@ export const DrawioPageV2 = () => {
   };
   // Everytime a Page is Added, it is rendered
   useEffect(() => {
-      if (drawioIframeRef.current && pages.length > 0) {
-        const xmlPages = pages.map(xml => `<diagram>${xml}</diagram>`).join('');
-        const fullXml = `<mxfile>${xmlPages}</mxfile>`;
+    if (drawioIframeRef.current && pages.length > 0) {
+      const xmlPages = pages.map((xml, index) => {
+        const pageNumber = index + 1;
+        const pageId = `page-${pageNumber}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        console.log("PageID:", pageId)
+        return `<diagram id="${pageId}" name="Page-${pageNumber}">${xml}</diagram>`;
+      }).join('');
+      const fullXml = `<mxfile>${xmlPages}</mxfile>`;
   
-        setTimeout(() => {
-          drawioIframeRef.current.contentWindow.postMessage(
-            JSON.stringify({ action: 'load', xml: fullXml }),
-            '*'
-          );
-        }, 1000);
-      }
-    }, [pages]);
+      setTimeout(() => {
+        drawioIframeRef.current.contentWindow.postMessage(
+          JSON.stringify({ action: 'load', xml: fullXml }),
+          '*'
+        );
+      }, 1000);
+    }
+  }, [pages]);
+  
   // Handle messages from Draw.io V2
   useEffect(() => {
     const handleMessage = (event) => {
@@ -114,7 +119,7 @@ export const DrawioPageV2 = () => {
           if (msg.event === "save" || msg.event === "exit") {
             if (msg.xml) {
               setDrawioXml(msg.xml);
-              const blob = new Blob([msg.xml], {type: "application/xml;charset=utf-8"});
+              const blob = new Blob([msg.xml], { type: "application/xml;charset=utf-8" });
               saveAs(blob, "diagram.drawio")
               setIsSaved(true)
             }
@@ -128,13 +133,12 @@ export const DrawioPageV2 = () => {
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
   }, []);
-
-    // Handle messages from Draw.io V2
-    useEffect(() => {
-      if (isSaved){
-        setEditorOpen(false)
-      }
-    }, [isSaved]);
+  // Handle messages from Draw.io V2
+  useEffect(() => {
+    if (isSaved) {
+      setEditorOpen(false)
+    }
+  }, [isSaved]);
 
   const gptCall = async (prompt) => {
     const apiUrl = `${apiEndpoint}/api/gpt-omini/`;
@@ -169,10 +173,10 @@ export const DrawioPageV2 = () => {
     };
     const sample = selectedSample.prompt ? selectedSample.prompt : default_xml
     setCurrentStatus("Analyzing the type of Diagram")
-    const technology =  await getTechnology(code)
+    const technology = await getTechnology(code)
     setCurrentStatus(`Technology Detected as : ${technology}`)
     let icons = ''
-    let sample_element= ''
+    let sample_element = ''
     if (technology === 'AWS') {
       sample_element = sample_aws_element
       icons = aws_images
@@ -205,18 +209,18 @@ export const DrawioPageV2 = () => {
     await delayedSetStatus(`Identifying the appropriate diagram`, 3000);
 
     const apiUrl = `${apiEndpoint}/api/gpt-omini/`;
-      const response = await axios.post(
-        apiUrl,
-        {
-          text: prompt,
-          gpt_type: "clean",
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-      const data = response.data.generated_text;
-      return data;
+    const response = await axios.post(
+      apiUrl,
+      {
+        text: prompt,
+        gpt_type: "clean",
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
+    const data = response.data.generated_text;
+    return data;
   };
 
   const generateDiagram = async () => {
@@ -259,10 +263,10 @@ export const DrawioPageV2 = () => {
             fullWidth
             sx={{ mb: 2 }}
           >
-              <MenuItem value="" disabled> Select a sample </MenuItem>
-             {samples.map((sample) => (
-                  <MenuItem  key={sample.id} value={sample}> {sample.title}</MenuItem>
-              ))}
+            <MenuItem value="" disabled> Select a sample </MenuItem>
+            {samples.map((sample) => (
+              <MenuItem key={sample.id} value={sample}> {sample.title}</MenuItem>
+            ))}
           </Select>
           <TextField
             fullWidth
@@ -285,7 +289,7 @@ export const DrawioPageV2 = () => {
           <DocumentLoader isLoading={isLoading} text={currentStatus} />
         </Grid>
         {drawioError && (
-            <Grid item xs={12}> Please try to generate a diagram again.</Grid>
+          <Grid item xs={12}> Please try to generate a diagram again.</Grid>
         )
         }
 
