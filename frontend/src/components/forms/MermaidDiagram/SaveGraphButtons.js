@@ -1,10 +1,10 @@
 import { Button } from "@mui/material";
 
-export const SaveGraphButtons = ({ isReport, saveDiagram, exportAsPNG,exportAsSVG }) => {
+export const SaveGraphButtons = ({ isReportPage, saveDiagram, exportAsPNG,exportAsSVG }) => {
     return (
         <>
 
-        {isReport &&         
+        {isReportPage &&         
         <Button
           variant="outlined"
           color="secondary"
