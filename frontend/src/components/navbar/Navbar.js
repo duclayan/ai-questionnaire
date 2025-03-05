@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, Dialog, DialogActions, DialogContent, DialogTitle, Menu, MenuItem } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { useAuth } from '../AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import logo from './logo-image.png';
 
 const Navbar = () => {
@@ -41,7 +41,9 @@ const Navbar = () => {
           {isAuthenticated ? (
             <>
               <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
-                <img src={logo} alt="Logo" style={{ height: "70px", marginRight: '10px' }} />
+                <Button omponent={Link} to="/" color="inherit" disableRipple> 
+                <img  component={Link} to="/" src={logo} alt="Logo" style={{ height: "70px", marginRight: '10px' }} />
+                </Button>
               </Box>
               <Box>
                 <Button
@@ -56,15 +58,18 @@ const Navbar = () => {
                   open={editorMenuOpen}
                   onClose={handleEditorMenuClose}
                 >
-                  <MenuItem onClick={() => { navigate('/editor'); handleEditorMenuClose(); }}>Beta 1 Aqua Editor</MenuItem>
-                  {/* <MenuItem onClick={() => { navigate('/editor-v3'); handleEditorMenuClose(); }}>Beta 1.1 Aqua Editor</MenuItem> */}
-                  <MenuItem onClick={() => { navigate('/editor-v2'); handleEditorMenuClose(); }}>Beta 2 Editor DrawIO</MenuItem>
-                  <MenuItem onClick={() => { navigate('/editor-v2-1'); handleEditorMenuClose(); }}>Beta 2.1 Editor DrawIO</MenuItem>
-                  {/* <MenuItem onClick={() => { navigate('/test'); handleEditorMenuClose(); }}>Beta Flowdiagram DrawIO</MenuItem> */}
-
+                  <MenuItem component={Link} to="/editor" onClick={handleEditorMenuClose}>
+                    Sample
+                  </MenuItem>
+                  <MenuItem component={Link} to="/editor-v2" onClick={handleEditorMenuClose}>
+                    Beta 2 Editor DrawIO
+                  </MenuItem>
+                  <MenuItem component={Link} to="/editor-v2-1" onClick={handleEditorMenuClose}>
+                    Beta 2.1 Editor DrawIO
+                  </MenuItem>
                 </Menu>
-                <Button color="inherit" onClick={() => navigate('/dashboard')}>Dashboard</Button>
-                <Button color="inherit" onClick={handleLogoutClick}>Logout</Button>
+                <Button component={Link} to="/dashboard" color="inherit"> Dashboard </Button>
+                <Button component={Link} to="/logout" color="inherit" onClick={handleLogoutClick}> Logout </Button>
               </Box>
             </>
           ) : (
