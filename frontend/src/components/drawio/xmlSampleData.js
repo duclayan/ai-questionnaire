@@ -72,6 +72,163 @@ export const default_xml = `
 
 `
 
+export const sequence_diagram_xml = `
+<mxGraphModel dx="1647" dy="1020" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+    <mxCell id="45" value="Risk Team" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};size=65;" vertex="1" parent="1">
+      <mxGeometry x="76" y="20" width="150" height="1061" as="geometry" />
+    </mxCell>
+    <mxCell id="46" value="Risk Matrix" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};size=65;" vertex="1" parent="1">
+      <mxGeometry x="280" y="20" width="150" height="1061" as="geometry" />
+    </mxCell>
+    <mxCell id="47" value="Mitigation Strategies" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};size=65;" vertex="1" parent="1">
+      <mxGeometry x="480" y="20" width="167" height="1061" as="geometry" />
+    </mxCell>
+    <mxCell id="48" value="loop" style="shape=umlFrame;dashed=1;pointerEvents=0;dropTarget=0;strokeColor=#B3B3B3;height=20;width=40" vertex="1" parent="1">
+      <mxGeometry x="140" y="245" width="301" height="305" as="geometry" />
+    </mxCell>
+    <mxCell id="49" value="[For each identified&#xa;risk]" style="text;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;" vertex="1" parent="48">
+      <mxGeometry x="40" width="261" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="50" value="loop" style="shape=umlFrame;dashed=1;pointerEvents=0;dropTarget=0;strokeColor=#B3B3B3;height=20;width=40" vertex="1" parent="1">
+      <mxGeometry x="60" y="642" width="515" height="262" as="geometry" />
+    </mxCell>
+    <mxCell id="51" value="[For high-priority risks]" style="text;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;" vertex="1" parent="50">
+      <mxGeometry x="40" width="475" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="52" value="Identify Risks" style="curved=1;endArrow=block;rounded=0;" edge="1" parent="1" source="45" target="45">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="202" y="127" />
+          <mxPoint x="202" y="157" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="53" value="1" style="ellipse;aspect=fixed;fillColor=#000000;align=center;fontColor=#FFFFFF;" vertex="1" parent="52">
+      <mxGeometry width="14" height="14" relative="1" as="geometry">
+        <mxPoint x="-57" y="-22" as="offset" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="54" value="Assess Likelihood" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;" edge="1" parent="1" source="45" target="46">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="262" y="344" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="55" value="2" style="ellipse;aspect=fixed;fillColor=#000000;align=center;fontColor=#FFFFFF;" vertex="1" parent="54">
+      <mxGeometry width="14" height="14" relative="1" as="geometry">
+        <mxPoint x="-109.5" y="-7" as="offset" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="56" value="Assess Impact" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;" edge="1" parent="1" source="45" target="46">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="262" y="396" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="57" value="3" style="ellipse;aspect=fixed;fillColor=#000000;align=center;fontColor=#FFFFFF;" vertex="1" parent="56">
+      <mxGeometry width="14" height="14" relative="1" as="geometry">
+        <mxPoint x="-109.5" y="-7" as="offset" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="58" value="Plot Risk on Matrix" style="curved=1;endArrow=block;rounded=0;" edge="1" parent="1" source="46" target="46">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="406" y="448" />
+          <mxPoint x="406" y="478" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="59" value="4" style="ellipse;aspect=fixed;fillColor=#000000;align=center;fontColor=#FFFFFF;" vertex="1" parent="58">
+      <mxGeometry width="14" height="14" relative="1" as="geometry">
+        <mxPoint x="-57" y="-22" as="offset" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="60" value="Return Risk Priority" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=block;" edge="1" parent="1" source="46" target="45">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="265" y="530" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="61" value="5" style="ellipse;aspect=fixed;fillColor=#000000;align=center;fontColor=#FFFFFF;" vertex="1" parent="60">
+      <mxGeometry width="14" height="14" relative="1" as="geometry">
+        <mxPoint x="95.5" y="-7" as="offset" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="62" value="Categorize Risks by Priority" style="curved=1;endArrow=block;rounded=0;" edge="1" parent="1" source="45" target="45">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="202" y="592" />
+          <mxPoint x="202" y="622" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="63" value="6" style="ellipse;aspect=fixed;fillColor=#000000;align=center;fontColor=#FFFFFF;" vertex="1" parent="62">
+      <mxGeometry width="14" height="14" relative="1" as="geometry">
+        <mxPoint x="-57" y="-22" as="offset" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="64" value="Develop Mitigation Strategy" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;" edge="1" parent="1" source="45" target="47">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="366" y="720" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="65" value="7" style="ellipse;aspect=fixed;fillColor=#000000;align=center;fontColor=#FFFFFF;" vertex="1" parent="64">
+      <mxGeometry width="14" height="14" relative="1" as="geometry">
+        <mxPoint x="-213.75" y="-7" as="offset" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="66" value="Proposed Mitigation Plan" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=block;" edge="1" parent="1" source="47" target="45">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="369" y="772" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="67" value="8" style="ellipse;aspect=fixed;fillColor=#000000;align=center;fontColor=#FFFFFF;" vertex="1" parent="66">
+      <mxGeometry width="14" height="14" relative="1" as="geometry">
+        <mxPoint x="199.75" y="-7" as="offset" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="68" value="Review and Adjust Plan" style="curved=1;endArrow=block;rounded=0;" edge="1" parent="1" source="45" target="45">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="202" y="824" />
+          <mxPoint x="202" y="854" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="69" value="9" style="ellipse;aspect=fixed;fillColor=#000000;align=center;fontColor=#FFFFFF;" vertex="1" parent="68">
+      <mxGeometry width="14" height="14" relative="1" as="geometry">
+        <mxPoint x="-57" y="-22" as="offset" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="70" value="Compile Final Risk Assessment Report" style="curved=1;endArrow=block;rounded=0;" edge="1" parent="1" source="45" target="45">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="202" y="946" />
+          <mxPoint x="202" y="976" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="71" value="10" style="ellipse;aspect=fixed;fillColor=#000000;align=center;fontColor=#FFFFFF;" vertex="1" parent="70">
+      <mxGeometry width="14" height="14" relative="1" as="geometry">
+        <mxPoint x="-57" y="-22" as="offset" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="72" value="Data breaches, system outages,&#xa;compliance violations, insider threats" style="fillColor=#ffff88;strokeColor=#9E916F;" vertex="1" parent="1">
+      <mxGeometry x="20" y="507" width="281" height="68" as="geometry" />
+    </mxCell>
+  </root>
+</mxGraphModel>
+`
 export const default_azure = `
 <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
   <root>
