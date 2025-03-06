@@ -96,7 +96,7 @@ export const DrawioPageV2 = () => {
       const xmlPages = pages.map((xml, index) => {
         const pageNumber = index + 1;
         const pageId = `page-${pageNumber}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-        return `<diagram id="${pageId}" name="${pageNumber}">${xml}</diagram>`;
+        return `<diagram id="${pageId}" name="Page-${pageNumber}">${xml}</diagram>`;
       }).join('');
       const fullXml = `<mxfile>${xmlPages}</mxfile>`;
   
@@ -108,7 +108,7 @@ export const DrawioPageV2 = () => {
       }, 1000);
     }
   }, [pages]);
-  
+    
   // Handle messages from Draw.io V2
   useEffect(() => {
     const handleMessage = (event) => {

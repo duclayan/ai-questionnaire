@@ -25,6 +25,7 @@ export const DrawioPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [drawioError, setDrawioError] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [pages, setPages] = useState([])
 
   const drawioIframeRef = useRef(null);
   const token = localStorage.getItem("token");
@@ -66,7 +67,24 @@ export const DrawioPage = () => {
       alert('Unable to handle information');
     } 
   };
-
+  // Everytime a Page is Added, it is rendered
+  useEffect(() => {
+    if (drawioIframeRef.current && pages.length > 0) {
+      const xmlPages = pages.map((xml, index) => {
+        const pageNumber = index + 1;
+        const pageId = `page-${pageNumber}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        return `<diagram id="${pageId}" name="Page-${pageNumber}">${xml}</diagram>`;
+      }).join('');
+      const fullXml = `<mxfile>${xmlPages}</mxfile>`;
+  
+      setTimeout(() => {
+        drawioIframeRef.current.contentWindow.postMessage(
+          JSON.stringify({ action: 'load', xml: fullXml }),
+          '*'
+        );
+      }, 1000);
+    }
+  }, [pages]);
   // Handle messages from Draw.io V2
   useEffect(() => {
     const handleMessage = (event) => {
@@ -138,7 +156,6 @@ export const DrawioPage = () => {
 
   const generateDiagram = async () => {
     try {
-      setEditorOpen(false);
       setIsLoading(true);
       generateXML(prompt);
     } catch (error) {
@@ -149,6 +166,7 @@ export const DrawioPage = () => {
   };
   useEffect(() => {
     if (drawioXml) {
+      setPages(prevPages => [...prevPages, drawioXml.trim()]);
       setEditorOpen(true);
       setIsLoading(false);
     }
@@ -212,7 +230,7 @@ export const DrawioPage = () => {
               ref={drawioIframeRef}
               title="drawio-editor"
               onLoad={handleDrawioLoad}
-              src="https://embed.diagrams.net/?embed=1&proto=json&spin=1&create=json"
+              src="https://embed.diagrams.net/?embed=1&spin=1&modified=unsavedChanges&proto=json"
               style={{
                 width: "100%",
                 height: "100%",
