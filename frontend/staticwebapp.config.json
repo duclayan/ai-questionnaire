@@ -1,0 +1,33 @@
+{
+    "navigationFallback": {
+      "rewrite": "/index.html"
+    },
+
+    "routes": [
+      {
+        "route": "/",
+        "serve": "/index.html",
+        "statusCode": 200
+      },
+      {
+        "route": "/form",
+        "serve": "/index.html",
+        "statusCode": 200
+      },
+      {
+        "route": "/dashboard",
+        "serve": "/index.html",
+        "statusCode": 200
+      },
+      {
+        "route": "/project/:id",
+        "serve": "/index.html",
+        "statusCode": 200
+      },
+      {
+        "route": "/login",
+        "serve": "/index.html",
+        "statusCode": 200
+      }
+    ]
+  }
