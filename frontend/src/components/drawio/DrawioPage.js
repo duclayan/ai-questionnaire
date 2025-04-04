@@ -13,7 +13,7 @@ import {
 
 import { CircularProgress } from "@mui/material";
 import { DocumentLoader } from "../forms/DocumentLoader/DocumentLoader";
-import { default_xml } from "./xmlSampleData";
+import { default_xml, default_azure } from "./xmlSampleData";
 import { saveAs } from 'file-saver';
 export const DrawioPage = () => {
  
@@ -54,7 +54,8 @@ export const DrawioPage = () => {
 
       const timeoutId = setTimeout(() => {
         setEditorOpen(false)
-      }, 10000)
+        console.log("Took too long to open")
+      }, 100000)
 
       if (iframe && drawioXml && editorOpen) {
 
@@ -115,14 +116,18 @@ export const DrawioPage = () => {
 
   const generateXML = async (code) => {
     // This generates the XML Code from the given code
-    const prompt = `Generate XML Code readable by DrawIO. Strictly return only the code content without any code block formatting.`;
-
+    const prompt = `With max 500 lines create a simple representation of this. Always start and end with the mxGraphModel Tag. Generate XML Code readable by DrawIO. Strictly return only the code content without any code block formatting.`;
+    // // Version : Test with default XML
+    // setDrawioXml(default_azure)
+    // Version : Generate XML code from the user input
     try {
       const apiUrl = `${apiEndpoint}/api/gpt-omini/`;
       const response = await axios.post(
         apiUrl,
         {
           text: `${prompt}. Sample return code : ${default_xml} . This is the code to convert: ${code}`,
+          // text: `${prompt}. This is the code to convert: ${code}`,
+
         },
         {
           headers: { Authorization: `Bearer ${token}` },

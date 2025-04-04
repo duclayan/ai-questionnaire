@@ -198,16 +198,22 @@ class openAICleanVersion_O1MINI(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     
-    def _build_prompt(self, data, gpt_type, language=None, prompt=None, question=None, sample=None):
+    def _build_prompt(self, data, language=None, prompt=None, question=None, sample=None):
         """Build the appropriate prompt based on available data"""
-        if gpt_type == "clean":
-            return data
-        else:
+        if all(v is None for v in [language, prompt, question, sample]):
+            # If only data is provided, send just the data
             return f"""
             Strictly return only mermaidjs code in plaintext. No explanations or other texts included
             ---
                 {data}
             """
+            
+        # Default prompt for mermaid translation
+        # return f"""
+        #     Create mermaidjs code for this only return the mermaidjs code in plain text and no other text included. Translate it to {language}:
+        #     {data}
+        # """
+        return data
 
     def post(self, request):
         # Get user input
@@ -216,7 +222,6 @@ class openAICleanVersion_O1MINI(APIView):
         prompt = request.data.get("prompt_strategy")
         question = request.data.get("question")
         sample = request.data.get("sample_answer")
-        gpt_type = request.data.get("gpt_type")
 
         # Load environment variables
         load_dotenv()
@@ -233,7 +238,6 @@ class openAICleanVersion_O1MINI(APIView):
         # Build the appropriate prompt
         content = self._build_prompt(
             data=data,
-            gpt_type=gpt_type,
             language=language,
             prompt=prompt,
             question=question,
@@ -249,11 +253,18 @@ class openAICleanVersion_O1MINI(APIView):
             }]
         )
 
+        # Enable for ORIGINAL
         # Extract the generated text from the response
         generated_text = response.choices[0].message.content
 
         # Return a JSON response
         return Response({"generated_text": generated_text})
+        # # Enable for test of React-Flow
+        # result = response.choices[0].message.content
+        # print("Result", result)
+
+        # # diagram_data = eval(result)  # Ensure GPT returns valid Python dict
+        # return Response(result)
 
 class openAIView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -283,31 +294,31 @@ class openAIView(APIView):
             model=AZURE_OPENAI_DEPLOYMENT,
             temperature=0.9,
             max_tokens=2000,
-          messages=[
-                    {
-                        "role": "user",
-                        "content": f"""
-                            For reference, here is the relevant information:
-                            Question: {question}
-                            Prompt Strategy: {prompt}
-                            ---
-                            Enhance the provided content while preserving all original information. Improve the text as needed without omitting any details from the initial input. Present only the refined answer in plain text format, 
-                            without explanations, questions, formatting, bullet points, headings, or special symbols. Translate all text and diagram contents to the specified language. If unable to follow these instructions, respond 
-                            with "We need more information."
-                            ---
-                            User Input: {data if isinstance(data, str) else data['input_answer']}
-                            Translate text to {language}
-                            ---
-                            Strictly do not include the language, question and prompt strategy in the return answer.
-                            If 
-                            ---
-                            Refine the answer so the following texts are not included in the return text:
-                             - {question}
-                             - {prompt}
-                             - translate {language}
-                        """,
-                    }
-                ]
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"""
+                        For reference, here is the relevant information:
+                        Question: {question}
+                        Prompt Strategy: {prompt}
+                        ---
+                        Enhance the provided content while preserving all original information. Improve the text as needed without omitting any details from the initial input. Present only the refined answer in plain text format, 
+                        without explanations, questions, formatting, bullet points, headings, or special symbols. Translate all text and diagram contents to the specified language. If unable to follow these instructions, respond 
+                        with "We need more information."
+                        ---
+                        User Input: {data if isinstance(data, str) else data['input_answer']}
+                        Translate text to {language}
+                        ---
+                        Strictly do not include the language, question and prompt strategy in the return answer.
+                        If 
+                        ---
+                        Refine the answer so the following texts are not included in the return text:
+                            - {question}
+                            - {prompt}
+                            - translate {language}
+                    """,
+                }
+            ]
         )
         # Extract the generated text from the response
         generated_text = response.choices[0].message.content
@@ -364,6 +375,29 @@ class ProjectsView(APIView):
             return Response({"message": "Project deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
         except Project.DoesNotExist:
             return Response({'error': 'Project not found'}, status=status.HTTP_404_NOT_FOUND)
+class VoiceView(APIView):
+    def get_gpt_response(request):
+        if request.method == 'POST':
+            data = json.loads(request.body.decode('utf-8'))
+            prompt = data.get('prompt')
+
+            if not prompt:
+                return JsonResponse({'error': 'Prompt is required'}, status=400)
+
+            try:
+                completion = openai.chat.completions.create(
+                    model="gpt-4",
+                    messages=[
+                        {"role": "user", "content": prompt}
+                    ]
+                )
+                gpt_response = completion.choices[0].message.content
+                return JsonResponse({'response': gpt_response})
+
+            except Exception as e:
+                return JsonResponse({'error': str(e)}, status=500)
+        else:
+            return JsonResponse({'error': 'Invalid method'}, status=405)
 class AnswersView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]

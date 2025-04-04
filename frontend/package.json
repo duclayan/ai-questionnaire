@@ -22,10 +22,13 @@
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.5",
     "react-dom": "^18.3.1",
+    "react-drawio": "^1.0.3",
+    "react-flow-renderer": "^10.3.17",
     "react-mermaid": "^0.1.3",
     "react-router-dom": "^6.26.1",
     "react-scripts": "^5.0.1",
     "react-simple-captcha": "^9.3.1",
+    "react-speech-recognition": "^4.0.0",
     "styled-components": "^6.1.13",
     "web-vitals": "^2.1.4",
     "xml-js": "^1.6.11"
