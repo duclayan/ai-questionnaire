@@ -45,6 +45,10 @@ import PyPDF2
 import tempfile
 from django.conf import settings
 from django.db import IntegrityError
+from pathlib import Path
+import asyncio
+import uuid
+from .transcribe import transcribe_audio
 class DocumentGenerator:
     def create_document_response(self, gpt_response):
         doc = Document()
@@ -593,7 +597,41 @@ class SaveDiagram(APIView):
             return Response({"message": "Diagram saved successfully.", "path": path}, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+class TranscribeAudio(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):        
+        # Get Base64 audio from request data
+        base64_audio = request.data.get("audio")
+        audio_format = request.data.get("format")
+
+        if not base64_audio:
+            return Response({"error": "Audio data is required."}, status=400)
+
+        # Decode Base64 to binary data
+        audio_data = base64.b64decode(base64_audio)
+
+        # Save audio temporarily (optional)
+        temp_audio_file = f"temp_audio_{uuid.uuid4().hex}.{audio_format}"
+        with open(temp_audio_file, "wb") as f:
+            f.write(audio_data)
+        temp_audio_path = os.path.abspath(temp_audio_file)
+        print()
+
+        try:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            transcript = loop.run_until_complete(transcribe_audio(temp_audio_file))
+            return Response({'transcript': transcript})
         
+        except Exception as e:
+            print("Error", e)
+            return Response({'error': str(e)}, status=500)
+        finally:
+            if os.path.exists(temp_audio_path):
+                os.remove(temp_audio_path)
 class ProcessDocumentView(APIView):
     permission_classes = [AllowAny]
     parser_classes = [MultiPartParser, FormParser]

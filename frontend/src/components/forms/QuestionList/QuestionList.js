@@ -47,6 +47,7 @@ export const QuestionList = ({
   const [questionBeingCorrected, setQuestionBeingCorrected] = useState(new Set())
   const [idleTimers, setIdleTimers] = useState(new Set());
   const [isTyping, setIsTyping] = useState(true);
+  const [isRecordingActive, setIsRecordingActive] = useState(false);
 
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT
 
@@ -291,6 +292,10 @@ export const QuestionList = ({
     return <DocumentLoader isLoading={loading} text={"Preparing the Data"} />;
   }
 
+  const handleRecordingStatus = (status) => {
+    setIsRecordingActive(status)
+  };
+
   return (
     <Box sx={{ mt: 4, paddingBottom: '100px'}}>
           {currentCategory === "Upload File" ? (
@@ -305,6 +310,7 @@ export const QuestionList = ({
             question={question}
             answers={answers}
             handleInputChangeWithIdle={handleInputChangeWithIdle}
+            handleInputChange={handleInputChange}
             handleAutoCorrect={handleAutoCorrect}
             giveSampleAnswer={(currentQuestion) => giveSampleAnswer(currentQuestion, answers[question.question_id]?.input_answer)}
             questionBeingCorrected={questionBeingCorrected}
