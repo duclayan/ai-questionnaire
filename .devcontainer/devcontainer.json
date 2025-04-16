@@ -1,0 +1,7 @@
+{
+    "name": "AI-questionnaire",
+    "features": {
+      "ghcr.io/devcontainers/features/azure-cli:1": {}  // Add Azure CLI feature
+    },
+    "postCreateCommand": "az --version && pip install django && pip install -r requirements.txt"  // Optional: Verify Azure CLI installation
+  }
