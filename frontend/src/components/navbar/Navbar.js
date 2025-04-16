@@ -60,6 +60,8 @@ const Navbar = () => {
                   {/* <MenuItem onClick={() => { navigate('/editor-v3'); handleEditorMenuClose(); }}>Beta 1.1 Aqua Editor</MenuItem> */}
                   <MenuItem onClick={() => { navigate('/editor-v2'); handleEditorMenuClose(); }}>Beta 2 Editor DrawIO</MenuItem>
                   <MenuItem onClick={() => { navigate('/editor-v2-1'); handleEditorMenuClose(); }}>Beta 2.1 Editor DrawIO</MenuItem>
+                  <MenuItem onClick={() => { navigate('/diagram'); handleEditorMenuClose(); }}>Mermaid Diagram</MenuItem>
+
                   {/* <MenuItem onClick={() => { navigate('/test'); handleEditorMenuClose(); }}>Beta Flowdiagram DrawIO</MenuItem> */}
 
                 </Menu>
