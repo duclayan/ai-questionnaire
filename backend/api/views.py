@@ -736,3 +736,49 @@ class ProcessDocumentView(APIView):
             "message": "Answers updated successfully",
             "updated_answers": updated_answers_dict
         }, status=status.HTTP_200_OK)
+
+class ExplainImageView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    def post(self, request, format=None):
+        AZURE_OPENAI_ENDPOINT= os.getenv("AZURE_OPENAI_ENDPOINT")
+        AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
+        AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT")
+
+        #PREPROCESSING OF IMAGE
+        image = request.FILES.get('image')
+        if not image:
+            return Response({"detail": "No image uploaded."}, status=status.HTTP_400_BAD_REQUEST)
+
+        image.seek(0)
+        image_data = base64.b64encode(image.read()).decode('utf-8')
+        image_type = image.content_type
+
+        #CALL GPT
+         # Initialize the Azure OpenAI client
+        client = AzureOpenAI(
+            api_key=AZURE_OPENAI_API_KEY,
+            api_version="2024-02-15-preview",
+            base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
+        )
+
+        # Create a chat completion
+        response = client.chat.completions.create(
+            model=AZURE_OPENAI_DEPLOYMENT,
+            messages=[
+                    {"role": "system", "content": "You are a helpful assistant that responds in Markdown. Help me with my math homework!"},
+                    {"role": "user", "content": [
+                        {"type": "text", "text": "Explain this diagram in 5 seconds speaking time like a gen-z, use slangs!"},
+                        {"type": "image_url", "image_url": {
+                            "url": f"data:image/png;base64,{image_data}"}
+                        }   
+                    ]}
+                ],
+            temperature=0.0,
+        )
+        # Extract the generated text from the response
+        generated_text = response.choices[0].message.content
+        print("Generated Text Answer:", generated_text)
+        # Return a JSON response
+        return Response({"explanation": generated_text})
+       

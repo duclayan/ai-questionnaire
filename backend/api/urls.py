@@ -15,5 +15,6 @@ urlpatterns = [
     path('projects/<int:pk>/', ProjectsView.as_view(), name='project-detail'), 
     path("login/", UserView.as_view(), name="users"),
     path("save-diagram/", SaveDiagram.as_view(), name='save_diagram'),
-     path("transcribe/", TranscribeAudio.as_view(), name='transcribe-audio')
+     path("transcribe/", TranscribeAudio.as_view(), name='transcribe-audio'),
+     path("explain-image/", ExplainImageView.as_view(), name='explain-image'),
 ]

@@ -17,6 +17,7 @@ import { DrawioPageAqua } from './components/drawio/DrawioPageAqua';
 import { DrawioPageV2 } from './components/drawio/DrawioPageV2';
 import { MermaidDiagram } from './components/forms/MermaidDiagram/MermaidDiagram';
 import MermaidInput from './components/forms/MermaidDiagram/MermaidInput';
+import ImageExplain from './components/text-to-audio/ImageExplain';
 function App() {
 
   const theme = createTheme({
@@ -53,7 +54,9 @@ function App() {
                 <Route path="/form" element={<ProtectedRoute element={<Form />} />} />
                 <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
                 <Route path="/forms/:project_id" element={<ProtectedRoute element={<Form />} />} />
-                
+                {/* Text to Audio */}
+                <Route path="/audio-1" element={<ImageExplain />} />
+
                 {/* Redirect all unmatched routes to the dashboard */}
                 <Route path="*" element={<ProtectedRoute element={<Dashboard />} />} />
               </Routes>

@@ -1,5 +1,3 @@
-/backend/api
-/backend/myenv
 /backend/crud/__pycache__
 /backend/.env
 /backend/db.sqlite3

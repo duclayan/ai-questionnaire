@@ -53,7 +53,6 @@ export const MermaidDiagram = ({  diagramName, question, answers, token, apiEndp
     }
   }, [isEnlarged]);
   const handleGenerateClick = async () => {
-    console.log(answers)
     // Generate the chart based on the input answer
     const currentAnswer = answers[question.question_id]?.input_answer || answers;
     // Render the chart after generating it
@@ -144,7 +143,6 @@ export const MermaidDiagram = ({  diagramName, question, answers, token, apiEndp
   }
 
   const renderMermaid = async (currentAnswer, isRetry = false) => {
-    console.log("Current Answer", currentAnswer)
     if (!currentAnswer || currentAnswer.trim() === "") {
       setErrorMessage("No valid answer provided");
       return;
@@ -172,11 +170,13 @@ export const MermaidDiagram = ({  diagramName, question, answers, token, apiEndp
             generated_chart = await processMermaidCode(response.data.generated_text);
             setChartContent(generated_chart)
           } catch (error) {
+            setErrorMessage("That was challenging. Maybe make it more simple.")
             console.log("Diagram Prompts Error:", error);
             throw error;
           }
         }
       } else {
+        generated_chart = currentAnswer
         setChartContent(currentAnswer)
       }
 
@@ -187,6 +187,7 @@ export const MermaidDiagram = ({  diagramName, question, answers, token, apiEndp
       mermaid.parseError = (error) => {
         mermaidError = error.message;
         console.error("Mermaid parse error:", mermaidError);
+        setErrorMessage("Please retry again.")
       };
 
 
@@ -211,28 +212,7 @@ export const MermaidDiagram = ({  diagramName, question, answers, token, apiEndp
 
       setSaveGraph(true)
     } catch (error) {
-      // console.log("Catching Error", isRetry);
-      // setErrorMessage("Seems like I don't know how to do that yet. You can try rephrasing it or just click generate  again.");
-      // setSaveGraph(false);
 
-      // if (!isRetry) {
-      //   try {
-      //     let count = 0
-      //     let corrected_chart = await handleMermaidError(generated_chart, error.message);
-      //     while (count < 3) {
-      //       corrected_chart = await handleMermaidError(generated_chart, error.message);
-      //       if (corrected_chart) {
-      //         await renderMermaid(corrected_chart, true);
-      //         return
-      //       }
-      //       count++
-      //     }
-
-      //   } catch (retryError) {
-      //     setErrorMessage("Failed to generate diagram after retry.");
-      //     setSaveGraph(false);
-      //   }
-      // }
     } finally {
       setLoading(false);
       setRepeatCount(0);
@@ -310,10 +290,12 @@ export const MermaidDiagram = ({  diagramName, question, answers, token, apiEndp
 
       } catch (error) {
         console.error('Error saving diagram:', error.response ? error.response.data : error.message);
+        setErrorMessage("Error Saving Diagram")
       }
       setSaveGraph(false); // Reset saveGraph after saving
     } else {
       console.error("Diagram is not present/submitted");
+      setErrorMessage("Diagram is not present/submittet")
     }
   };
   const exportAsPNG = () => {
@@ -382,7 +364,7 @@ export const MermaidDiagram = ({  diagramName, question, answers, token, apiEndp
             {saveGraph && (
 
               <>
-                {answers[question.question_id] &&
+                {answers[question.question_id].input_answer &&
                 (
                   <Button
                   variant="outlined"
