@@ -58,18 +58,21 @@ const Navbar = () => {
                   open={editorMenuOpen}
                   onClose={handleEditorMenuClose}
                 >
-                  <MenuItem component={Link} to="/editor" onClick={handleEditorMenuClose}>
-                    Sample
-                  </MenuItem>
-                  <MenuItem component={Link} to="/editor-v2" onClick={handleEditorMenuClose}>
-                    Beta 2 Editor DrawIO
-                  </MenuItem>
-                  <MenuItem component={Link} to="/editor-v2-1" onClick={handleEditorMenuClose}>
-                    Beta 2.1 Editor DrawIO
-                  </MenuItem>
+                  <MenuItem onClick={() => { navigate('/editor'); handleEditorMenuClose(); }}>Beta 1 Aqua Editor</MenuItem>
+                  {/* <MenuItem onClick={() => { navigate('/editor-v3'); handleEditorMenuClose(); }}>Beta 1.1 Aqua Editor</MenuItem> */}
+                  <MenuItem onClick={() => { navigate('/editor-v2'); handleEditorMenuClose(); }}>Beta 2 Editor DrawIO</MenuItem>
+                  <MenuItem onClick={() => { navigate('/editor-v2-1'); handleEditorMenuClose(); }}>Beta 2.1 Editor DrawIO</MenuItem>
+
+
+                  {/* <MenuItem onClick={() => { navigate('/test'); handleEditorMenuClose(); }}>Beta Flowdiagram DrawIO</MenuItem> */}
+
                 </Menu>
-                <Button component={Link} to="/dashboard" color="inherit"> Dashboard </Button>
-                <Button component={Link} to="/logout" color="inherit" onClick={handleLogoutClick}> Logout </Button>
+                <Button color="inherit" onClick={() => navigate('/audio-1')}>Diagram Audio</Button>
+                <Button color="inherit" onClick={() => navigate('/diagram')}>Mermaid</Button>
+
+
+                <Button color="inherit" onClick={() => navigate('/dashboard')}>Dashboard</Button>
+                <Button color="inherit" onClick={handleLogoutClick}>Logout</Button>
               </Box>
             </>
           ) : (

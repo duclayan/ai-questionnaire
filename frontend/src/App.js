@@ -2,7 +2,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Form from './views/Form/Form';
-import Login from './views/Login/Login';
 import Dashboard from './views/Dashboard/Dashboard';
 import { AuthProvider } from './components/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -16,6 +15,9 @@ import { DrawioPage } from './components/drawio/DrawioPage';
 import { DrawioPageTest } from './components/drawio/DrawioPageCopy';
 import { DrawioPageAqua } from './components/drawio/DrawioPageAqua';
 import { DrawioPageV2 } from './components/drawio/DrawioPageV2';
+import { MermaidDiagram } from './components/forms/MermaidDiagram/MermaidDiagram';
+import MermaidInput from './components/forms/MermaidDiagram/MermaidInput';
+import ImageExplain from './components/text-to-audio/ImageExplain';
 function App() {
   const theme = createTheme({
     palette: {
@@ -47,10 +49,13 @@ function App() {
 
 
                 <Route path="/login" element={<Home />} />
+                <Route path="/diagram" element={ <MermaidInput/>} />
                 <Route path="/form" element={<ProtectedRoute element={<Form />} />} />
                 <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
                 <Route path="/forms/:project_id" element={<ProtectedRoute element={<Form />} />} />
-                
+                {/* Text to Audio */}
+                <Route path="/audio-1" element={<ImageExplain />} />
+
                 {/* Redirect all unmatched routes to the dashboard */}
                 <Route path="*" element={<ProtectedRoute element={<Dashboard />} />} />
               </Routes>

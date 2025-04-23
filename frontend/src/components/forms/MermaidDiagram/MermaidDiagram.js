@@ -7,7 +7,9 @@ import { Box, Button } from '@mui/material';
 import { DocumentLoader } from '../DocumentLoader/DocumentLoader';
 import { SaveGraphButtons } from './SaveGraphButtons';
 import { EnlargedImage } from './EnlargedImage';
-export const MermaidDiagram = ({ isReportPage, prompt, diagramName, question, answers, token, apiEndpoint }) => {
+
+export const MermaidDiagram = ({  isReportPage, diagramName, question, answers, token, apiEndpoint, language }) => {
+  const [mermaidError, setMermaidError] = useState(null);
   const [saveGraph, setSaveGraph] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isEnlarged, setIsEnlarged] = useState(false);
@@ -49,16 +51,13 @@ export const MermaidDiagram = ({ isReportPage, prompt, diagramName, question, an
   }, [isEnlarged]);
   const handleGenerateClick = async () => {
     // Generate the chart based on the input answer
-    const userPrompt = isReportPage 
-    ? answers[question.question_id]?.input_answer || ""
-    : prompt;
-  
+    const currentAnswer = answers[question.question_id]?.input_answer || answers;
     // Render the chart after generating it
     setErrorMessage(null)
     if (chartRef) {
       chartRef.current.innerHTML = ""
     }
-    renderMermaid(userPrompt);
+    renderMermaid(currentAnswer);
   };
   async function processMermaidCode(code) {
 
@@ -137,41 +136,53 @@ export const MermaidDiagram = ({ isReportPage, prompt, diagramName, question, an
 
     return null;
   }
-  const renderMermaid = async (currentPrompt, isRetry = false) => {
-    // Check if currentAnswer is valid
-    if (!currentPrompt || currentPrompt.trim() === "") {
+
+  const renderMermaid = async (currentAnswer, isRetry = false) => {
+    if (!currentAnswer || currentAnswer.trim() === "") {
       setErrorMessage("No valid answer provided");
       return;
     }
     let mermaidChart = chartRef.current
-    let generated_chart = "";
+    let generated_chart = answers[question.question_id]? "": currentAnswer;
     setSaveGraph(false)
     try {
       mermaidChart.innerHTML = ''
-      for (let i = 0; i < diagramPrompts.length; i++) {
-        try {
-          setLoading(true);
+      if (answers[question.question_id]?.input_answer) {
+        console.log("Went inside the loop")
+        for (let i = 0; i < diagramPrompts.length; i++) {
+          try {
+            setLoading(true);
 
-          const apiUrl = `${apiEndpoint}/api/gpt-omini/`;
-          console.log("GPT Using: OMINI")
-          const response = await axios.post(apiUrl, {
-            text: currentPrompt,
-          }, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          generated_chart = await processMermaidCode(response.data.generated_text);
-        } catch (error) {
-          throw error;
+            const apiUrl = `${apiEndpoint}/api/gpt-omini/`;
+            console.log("GPT Using: OMINI")
+            const response = await axios.post(apiUrl, {
+
+              text: currentAnswer,
+            }, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+
+            generated_chart = await processMermaidCode(response.data.generated_text);
+            setChartContent(generated_chart)
+          } catch (error) {
+            setErrorMessage("That was challenging. Maybe make it more simple.")
+            console.log("Diagram Prompts Error:", error);
+            throw error;
+          }
         }
+      } else {
+        generated_chart = currentAnswer
+        setChartContent(currentAnswer)
       }
 
-      setChartContent(generated_chart);
 
+      console.log("Chart Content", chartContent)
       let mermaidError = null;
 
       mermaid.parseError = (error) => {
         mermaidError = error.message;
         console.error("Mermaid parse error:", mermaidError);
+        setErrorMessage("Please retry again.")
       };
 
 
@@ -199,7 +210,6 @@ export const MermaidDiagram = ({ isReportPage, prompt, diagramName, question, an
       setSaveGraph(false);
 
       if (!isRetry) {
-        try {
           let count = 0
           let corrected_chart = await handleMermaidError(generated_chart, error.message);
           while (count < 3) {
@@ -210,16 +220,12 @@ export const MermaidDiagram = ({ isReportPage, prompt, diagramName, question, an
             }
             count++
           }
-
-        } catch (retryError) {
-          setErrorMessage("Failed to generate diagram after retry.");
-          setSaveGraph(false);
-        }
       }
     } finally {
       setLoading(false);
     }
-  };
+      
+  }
   const handleMermaidError = async (generated_chart, error_message) => {
     setLoading(true)
     setErrorMessage("This is quite challenging, let me try again");
@@ -268,7 +274,7 @@ export const MermaidDiagram = ({ isReportPage, prompt, diagramName, question, an
       });
       return response.data.generated_text
     } catch (error) {
-      console.error()
+      setMermaidError(`Error in prompt: Unable to generate a valid diagram`);
     }
 
   }
@@ -289,10 +295,12 @@ export const MermaidDiagram = ({ isReportPage, prompt, diagramName, question, an
 
       } catch (error) {
         console.error('Error saving diagram:', error.response ? error.response.data : error.message);
+        setErrorMessage("Error Saving Diagram")
       }
       setSaveGraph(false); // Reset saveGraph after saving
     } else {
       console.error("Diagram is not present/submitted");
+      setErrorMessage("Diagram is not present/submittet")
     }
   };
   const exportAsPNG = () => {
@@ -359,12 +367,42 @@ export const MermaidDiagram = ({ isReportPage, prompt, diagramName, question, an
             </Button>
 
             {saveGraph && (
-              <SaveGraphButtons
-                isReportPage = {isReportPage}
-                saveDiagram = {saveDiagram}
-                exportAsPNG = {exportAsPNG}
-                exportAsSVG = {exportAsSVG}
-              />
+
+              <>
+                {answers[question.question_id].input_answer &&
+                (
+                  <Button
+                  variant="outlined"
+                  color="secondary"
+                  size="small"
+                  onClick={saveDiagram}
+                  style={{ marginLeft: '10px' }}
+                >
+                  Add to Report
+                </Button>
+                )}
+
+
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  size="small"
+                  onClick={exportAsPNG}
+                  style={{ marginLeft: '10px' }}
+                >
+                  Download PNG Diagram
+                </Button>
+
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  size="small"
+                  onClick={exportAsSVG}
+                  style={{ marginLeft: '10px' }}
+                >
+                  Download SVG Diagram
+                </Button>
+              </>
             )}
           </>
         )}

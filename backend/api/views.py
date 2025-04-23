@@ -45,6 +45,10 @@ import PyPDF2
 import tempfile
 from django.conf import settings
 from django.db import IntegrityError
+from pathlib import Path
+import asyncio
+import uuid
+from .transcribe import transcribe_audio
 class DocumentGenerator:
     def create_document_response(self, gpt_response):
         doc = Document()
@@ -198,16 +202,22 @@ class openAICleanVersion_O1MINI(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     
-    def _build_prompt(self, data, gpt_type, language=None, prompt=None, question=None, sample=None):
+    def _build_prompt(self, data, language=None, prompt=None, question=None, sample=None):
         """Build the appropriate prompt based on available data"""
-        if gpt_type == "clean":
-            return data
-        else:
+        if all(v is None for v in [language, prompt, question, sample]):
+            # If only data is provided, send just the data
             return f"""
             Strictly return only mermaidjs code in plaintext. No explanations or other texts included
             ---
                 {data}
             """
+            
+        # Default prompt for mermaid translation
+        # return f"""
+        #     Create mermaidjs code for this only return the mermaidjs code in plain text and no other text included. Translate it to {language}:
+        #     {data}
+        # """
+        return data
 
     def post(self, request):
         # Get user input
@@ -216,7 +226,6 @@ class openAICleanVersion_O1MINI(APIView):
         prompt = request.data.get("prompt_strategy")
         question = request.data.get("question")
         sample = request.data.get("sample_answer")
-        gpt_type = request.data.get("gpt_type")
 
         # Load environment variables
         load_dotenv()
@@ -233,7 +242,6 @@ class openAICleanVersion_O1MINI(APIView):
         # Build the appropriate prompt
         content = self._build_prompt(
             data=data,
-            gpt_type=gpt_type,
             language=language,
             prompt=prompt,
             question=question,
@@ -249,11 +257,18 @@ class openAICleanVersion_O1MINI(APIView):
             }]
         )
 
+        # Enable for ORIGINAL
         # Extract the generated text from the response
         generated_text = response.choices[0].message.content
 
         # Return a JSON response
         return Response({"generated_text": generated_text})
+        # # Enable for test of React-Flow
+        # result = response.choices[0].message.content
+        # print("Result", result)
+
+        # # diagram_data = eval(result)  # Ensure GPT returns valid Python dict
+        # return Response(result)
 
 class openAIView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -283,31 +298,31 @@ class openAIView(APIView):
             model=AZURE_OPENAI_DEPLOYMENT,
             temperature=0.9,
             max_tokens=2000,
-          messages=[
-                    {
-                        "role": "user",
-                        "content": f"""
-                            For reference, here is the relevant information:
-                            Question: {question}
-                            Prompt Strategy: {prompt}
-                            ---
-                            Enhance the provided content while preserving all original information. Improve the text as needed without omitting any details from the initial input. Present only the refined answer in plain text format, 
-                            without explanations, questions, formatting, bullet points, headings, or special symbols. Translate all text and diagram contents to the specified language. If unable to follow these instructions, respond 
-                            with "We need more information."
-                            ---
-                            User Input: {data if isinstance(data, str) else data['input_answer']}
-                            Translate text to {language}
-                            ---
-                            Strictly do not include the language, question and prompt strategy in the return answer.
-                            If 
-                            ---
-                            Refine the answer so the following texts are not included in the return text:
-                             - {question}
-                             - {prompt}
-                             - translate {language}
-                        """,
-                    }
-                ]
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"""
+                        For reference, here is the relevant information:
+                        Question: {question}
+                        Prompt Strategy: {prompt}
+                        ---
+                        Enhance the provided content while preserving all original information. Improve the text as needed without omitting any details from the initial input. Present only the refined answer in plain text format, 
+                        without explanations, questions, formatting, bullet points, headings, or special symbols. Translate all text and diagram contents to the specified language. If unable to follow these instructions, respond 
+                        with "We need more information."
+                        ---
+                        User Input: {data if isinstance(data, str) else data['input_answer']}
+                        Translate text to {language}
+                        ---
+                        Strictly do not include the language, question and prompt strategy in the return answer.
+                        If 
+                        ---
+                        Refine the answer so the following texts are not included in the return text:
+                            - {question}
+                            - {prompt}
+                            - translate {language}
+                    """,
+                }
+            ]
         )
         # Extract the generated text from the response
         generated_text = response.choices[0].message.content
@@ -364,6 +379,29 @@ class ProjectsView(APIView):
             return Response({"message": "Project deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
         except Project.DoesNotExist:
             return Response({'error': 'Project not found'}, status=status.HTTP_404_NOT_FOUND)
+class VoiceView(APIView):
+    def get_gpt_response(request):
+        if request.method == 'POST':
+            data = json.loads(request.body.decode('utf-8'))
+            prompt = data.get('prompt')
+
+            if not prompt:
+                return JsonResponse({'error': 'Prompt is required'}, status=400)
+
+            try:
+                completion = openai.chat.completions.create(
+                    model="gpt-4",
+                    messages=[
+                        {"role": "user", "content": prompt}
+                    ]
+                )
+                gpt_response = completion.choices[0].message.content
+                return JsonResponse({'response': gpt_response})
+
+            except Exception as e:
+                return JsonResponse({'error': str(e)}, status=500)
+        else:
+            return JsonResponse({'error': 'Invalid method'}, status=405)
 class AnswersView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -559,7 +597,41 @@ class SaveDiagram(APIView):
             return Response({"message": "Diagram saved successfully.", "path": path}, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+class TranscribeAudio(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):        
+        # Get Base64 audio from request data
+        base64_audio = request.data.get("audio")
+        audio_format = request.data.get("format")
+
+        if not base64_audio:
+            return Response({"error": "Audio data is required."}, status=400)
+
+        # Decode Base64 to binary data
+        audio_data = base64.b64decode(base64_audio)
+
+        # Save audio temporarily (optional)
+        temp_audio_file = f"temp_audio_{uuid.uuid4().hex}.{audio_format}"
+        with open(temp_audio_file, "wb") as f:
+            f.write(audio_data)
+        temp_audio_path = os.path.abspath(temp_audio_file)
+        print()
+
+        try:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            transcript = loop.run_until_complete(transcribe_audio(temp_audio_file))
+            return Response({'transcript': transcript})
         
+        except Exception as e:
+            print("Error", e)
+            return Response({'error': str(e)}, status=500)
+        finally:
+            if os.path.exists(temp_audio_path):
+                os.remove(temp_audio_path)
 class ProcessDocumentView(APIView):
     permission_classes = [AllowAny]
     parser_classes = [MultiPartParser, FormParser]
@@ -664,3 +736,49 @@ class ProcessDocumentView(APIView):
             "message": "Answers updated successfully",
             "updated_answers": updated_answers_dict
         }, status=status.HTTP_200_OK)
+
+class ExplainImageView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    def post(self, request, format=None):
+        AZURE_OPENAI_ENDPOINT= os.getenv("AZURE_OPENAI_ENDPOINT")
+        AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
+        AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT")
+
+        #PREPROCESSING OF IMAGE
+        image = request.FILES.get('image')
+        if not image:
+            return Response({"detail": "No image uploaded."}, status=status.HTTP_400_BAD_REQUEST)
+
+        image.seek(0)
+        image_data = base64.b64encode(image.read()).decode('utf-8')
+        image_type = image.content_type
+
+        #CALL GPT
+         # Initialize the Azure OpenAI client
+        client = AzureOpenAI(
+            api_key=AZURE_OPENAI_API_KEY,
+            api_version="2024-02-15-preview",
+            base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
+        )
+
+        # Create a chat completion
+        response = client.chat.completions.create(
+            model=AZURE_OPENAI_DEPLOYMENT,
+            messages=[
+                    {"role": "system", "content": "You are a helpful assistant that responds in Markdown. Help me with my math homework!"},
+                    {"role": "user", "content": [
+                        {"type": "text", "text": "Explain this diagram in 5 seconds speaking time like a gen-z, use slangs!"},
+                        {"type": "image_url", "image_url": {
+                            "url": f"data:image/png;base64,{image_data}"}
+                        }   
+                    ]}
+                ],
+            temperature=0.0,
+        )
+        # Extract the generated text from the response
+        generated_text = response.choices[0].message.content
+        print("Generated Text Answer:", generated_text)
+        # Return a JSON response
+        return Response({"explanation": generated_text})
+       

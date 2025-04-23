@@ -8,6 +8,7 @@ import ErrorIcon from "@mui/icons-material/Error";
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { MermaidDropdown } from "../MermaidDropdown/MermaidDropdown";
+import AudioRecorderComponent from "../../voice/AudioRecorder";
 
 export const InputField = ({ 
   question,
@@ -17,8 +18,8 @@ export const InputField = ({
   giveSampleAnswer,
   questionBeingCorrected,
   onChange,
-  currentCategory
-
+  currentCategory,
+  handleInputChange
  }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -159,11 +160,7 @@ export const InputField = ({
                 <CheckCircleIcon />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Voice recording to text is currently available. We're working on adding this feature in a future update. For now, please use text input." arrow>
-              <IconButton>
-                <MicIcon />
-              </IconButton>
-            </Tooltip>
+            <AudioRecorderComponent question={question} handleInputChange={handleInputChange}/>
             <Tooltip title="Unsure how to formulate your answer? Click this button to receive a sample response, which you can then refine using our correction button for improvements." arrow>
               <IconButton onClick={() => giveSampleAnswer(question)}>
                 <ErrorIcon />

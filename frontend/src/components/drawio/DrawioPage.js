@@ -52,6 +52,13 @@ export const DrawioPage = () => {
       setEditorOpen(false) // close the editor if it is morethan 10 seconds
     }, 10000)
     try {
+      const iframe = drawioIframeRef.current;
+
+      const timeoutId = setTimeout(() => {
+        setEditorOpen(false)
+        console.log("Took too long to open")
+      }, 100000)
+
       if (iframe && drawioXml && editorOpen) {
         setTimeout(() => {
           iframe.contentWindow.postMessage(
@@ -125,8 +132,10 @@ export const DrawioPage = () => {
 
   const generateXML = async (code) => {
     // This generates the XML Code from the given code
-    const prompt = `Generate XML Code readable by DrawIO. Strictly return only the code content without any code block formatting.`;
-
+    const prompt = `With max 500 lines create a simple representation of this. Always start and end with the mxGraphModel Tag. Generate XML Code readable by DrawIO. Strictly return only the code content without any code block formatting.`;
+    // // Version : Test with default XML
+    // setDrawioXml(default_azure)
+    // Version : Generate XML code from the user input
     try {
       const apiUrl = `${apiEndpoint}/api/gpt4o/`;
       const response = await axios.post(
