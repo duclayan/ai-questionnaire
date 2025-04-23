@@ -20,7 +20,7 @@ jobs:
           submodules: true
           lfs: false
       - name: Install react-speech-kit with force
-        run: npm install react-speech-kit --force
+        run: npm install --legacy-peer-deps react-speech-kit
         working-directory: ./frontend
       - name: Build And Deploy
         id: builddeploy
