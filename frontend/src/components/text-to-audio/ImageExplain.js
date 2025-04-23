@@ -26,7 +26,7 @@ function ImageExplain() {
     setExplanation("");
     const formData = new FormData();
     formData.append("image", image);
-    const apiUrl = `${apiEndpoint}api/explain-image/`;
+    const apiUrl = `${apiEndpoint}/api/explain-image/`;
 
 
     try {

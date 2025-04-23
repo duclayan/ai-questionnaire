@@ -46,7 +46,7 @@ const AudioRecorderComponent = (
 
     reader.onloadend = async () => {
       const base64Audio = reader.result.split(",")[1]; // Extract Base64 string after the prefix
-      const apiUrl = `${apiEndpoint}api/transcribe/`;
+      const apiUrl = `${apiEndpoint}/api/transcribe/`;
 
       try {
         const response = await axios.post(
