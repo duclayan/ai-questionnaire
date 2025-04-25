@@ -48,6 +48,7 @@ export const QuestionList = ({
   const [idleTimers, setIdleTimers] = useState(new Set());
   const [isTyping, setIsTyping] = useState(true);
   const [isRecordingActive, setIsRecordingActive] = useState(false);
+  const [currentlyRecordingId, setCurrentlyRecordingId] = useState(null);
 
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT
 
@@ -315,6 +316,8 @@ export const QuestionList = ({
             giveSampleAnswer={(currentQuestion) => giveSampleAnswer(currentQuestion, answers[question.question_id]?.input_answer)}
             questionBeingCorrected={questionBeingCorrected}
             currentCategory={currentCategory}
+            currentlyRecordingId={currentlyRecordingId}
+            setCurrentlyRecordingId={setCurrentlyRecordingId}
             onChange={(selectedAnswer) => {
               setAnswers((prevAnswers) => ({
                 ...prevAnswers,

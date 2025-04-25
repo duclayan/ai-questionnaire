@@ -5,7 +5,7 @@ import StopIcon from "@mui/icons-material/Stop";
 import axios from "axios";
 
 const AudioRecorderComponent = (
-  { question,  handleInputChange}) => {
+  { question,  handleInputChange, currentlyRecordingId, setCurrentlyRecordingId}) => {
   const [isRecording, setIsRecording] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -14,9 +14,27 @@ const AudioRecorderComponent = (
   const token = localStorage.getItem("token");
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT;
 
+  useEffect(() => {
+    // If another input starts recording, stop this one
+    if (isRecording && currentlyRecordingId !== question.question_id) {
+      if (mediaRecorder.current && mediaRecorder.current.state === "recording") {
+        mediaRecorder.current.stop();
+        mediaRecorder.current.onstop = async () => {
+          const audioBlob = new Blob(audioChunks.current, { type: "audio/webm" });
+          setIsRecording(false);
+  
+          // Send the audio blob to the backend
+          sendAudioToBackend(audioBlob);
+        };
+      }
+      setIsRecording(false);
+    }
+  }, [currentlyRecordingId, isRecording, question.question_id]);
 
   const handleMicClick = async () => {
-    if (!isRecording) {
+    console.log("Currently Recording", question)
+    if (!isRecording  ) {
+      setCurrentlyRecordingId(question.question_id);
       // Start recording
       audioChunks.current = [];
       navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
@@ -29,6 +47,7 @@ const AudioRecorderComponent = (
       });
     } else {
       // Stop recording
+      setCurrentlyRecordingId(null)
       mediaRecorder.current.stop();
       mediaRecorder.current.onstop = async () => {
         const audioBlob = new Blob(audioChunks.current, { type: "audio/webm" });

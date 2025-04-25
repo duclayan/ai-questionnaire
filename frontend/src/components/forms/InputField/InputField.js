@@ -19,7 +19,9 @@ export const InputField = ({
   questionBeingCorrected,
   onChange,
   currentCategory,
-  handleInputChange
+  handleInputChange,
+  currentlyRecordingId,
+  setCurrentlyRecordingId
  }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -160,7 +162,8 @@ export const InputField = ({
                 <CheckCircleIcon />
               </IconButton>
             </Tooltip>
-            <AudioRecorderComponent question={question} handleInputChange={handleInputChange}/>
+            <AudioRecorderComponent question={question} handleInputChange={handleInputChange} currentlyRecordingId={currentlyRecordingId}
+  setCurrentlyRecordingId={setCurrentlyRecordingId}/>
             <Tooltip title="Unsure how to formulate your answer? Click this button to receive a sample response, which you can then refine using our correction button for improvements." arrow>
               <IconButton onClick={() => giveSampleAnswer(question)}>
                 <ErrorIcon />
