@@ -138,7 +138,7 @@ export const MermaidDiagram = ({  isReportPage, diagramName, question, answers, 
   }
 
   const renderMermaid = async (currentAnswer, isRetry = false) => {
-    if (!currentAnswer || currentAnswer.trim() === "") {
+    if (!currentAnswer || currentAnswer.trim() == "") {
       setErrorMessage("No valid answer provided");
       return;
     }
@@ -208,6 +208,10 @@ export const MermaidDiagram = ({  isReportPage, diagramName, question, answers, 
     } catch (error) {
       setErrorMessage("Seems like I don't know how to do that yet. You can try rephrasing it or just click generate  again.");
       setSaveGraph(false);
+
+      if(!isReportPage) {
+        return 
+      }
 
       if (!isRetry) {
           let count = 0
