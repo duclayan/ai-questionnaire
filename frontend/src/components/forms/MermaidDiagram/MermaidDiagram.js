@@ -5,11 +5,9 @@ import html2canvas from 'html2canvas';
 import './styles.css';
 import { Box, Button } from '@mui/material';
 import { DocumentLoader } from '../DocumentLoader/DocumentLoader';
-import { SaveGraphButtons } from './SaveGraphButtons';
 import { EnlargedImage } from './EnlargedImage';
 
-export const MermaidDiagram = ({  isReportPage, diagramName, question, answers, token, apiEndpoint, language }) => {
-  const [mermaidError, setMermaidError] = useState(null);
+export const MermaidDiagram = ({ isReportPage, question, answers, token, apiEndpoint, requireGPT }) => {
   const [saveGraph, setSaveGraph] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isEnlarged, setIsEnlarged] = useState(false);
@@ -26,19 +24,18 @@ export const MermaidDiagram = ({  isReportPage, diagramName, question, answers, 
     mermaid.initialize({
       startOnLoad: true,
       suppressErrorRendering: true,
-      theme: 'default', // Set your preferred theme
+      theme: 'default', 
       flowchart: {
         useMaxWidth: true,
-        htmlLabels: true // Allow HTML labels for better language support
+        htmlLabels: true
       }
     });
   }, []);
   useEffect(() => {
     if (isEnlarged) {
       const mermaidChart = document.getElementById('enlarged-mermaid-chart');
-      // Clear previous content
       mermaidChart.innerHTML = '';
-      mermaidChart.innerHTML = chartContent; // Set the inner HTML to the chart
+      mermaidChart.innerHTML = chartContent; 
       mermaidChart.removeAttribute('data-processed');
 
       mermaid.run({
@@ -51,7 +48,7 @@ export const MermaidDiagram = ({  isReportPage, diagramName, question, answers, 
   }, [isEnlarged]);
   const handleGenerateClick = async () => {
     // Generate the chart based on the input answer
-    const currentAnswer = answers[question.question_id]?.input_answer || answers;
+    const currentAnswer = isReportPage ? answers[question.question_id]?.input_answer : answers;
     // Render the chart after generating it
     setErrorMessage(null)
     if (chartRef) {
@@ -136,18 +133,18 @@ export const MermaidDiagram = ({  isReportPage, diagramName, question, answers, 
 
     return null;
   }
-
   const renderMermaid = async (currentAnswer, isRetry = false) => {
     if (!currentAnswer || currentAnswer.trim() == "") {
       setErrorMessage("No valid answer provided");
       return;
     }
     let mermaidChart = chartRef.current
-    let generated_chart = answers[question.question_id]? "": currentAnswer;
+    let generated_chart = isReportPage ? "" : currentAnswer;
+    console.log(generated_chart)
     setSaveGraph(false)
     try {
       mermaidChart.innerHTML = ''
-      if (answers[question.question_id]?.input_answer) {
+      if (requireGPT) {
         console.log("Went inside the loop")
         for (let i = 0; i < diagramPrompts.length; i++) {
           try {
@@ -209,26 +206,26 @@ export const MermaidDiagram = ({  isReportPage, diagramName, question, answers, 
       setErrorMessage("Seems like I don't know how to do that yet. You can try rephrasing it or just click generate  again.");
       setSaveGraph(false);
 
-      if(!isReportPage) {
-        return 
+      if (!isReportPage) {
+        return
       }
 
       if (!isRetry) {
-          let count = 0
-          let corrected_chart = await handleMermaidError(generated_chart, error.message);
-          while (count < 3) {
-            corrected_chart = await handleMermaidError(generated_chart, error.message);
-            if (corrected_chart) {
-              await renderMermaid(corrected_chart, true);
-              return
-            }
-            count++
+        let count = 0
+        let corrected_chart = await handleMermaidError(generated_chart, error.message);
+        while (count < 3) {
+          corrected_chart = await handleMermaidError(generated_chart, error.message);
+          if (corrected_chart) {
+            await renderMermaid(corrected_chart, true);
+            return
           }
+          count++
+        }
       }
     } finally {
       setLoading(false);
     }
-      
+
   }
   const handleMermaidError = async (generated_chart, error_message) => {
     setLoading(true)
@@ -278,7 +275,7 @@ export const MermaidDiagram = ({  isReportPage, diagramName, question, answers, 
       });
       return response.data.generated_text
     } catch (error) {
-      setMermaidError(`Error in prompt: Unable to generate a valid diagram`);
+      console.error(`Error in prompt: Unable to generate a valid diagram`);
     }
 
   }
@@ -293,7 +290,7 @@ export const MermaidDiagram = ({  isReportPage, diagramName, question, answers, 
         // API call to save the diagram
         await axios.post(
           `${apiEndpoint}/api/save-diagram/`,
-          { diagram: dataUrl, diagramName },
+          { diagram: dataUrl },
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -345,7 +342,7 @@ export const MermaidDiagram = ({  isReportPage, diagramName, question, answers, 
   return (
 
     <Box
-      key={isReportPage? question.question_id : "diagramPage"}
+      key={isReportPage ? question.question_id : "diagramPage"}
       sx={{
         mb: 4,
         display: "flex",
@@ -369,22 +366,20 @@ export const MermaidDiagram = ({  isReportPage, diagramName, question, answers, 
             >
               Generate
             </Button>
-
             {saveGraph && (
-
               <>
-                {answers[question.question_id].input_answer &&
-                (
-                  <Button
-                  variant="outlined"
-                  color="secondary"
-                  size="small"
-                  onClick={saveDiagram}
-                  style={{ marginLeft: '10px' }}
-                >
-                  Add to Report
-                </Button>
-                )}
+                {isReportPage &&
+                  (
+                    <Button
+                      variant="outlined"
+                      color="secondary"
+                      size="small"
+                      onClick={saveDiagram}
+                      style={{ marginLeft: '10px' }}
+                    >
+                      Add to Report
+                    </Button>
+                  )}
 
 
                 <Button
@@ -412,7 +407,6 @@ export const MermaidDiagram = ({  isReportPage, diagramName, question, answers, 
         )}
 
         {loading && <DocumentLoader isLoading={loading} text={"Preparing the Data"} />}
-
 
         <div id="mermaid-chart" ref={chartRef} className="mermaid" style={{ width: '100%', overflow: 'hidden', whiteSpace: 'nowrap' }} onClick={() => setIsEnlarged(true)}></div>
 

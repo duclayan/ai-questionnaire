@@ -30,7 +30,8 @@ function MermaidInput() {
                     />
                 </Box>
                 <MermaidDiagram
-                    diagramName='diagram'
+                    isReportPage={false}
+                    requireGPT={false}
                     question={{ question_id: 192 }}
                     answers={inputValue}
                     token={token}

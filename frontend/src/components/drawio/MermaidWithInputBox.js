@@ -83,10 +83,10 @@ export const MermaidWithInputBox = () => {
 
         <MermaidDiagram
           isReportPage={false}
-          diagramName='mermaid'
           isDiagram={false}
           token={token}
-          prompt={prompt}
+          requireGPT={true}
+          answers={prompt}
           apiEndpoint={apiEndpoint}
         />
       </Box>

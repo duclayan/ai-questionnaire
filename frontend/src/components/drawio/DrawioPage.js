@@ -18,7 +18,6 @@ import { saveAs } from 'file-saver';
 export const DrawioPage = () => {
 
   const [prompt, setPrompt] = useState("");
-  const [mermaidCode, setMermaidCode] = useState("");
   const [editorOpen, setEditorOpen] = useState(false);
   const [editorLoading, setEditorLoading] = useState(true);
   const [drawioXml, setDrawioXml] = useState("");
@@ -72,7 +71,9 @@ export const DrawioPage = () => {
       setEditorOpen(false);
       setDrawioError(true)
       alert('Unable to handle information');
-    } 
+    } finally {
+      clearTimeout(timeoutId)
+    }
   };
   // Everytime a Page is Added, it is rendered
   useEffect(() => {
@@ -133,9 +134,7 @@ export const DrawioPage = () => {
   const generateXML = async (code) => {
     // This generates the XML Code from the given code
     const prompt = `With max 500 lines create a simple representation of this. Always start and end with the mxGraphModel Tag. Generate XML Code readable by DrawIO. Strictly return only the code content without any code block formatting.`;
-    // // Version : Test with default XML
-    // setDrawioXml(default_azure)
-    // Version : Generate XML code from the user input
+
     try {
       const apiUrl = `${apiEndpoint}/api/gpt4o/`;
       const response = await axios.post(

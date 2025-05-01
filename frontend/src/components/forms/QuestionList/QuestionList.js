@@ -333,13 +333,13 @@ export const QuestionList = ({
           {currentCategory === "Architecture Diagram" ? (
             <>
               <MermaidDiagram
-                diagramName='diagram'
+                isReportPage={true}
+                requireGPT={true}
                 question={question}
                 answers={answers}
                 token={token}
                 apiEndpoint={apiEndpoint}
                 language={language}
-
               />
             </>
           ) : null}
