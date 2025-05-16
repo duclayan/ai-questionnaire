@@ -41,8 +41,8 @@ const Navbar = () => {
           {isAuthenticated ? (
             <>
               <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
-                <Button omponent={Link} to="/" color="inherit" disableRipple> 
-                <img  component={Link} to="/" src={logo} alt="Logo" style={{ height: "70px", marginRight: '10px' }} />
+                <Button component={Link} to="/" color="inherit" disableRipple>
+                  <img src={logo} alt="Logo" style={{ height: "70px", marginRight: '10px' }} />
                 </Button>
               </Box>
               <Box>
@@ -58,20 +58,25 @@ const Navbar = () => {
                   open={editorMenuOpen}
                   onClose={handleEditorMenuClose}
                 >
-                  <MenuItem onClick={() => { navigate('/editor'); handleEditorMenuClose(); }}>Beta 1 Aqua Editor</MenuItem>
-                  {/* <MenuItem onClick={() => { navigate('/editor-v3'); handleEditorMenuClose(); }}>Beta 1.1 Aqua Editor</MenuItem> */}
-                  <MenuItem onClick={() => { navigate('/editor-v2'); handleEditorMenuClose(); }}>Beta 2 Editor DrawIO</MenuItem>
-                  <MenuItem onClick={() => { navigate('/editor-v2-1'); handleEditorMenuClose(); }}>Beta 2.1 Editor DrawIO</MenuItem>
-
-
-                  {/* <MenuItem onClick={() => { navigate('/test'); handleEditorMenuClose(); }}>Beta Flowdiagram DrawIO</MenuItem> */}
-
+                  <MenuItem component={Link} to="/editor" onClick={handleEditorMenuClose}>
+                    Beta 1 Aqua Editor
+                  </MenuItem>
+                  {/* <MenuItem component={Link} to="/editor-v3" onClick={handleEditorMenuClose}>
+        Beta 1.1 Aqua Editor
+      </MenuItem> */}
+                  <MenuItem component={Link} to="/editor-v2" onClick={handleEditorMenuClose}>
+                    Beta 2 Editor DrawIO
+                  </MenuItem>
+                  <MenuItem component={Link} to="/editor-v2-1" onClick={handleEditorMenuClose}>
+                    Beta 2.1 Editor DrawIO
+                  </MenuItem>
+                  {/* <MenuItem component={Link} to="/test" onClick={handleEditorMenuClose}>
+        Beta Flowdiagram DrawIO
+      </MenuItem> */}
                 </Menu>
-                <Button color="inherit" onClick={() => navigate('/audio-1')}>Diagram Audio</Button>
-                <Button color="inherit" onClick={() => navigate('/diagram')}>Mermaid</Button>
-
-
-                <Button color="inherit" onClick={() => navigate('/dashboard')}>Dashboard</Button>
+                <Button component={Link} to="/audio-1" color="inherit">Diagram Audio</Button>
+                <Button component={Link} to="/diagram" color="inherit">Mermaid</Button>
+                <Button component={Link} to="/dashboard" color="inherit">Dashboard</Button>
                 <Button color="inherit" onClick={handleLogoutClick}>Logout</Button>
               </Box>
             </>
