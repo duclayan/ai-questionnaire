@@ -747,6 +747,7 @@ class ExplainImageView(APIView):
 
         #PREPROCESSING OF IMAGE
         image = request.FILES.get('image')
+        language = request.data.get('language')
         if not image:
             return Response({"detail": "No image uploaded."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -768,7 +769,7 @@ class ExplainImageView(APIView):
             messages=[
                     {"role": "system", "content": "You are a helpful assistant that responds in Markdown. Help me with my math homework!"},
                     {"role": "user", "content": [
-                        {"type": "text", "text": "Check if the image given is a diagram. If it is a diagram, do not include 'this is a diagram' Explain this diagram to client in 5 seconds speaking time. If not explain what you see in the image in 5."},
+                        {"type": "text", "text": "Check if the image given is a diagram. If it is a diagram, do not include 'this is a diagram' Explain this diagram to client in 20 seconds speaking time. If not explain what you see in the image in 5 saying it's not a diagram. Explain in English only"},
                         {"type": "image_url", "image_url": {
                             "url": f"data:image/png;base64,{image_data}"}
                         }   

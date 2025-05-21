@@ -75,7 +75,7 @@ const Navbar = () => {
       </MenuItem> */}
                 </Menu>
                 <Button component={Link} to="/audio-1" color="inherit">Diagram Audio</Button>
-                <Button component={Link} to="/diagram" color="inherit">Mermaid</Button>
+                <Button component={Link} to="/diagram" color="inherit">Code Editor</Button>
                 <Button component={Link} to="/dashboard" color="inherit">Dashboard</Button>
                 <Button color="inherit" onClick={handleLogoutClick}>Logout</Button>
               </Box>
