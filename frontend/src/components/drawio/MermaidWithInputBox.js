@@ -11,9 +11,12 @@ import {
 } from '@mui/material';
 import { DocumentLoader } from '../forms/DocumentLoader/DocumentLoader';
 import { MermaidDiagram } from '../forms/MermaidDiagram/MermaidDiagram';
+import AudioRecorderComponent from '../voice/AudioRecorder';
 export const MermaidWithInputBox = () => {
   const [prompt, setPrompt] = useState('');
   const [mermaidCode, setMermaidCode] = useState('');
+  const [currentlyRecordingId, setCurrentlyRecordingId] = useState(123);
+  
   const [svgCode, setSvgCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [title, setTitle] = useState('Note: This will give you a sneak peek of the diagram, but you would not be able to save it');
@@ -36,6 +39,9 @@ export const MermaidWithInputBox = () => {
     const result = response.data.generated_text
 
     return result
+  };
+  const handleInputChange = async (question_id, response, category) => {
+    setPrompt(response)
   };
 
   const showDiagram = async () => {
@@ -66,6 +72,12 @@ export const MermaidWithInputBox = () => {
     }
   }, [mermaidCode]);
 
+  const question = {
+    question_id: 123,
+    category: "general",
+    prompt: "",
+    question:""
+  }
   return (
     <Container>
       <Box my={4}>
@@ -78,6 +90,14 @@ export const MermaidWithInputBox = () => {
             onChange={(e) => setPrompt(e.target.value)}
             multiline
             rows={3}
+            InputProps={{
+              endAdornment: (
+                <Box sx={{ display: "flex" }}>
+                  <AudioRecorderComponent  question={question} handleInputChange={handleInputChange} currentlyRecordingId={currentlyRecordingId}
+                    setCurrentlyRecordingId={setCurrentlyRecordingId} />
+                </Box>
+              ),
+            }}
           />
         </Box>
 

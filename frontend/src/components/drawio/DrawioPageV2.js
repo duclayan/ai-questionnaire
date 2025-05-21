@@ -15,6 +15,7 @@ import { CircularProgress } from "@mui/material";
 import { DocumentLoader } from "../forms/DocumentLoader/DocumentLoader";
 import { default_aws, default_azure, default_xml, azure_images, aws_images, sample_aws_element, sample_azure_element, gcp_images, sample_gcp_element } from "./xmlSampleData";
 import { saveAs } from 'file-saver';
+import AudioRecorderComponent from "../voice/AudioRecorder";
 export const DrawioPageV2 = () => {
 
   const [prompt, setPrompt] = useState("");
@@ -31,6 +32,8 @@ export const DrawioPageV2 = () => {
   const token = localStorage.getItem("token");
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT;
   const [selectedSample, setSelectedSample] = useState('');
+    const [currentlyRecordingId, setCurrentlyRecordingId] = useState(123);
+  
 
   const samples = [
     {
@@ -49,6 +52,16 @@ export const DrawioPageV2 = () => {
       "title": "Microsoft Azure Webservices"
     }
   ]
+  const question = {
+    question_id: 123,
+    category: "general",
+    prompt: "",
+    question:""
+  }
+  const handleInputChange = async (question_id, response, category) => {
+    setPrompt(response)
+  };
+
   const handleSampleChange = (event) => {
     const selected = event.target.value;
     setSelectedSample(selected);
@@ -274,6 +287,14 @@ export const DrawioPageV2 = () => {
             onChange={(e) => setPrompt(e.target.value)}
             multiline
             rows={3}
+            InputProps={{
+              endAdornment: (
+                <Box sx={{ display: "flex" }}>
+                  <AudioRecorderComponent  question={question} handleInputChange={handleInputChange} currentlyRecordingId={currentlyRecordingId}
+                    setCurrentlyRecordingId={setCurrentlyRecordingId} />
+                </Box>
+              ),
+            }}
           />
           <Button
             variant="contained"

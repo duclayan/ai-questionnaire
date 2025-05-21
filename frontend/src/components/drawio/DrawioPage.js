@@ -15,6 +15,7 @@ import { CircularProgress } from "@mui/material";
 import { DocumentLoader } from "../forms/DocumentLoader/DocumentLoader";
 import { default_xml, sequence_diagram_xml } from "./xmlSampleData";
 import { saveAs } from 'file-saver';
+import AudioRecorderComponent from "../voice/AudioRecorder";
 export const DrawioPage = () => {
 
   const [prompt, setPrompt] = useState("");
@@ -25,6 +26,8 @@ export const DrawioPage = () => {
   const [drawioError, setDrawioError] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [pages, setPages] = useState([])
+  const [currentlyRecordingId, setCurrentlyRecordingId] = useState(123);
+  
 
   const drawioIframeRef = useRef(null);
   const token = localStorage.getItem("token");
@@ -35,6 +38,15 @@ export const DrawioPage = () => {
     sample1: "Create a GenAI chatbot architecture diagram with react.js as the frontend, python FastAPI and the backend, use typical aws resources for web app, database, storage, monitoring, include security components like iam, firewall, gateway, monitoring, security groups, amazon bedrock as the NLP and claude as the LLM. All components inside the AWS, only the user is outside of the cloud.",
     sample2: "Create an echarging management system architecture diagram with angular.js as the frontend, javaspring frame work as the backend, java Eureka for service exploration, postgressql database, with typical AWS resources. Consider typical security components such as iam, firewall, gateway, monitoring. All components inside the AWS cloud, only the user is outside of the cloud.",
     sample3: "Create a sequence diagram  to assess risks based on their likelihood and impact on the organization. Risks may include data breaches, system outages, compliance violations, and insider threats."
+  };
+  const question = {
+    question_id: 123,
+    category: "general",
+    prompt: "",
+    question:""
+  }
+  const handleInputChange = async (question_id, response, category) => {
+    setPrompt(response)
   };
 
   const handleSampleChange = (event) => {
@@ -205,6 +217,15 @@ export const DrawioPage = () => {
             onChange={(e) => setPrompt(e.target.value)}
             multiline
             rows={3}
+            InputProps={{
+              endAdornment: (
+                <Box sx={{ display: "flex" }}>
+                  <AudioRecorderComponent  question={question} handleInputChange={handleInputChange} currentlyRecordingId={currentlyRecordingId}
+                    setCurrentlyRecordingId={setCurrentlyRecordingId} />
+                </Box>
+              ),
+            }}
+                      
           />
           <Button
             variant="contained"
