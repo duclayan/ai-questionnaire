@@ -750,7 +750,8 @@ class ExplainImageView(APIView):
         language = request.data.get('language')
         if not image:
             return Response({"detail": "No image uploaded."}, status=status.HTTP_400_BAD_REQUEST)
-
+        if not language:
+            return Response({"detail": "No langauge selected."}, status=status.HTTP_400_BAD_REQUEST)
         image.seek(0)
         image_data = base64.b64encode(image.read()).decode('utf-8')
         image_type = image.content_type
