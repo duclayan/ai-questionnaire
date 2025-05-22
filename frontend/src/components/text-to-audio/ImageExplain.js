@@ -30,6 +30,7 @@ function ImageExplain() {
     if (!image) return;
     setLoading(true);
     setExplanation("");
+    setCurrentLanguage("English")
     const formData = new FormData();
     formData.append("image", image);
     if (formData) { console.log(image) }
