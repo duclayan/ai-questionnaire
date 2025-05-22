@@ -15,6 +15,7 @@ function ImageExplain() {
   const token = localStorage.getItem("token");
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT;
   const [currentlanguage, setCurrentLanguage] = useState('English');
+
   const handleChange = (event) => {
     setCurrentLanguage(event.target.value);
   };
@@ -32,7 +33,7 @@ function ImageExplain() {
     const formData = new FormData();
     formData.append("image", image);
     if (formData) { console.log(image) }
-    const apiUrl = `${apiEndpoint}api/explain-image/`;
+    const apiUrl = `${apiEndpoint}/api/explain-image/`;
 
     try {
       const response = await axios.post(
@@ -40,9 +41,7 @@ function ImageExplain() {
         formData,
         {
           headers: { Authorization: `Bearer ${token}` },
-          params: {
-            language: currentlanguage, 
-          }
+          params: {language: currentlanguage}
         }
       );
       setExplanation(response.data.explanation);
