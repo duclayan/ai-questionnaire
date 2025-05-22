@@ -33,7 +33,8 @@ function ImageExplain() {
     setCurrentLanguage("English")
     const formData = new FormData();
     formData.append("image", image);
-    if (formData) { console.log(image) }
+    formData.append("language", 'English')
+    if (formData) { console.log(formData) }
     const apiUrl = `${apiEndpoint}/api/explain-image/`;
 
     try {
@@ -41,8 +42,7 @@ function ImageExplain() {
         apiUrl,
         formData,
         {
-          headers: { Authorization: `Bearer ${token}` },
-          params: {language: currentlanguage}
+          headers: { Authorization: `Bearer ${token}` }
         }
       );
       setExplanation(response.data.explanation);
