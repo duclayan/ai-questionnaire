@@ -5,7 +5,7 @@ import StopIcon from "@mui/icons-material/Stop";
 import axios from "axios";
 
 const AudioRecorderComponent = (
-  { question,  handleInputChange, currentlyRecordingId, setCurrentlyRecordingId}) => {
+  { question, handleInputChange, currentlyRecordingId, setCurrentlyRecordingId, isAudioPlaying, setIsAudioPlaying }) => {
   // HandleInputChange allows to change the userprompt, send that idea to the main thing
   const [isRecording, setIsRecording] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -15,6 +15,13 @@ const AudioRecorderComponent = (
   const token = localStorage.getItem("token");
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT;
 
+  const disableButton = async (status) => {
+    console.log("disable")
+    if (typeof isAudioPlaying !== "undefined" && isAudioPlaying !== null) {
+      setIsAudioPlaying(status);
+    }
+  }
+
   useEffect(() => {
     // If another input starts recording, stop this one
     if (isRecording && currentlyRecordingId !== question.question_id) {
@@ -23,7 +30,6 @@ const AudioRecorderComponent = (
         mediaRecorder.current.onstop = async () => {
           const audioBlob = new Blob(audioChunks.current, { type: "audio/webm" });
           setIsRecording(false);
-  
           // Send the audio blob to the backend
           sendAudioToBackend(audioBlob);
         };
@@ -33,8 +39,7 @@ const AudioRecorderComponent = (
   }, [currentlyRecordingId, isRecording, question.question_id]);
 
   const handleMicClick = async () => {
-    console.log("Currently Recording", question)
-    if (!isRecording  ) {
+    if (!isRecording) {
       setCurrentlyRecordingId(question.question_id);
       // Start recording
       audioChunks.current = [];
@@ -48,12 +53,13 @@ const AudioRecorderComponent = (
       });
     } else {
       // Stop recording
+
       setCurrentlyRecordingId(null)
+      disableButton(true)
       mediaRecorder.current.stop();
       mediaRecorder.current.onstop = async () => {
         const audioBlob = new Blob(audioChunks.current, { type: "audio/webm" });
         setIsRecording(false);
-
         // Send the audio blob to the backend
         sendAudioToBackend(audioBlob);
       };
@@ -103,7 +109,7 @@ const AudioRecorderComponent = (
         <IconButton
           onClick={handleMicClick}
           color={isRecording ? "secondary" : "primary"}
-          disabled={loading} 
+          disabled={loading}
         >
           {isRecording ? (<StopIcon />) : (<MicIcon />)}
           {loading && <CircularProgress size={24} sx={{ position: "absolute" }} />}

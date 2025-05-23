@@ -10,11 +10,16 @@ function AudioChat({ token, apiEndpoint, context, gptResponse, setGptResponse })
     const [currentlyRecordingId, setCurrentlyRecordingId] = useState(123);
     const [prompt, setPrompt] = useState(""); // audio prompt from the recording
     const [isNewPrompt, setIsNewPrompt] = useState(false); // audio prompt from the recording
+    const [isAudioPlaying, setIsAudioPlaying] = useState(true); // audio prompt from the recording
 
 
     useEffect(() => {
        setIsNewPrompt(true)
     }, [gptResponse]);
+
+    useEffect(() => {
+       console.log(isAudioPlaying)
+    }, [isAudioPlaying]);
     const handleInputChange = async (question_id, response, category) => {
         // set prompt to the text from audio
         setPrompt(response)
@@ -72,16 +77,16 @@ function AudioChat({ token, apiEndpoint, context, gptResponse, setGptResponse })
             <Button
             variant="contained"
             component="label"
-            startIcon={<MicIcon />}
             fullWidth
             sx={{ mb: 1 }}
+            disabled={isAudioPlaying}
         >
             Chat with Audio
-            <AudioRecorderComponent question={question} handleInputChange={handleInputChange} currentlyRecordingId={currentlyRecordingId} setCurrentlyRecordingId={setCurrentlyRecordingId} />
+            <AudioRecorderComponent question={question} setIsAudioPlaying={setIsAudioPlaying} handleInputChange={handleInputChange} currentlyRecordingId={currentlyRecordingId} setCurrentlyRecordingId={setCurrentlyRecordingId} />
         </Button>
 
         {isNewPrompt && (
-            <TextToAudio explanation={gptResponse} />
+            <TextToAudio explanation={gptResponse} isAudioPlaying={isAudioPlaying} setIsAudioPlaying={setIsAudioPlaying}/>
         )}
         
         </>

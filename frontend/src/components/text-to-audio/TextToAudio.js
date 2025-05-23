@@ -1,23 +1,49 @@
-import{ useState, useEffect } from 'react';
-import { useSpeechSynthesis } from "react-speech-kit";
+import { useEffect, useState } from 'react';
 
-function TextToAudio({ explanation }) {
+function TextToAudio({ explanation, setIsAudioPlaying }) {
   const [isPlaying, setIsPlaying] = useState(false);
-  const { speak, cancel } = useSpeechSynthesis();
+
   useEffect(() => {
-    setIsPlaying(true)
+    setIsPlaying(true);
+    setIsAudioPlaying(true);
   }, []);
 
-  // Autoplay explanation when component mounts or when explanation changes
   useEffect(() => {
-
     if (explanation && isPlaying) {
-      speak({ text: explanation });
-    }
-    // Cleanup: cancel speech on unmount
-    return () => cancel()
+      // Create the utterance
+      const utterance = new window.SpeechSynthesisUtterance(explanation);
 
-  }, [isPlaying]); // <-- Empty dependency array: only runs on mount/unmount
+      // Attach the event listener
+      utterance.addEventListener('end', () => {
+        setIsPlaying(false);
+        setIsAudioPlaying(false);
+      });
+
+      // Speak the utterance
+      window.speechSynthesis.speak(utterance);
+
+      // Cleanup: cancel speech if component unmounts or explanation changes
+      return () => {
+        window.speechSynthesis.cancel();
+      };
+    }
+  }, [explanation, isPlaying]);
+
+  // Stop speech on page refresh or unload
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      window.speechSynthesis.cancel();
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.speechSynthesis.cancel();
+    };
+  }, []);
+
+  return null;
 }
 
 export default TextToAudio;
