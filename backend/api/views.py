@@ -202,22 +202,18 @@ class openAICleanVersion_O1MINI(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     
-    def _build_prompt(self, data, language=None, prompt=None, question=None, sample=None):
+    def _build_prompt(self, data, language, prompt, question, sample):
         """Build the appropriate prompt based on available data"""
         if all(v is None for v in [language, prompt, question, sample]):
             # If only data is provided, send just the data
-            return f"""
-            Strictly return only mermaidjs code in plaintext. No explanations or other texts included
-            ---
-                {data}
-            """
-            
-        # Default prompt for mermaid translation
-        # return f"""
-        #     Create mermaidjs code for this only return the mermaidjs code in plain text and no other text included. Translate it to {language}:
-        #     {data}
-        # """
-        return data
+            return data
+        return f"""
+        Strictly return only mermaidjs code in plaintext. No explanations or other texts included
+        Language: {language}, if none, it is automatic english.
+        ---
+            {data}
+        """
+
 
     def post(self, request):
         # Get user input
@@ -226,7 +222,6 @@ class openAICleanVersion_O1MINI(APIView):
         prompt = request.data.get("prompt_strategy")
         question = request.data.get("question")
         sample = request.data.get("sample_answer")
-
         # Load environment variables
         load_dotenv()
         AZURE_OPENAI_ENDPOINT = os.getenv("O1MINI_AZURE_OPENAI_ENDPOINT")
@@ -256,19 +251,10 @@ class openAICleanVersion_O1MINI(APIView):
                 "content": content
             }]
         )
-
-        # Enable for ORIGINAL
         # Extract the generated text from the response
         generated_text = response.choices[0].message.content
-
         # Return a JSON response
         return Response({"generated_text": generated_text})
-        # # Enable for test of React-Flow
-        # result = response.choices[0].message.content
-        # print("Result", result)
-
-        # # diagram_data = eval(result)  # Ensure GPT returns valid Python dict
-        # return Response(result)
 
 class openAIView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -754,10 +740,9 @@ class ExplainImageView(APIView):
             return Response({"detail": "No langauge selected."}, status=status.HTTP_400_BAD_REQUEST)
         image.seek(0)
         image_data = base64.b64encode(image.read()).decode('utf-8')
-        image_type = image.content_type
 
         #CALL GPT
-         # Initialize the Azure OpenAI client
+        # Initialize the Azure OpenAI client
         client = AzureOpenAI(
             api_key=AZURE_OPENAI_API_KEY,
             api_version="2024-02-15-preview",

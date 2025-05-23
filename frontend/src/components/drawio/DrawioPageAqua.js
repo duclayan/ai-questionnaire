@@ -159,7 +159,8 @@ export const DrawioPageAqua = () => {
       const response = await axios.post(
         apiUrl,
         {
-          text: general_prompt,
+          text: "DrawIOPage Aqua",
+          language: "English"
         },
         {
           headers: { Authorization: `Bearer ${token}` },

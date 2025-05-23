@@ -7,7 +7,7 @@ import { Box, Button } from '@mui/material';
 import { DocumentLoader } from '../DocumentLoader/DocumentLoader';
 import { EnlargedImage } from './EnlargedImage';
 
-export const MermaidDiagram = ({ isReportPage, question, answers, token, apiEndpoint, requireGPT }) => {
+export const MermaidDiagram = ({ isReportPage, question, answers, token, apiEndpoint, requireGPT, language }) => {
   const [saveGraph, setSaveGraph] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isEnlarged, setIsEnlarged] = useState(false);
@@ -155,6 +155,7 @@ export const MermaidDiagram = ({ isReportPage, question, answers, token, apiEndp
             const response = await axios.post(apiUrl, {
 
               text: currentAnswer,
+              language: {language: language ?? "english"}
             }, {
               headers: { Authorization: `Bearer ${token}` }
             });
@@ -269,7 +270,8 @@ export const MermaidDiagram = ({ isReportPage, question, answers, token, apiEndp
     try {
       const apiUrl = `${apiEndpoint}/api/gpt-omini/`;
       const response = await axios.post(apiUrl, {
-        text: gpt_input
+        text: gpt_input,
+        language: {language: language ?? "english"}
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });

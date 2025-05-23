@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Box, Button, Typography, CircularProgress,  FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { Box, Button, Typography, CircularProgress, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import ImageIcon from "@mui/icons-material/Image";
 import axios from "axios";
 import TextToAudio from "./TextToAudio";
+import AudioChat from "./AudioChat";
 
 function ImageExplain() {
   const [image, setImage] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
 
-
-  const [explanation, setExplanation] = useState("");
+  const [gptResponse, setGptResponse] = useState(""); // response 
+  const [explanation, setExplanation] = useState(""); // Diagram Context
   const [loading, setLoading] = useState(false);
   const token = localStorage.getItem("token");
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT;
@@ -21,10 +22,10 @@ function ImageExplain() {
   };
 
   useEffect(() => {
-   console.log("current:", currentlanguage)
+    console.log("current:", currentlanguage)
 
   }, [currentlanguage]);
-  
+
   const handleSubmit = async (e) => {
     // e.preventDefault();
     if (!image) return;
@@ -46,6 +47,7 @@ function ImageExplain() {
         }
       );
       setExplanation(response.data.explanation);
+      setGptResponse(response.data.explanation)
     } catch (error) {
       setExplanation("Error: " + (error.response?.data?.detail || error.message));
     } finally {
@@ -86,21 +88,6 @@ function ImageExplain() {
         bgcolor: "#fafafa",
       }}
     >
-      {/* <FormControl fullWidth variant="outlined">
-        <InputLabel id="language-select-label">Language</InputLabel>
-        <Select
-          labelId="language-select-label"
-          value={currentlanguage}
-          label="Language"
-          onChange={handleChange}
-        >
-          <MenuItem value="en">English</MenuItem>
-          <MenuItem value="fr">French</MenuItem>
-          <MenuItem value="es">Spanish</MenuItem>
-          <MenuItem value="de">German</MenuItem>
-        </Select>
-      </FormControl> */}
-
       <form onSubmit={onFormSubmit}>
         <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
           <Button
@@ -151,9 +138,15 @@ function ImageExplain() {
             Loading...
           </Typography>
         )}
-        {explanation && TextToAudio && (
+        {gptResponse && TextToAudio && (
           <Box mt={2}>
-            <TextToAudio explanation={explanation} />
+            <AudioChat
+              token={token}
+              apiEndpoint={apiEndpoint}
+              context={explanation}
+              gptResponse={gptResponse}
+              setGptResponse={setGptResponse}
+            />
           </Box>
         )}
       </Box>

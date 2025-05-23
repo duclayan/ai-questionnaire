@@ -1,12 +1,9 @@
-import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
+import{ useState, useEffect } from 'react';
 import { useSpeechSynthesis } from "react-speech-kit";
 
 function TextToAudio({ explanation }) {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [hasPlayed, setHasPlayed] = useState(false);
-  const { speak, cancel, onEnd } = useSpeechSynthesis();
-  const [prevExplanationRef, setPreviousExplanation] = useState(false);
-  // const prevExplanationRef = useRef();
+  const { speak, cancel } = useSpeechSynthesis();
   useEffect(() => {
     setIsPlaying(true)
   }, []);
@@ -21,20 +18,6 @@ function TextToAudio({ explanation }) {
     return () => cancel()
 
   }, [isPlaying]); // <-- Empty dependency array: only runs on mount/unmount
-
-  // Play handler (only if not already played)
-  const handlePlay = (status) => {
-    if (explanation && status) {
-      speak({
-        text: explanation,
-        onEnd: () => setHasPlayed(true)
-      });
-      setIsPlaying(true)
-    } else {
-      cancel()
-      setIsPlaying(false)
-    }
-  };
 }
 
 export default TextToAudio;

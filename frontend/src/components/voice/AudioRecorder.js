@@ -6,6 +6,7 @@ import axios from "axios";
 
 const AudioRecorderComponent = (
   { question,  handleInputChange, currentlyRecordingId, setCurrentlyRecordingId}) => {
+  // HandleInputChange allows to change the userprompt, send that idea to the main thing
   const [isRecording, setIsRecording] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -72,7 +73,7 @@ const AudioRecorderComponent = (
           apiUrl,
           {
             audio: base64Audio,
-            format: "mp3", // Specify the desired format (can be dynamic)
+            format: "mp3",
           },
           {
             headers: { Authorization: `Bearer ${token}` }, // Add authorization header
