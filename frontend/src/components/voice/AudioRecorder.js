@@ -17,8 +17,6 @@ const AudioRecorderComponent = (
 
   useEffect(() => {
     // If another input starts recording, stop this one
-    handleInputChange(question.question_id, "", question.category)
-
     if (isRecording && currentlyRecordingId !== question.question_id) {
       if (mediaRecorder.current && mediaRecorder.current.state === "recording") {
         mediaRecorder.current.stop();
@@ -82,7 +80,6 @@ const AudioRecorderComponent = (
           }
         );
         handleInputChange(question.question_id, response.data.transcript, question.category)
-        console.log(response.data.transcript)
       } catch (error) {
         console.error("Error:", error.message);
       } finally {
