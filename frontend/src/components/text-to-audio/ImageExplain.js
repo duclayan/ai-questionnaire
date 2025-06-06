@@ -17,15 +17,6 @@ function ImageExplain() {
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT;
   const [currentlanguage, setCurrentLanguage] = useState('English');
 
-  const handleChange = (event) => {
-    setCurrentLanguage(event.target.value);
-  };
-
-  useEffect(() => {
-    console.log("current:", currentlanguage)
-
-  }, [currentlanguage]);
-
   const handleSubmit = async (e) => {
     // e.preventDefault();
     if (!image) return;
