@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import mermaid from 'mermaid';
 import axios from 'axios';
 import html2canvas from 'html2canvas';
@@ -13,18 +13,13 @@ export const MermaidDiagram = ({ isReportPage, question, answers, token, apiEndp
   const [isEnlarged, setIsEnlarged] = useState(false);
   const [chartContent, setChartContent] = useState('');
   const [errorMessage, setErrorMessage] = useState(null);
+  const [cacheMermaid, setCacheMermaid] = useState("");
   const chartRef = useRef(null)
-  const diagramPrompts = [
-    `Strictly Generate a basic (no designs) executable Mermaid.js code for the 'question'.
-    Output only the Mermaid.js code. Do not include any explanations, comments, or additional text. Translate to target language. Remove the word 'mermaid' in the return answer
-    ---
-    Return code should be execution ready for a mermaid render`
-  ];;
   useEffect(() => {
     mermaid.initialize({
       startOnLoad: true,
       suppressErrorRendering: true,
-      theme: 'default', 
+      theme: 'default',
       flowchart: {
         useMaxWidth: true,
         htmlLabels: true
@@ -35,7 +30,7 @@ export const MermaidDiagram = ({ isReportPage, question, answers, token, apiEndp
     if (isEnlarged) {
       const mermaidChart = document.getElementById('enlarged-mermaid-chart');
       mermaidChart.innerHTML = '';
-      mermaidChart.innerHTML = chartContent; 
+      mermaidChart.innerHTML = chartContent;
       mermaidChart.removeAttribute('data-processed');
 
       mermaid.run({
@@ -46,7 +41,7 @@ export const MermaidDiagram = ({ isReportPage, question, answers, token, apiEndp
       });
     }
   }, [isEnlarged]);
-  const handleGenerateClick = async () => {
+  const prepareAndRenderMermaid = async (isNewDiagram) => {
     // Generate the chart based on the input answer
     const currentAnswer = isReportPage ? answers[question.question_id]?.input_answer : answers;
     // Render the chart after generating it
@@ -54,10 +49,15 @@ export const MermaidDiagram = ({ isReportPage, question, answers, token, apiEndp
     if (chartRef) {
       chartRef.current.innerHTML = ""
     }
-    renderMermaid(currentAnswer);
+    renderMermaid(currentAnswer, isNewDiagram);
+  };
+  const handleGenerateClick = async () => {
+    await prepareAndRenderMermaid(true)
+  };
+  const handleUpdateClick = async () => {
+    await prepareAndRenderMermaid(false)
   };
   async function processMermaidCode(code) {
-
     if (!code || code.toLowerCase().includes("we need more information".toLowerCase())) {
       return null
     }
@@ -133,53 +133,56 @@ export const MermaidDiagram = ({ isReportPage, question, answers, token, apiEndp
 
     return null;
   }
-  const renderMermaid = async (currentAnswer, isRetry = false) => {
+  function generateMermaidPrompt(prompt) {
+    // If cache is present -> prompt = Reference Diagram #previousdiagram + Prompt
+    if (cacheMermaid) {
+      return `${cacheMermaid} - 
+      Improve this according to this: ${prompt}
+      - Return only the mermaidjs code remove any markups.
+      - If prompt not related, then create a new diagram accordingly`
+    } else {
+      return prompt
+    }
+  }
+  const renderMermaid = async (currentAnswer, isNew, isRetry = false) => {
     if (!currentAnswer || currentAnswer.trim() == "") {
       setErrorMessage("No valid answer provided");
       return;
     }
     let mermaidChart = chartRef.current
     let generated_chart = isReportPage ? "" : currentAnswer;
-    console.log(generated_chart)
     setSaveGraph(false)
     try {
       mermaidChart.innerHTML = ''
       if (requireGPT) {
-        console.log("Went inside the loop")
-        for (let i = 0; i < diagramPrompts.length; i++) {
-          try {
-            setLoading(true);
+        try {
+          setLoading(true);
 
-            const apiUrl = `${apiEndpoint}/api/gpt-omini/`;
-            console.log("GPT Using: OMINI")
-            const response = await axios.post(apiUrl, {
+          const apiUrl = `${apiEndpoint}/api/gpt-omini/`;
+          const mermaidPrompt = isNew ? currentAnswer : generateMermaidPrompt(currentAnswer)
+          const response = await axios.post(apiUrl, {
+            text: mermaidPrompt,
+            language: {language: language ?? "english"}
+          }, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
 
-              text: currentAnswer,
-              language: {language: language ?? "english"}
-            }, {
-              headers: { Authorization: `Bearer ${token}` }
-            });
-
-            generated_chart = await processMermaidCode(response.data.generated_text);
-            setChartContent(generated_chart)
-          } catch (error) {
-            setErrorMessage("That was challenging. Maybe make it more simple.")
-            console.log("Diagram Prompts Error:", error);
-            throw error;
-          }
+          generated_chart = await processMermaidCode(response.data.generated_text);
+          setCacheMermaid(generated_chart)
+          setChartContent(generated_chart)
+        } catch (error) {
+          setErrorMessage("That was challenging. Maybe make it more simple.")
+          throw error;
         }
       } else {
         generated_chart = currentAnswer
         setChartContent(currentAnswer)
       }
 
-
-      console.log("Chart Content", chartContent)
       let mermaidError = null;
 
       mermaid.parseError = (error) => {
         mermaidError = error.message;
-        console.error("Mermaid parse error:", mermaidError);
         setErrorMessage("Please retry again.")
       };
 
@@ -255,7 +258,7 @@ export const MermaidDiagram = ({ isReportPage, question, answers, token, apiEndp
 
           return cleaned_chart;
         } catch (error) {
-          console.log("Not a mermaid")
+          console.error("Not a a valid diagram")
         }
       }
       repeat_counter++;
@@ -383,6 +386,15 @@ export const MermaidDiagram = ({ isReportPage, question, answers, token, apiEndp
                     </Button>
                   )}
 
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  size="small"
+                  style={{ marginLeft: '10px' }}
+                  onClick={handleUpdateClick}
+                >
+                  Update Diagram
+                </Button>
 
                 <Button
                   variant="outlined"
