@@ -8,7 +8,6 @@ import { DocumentLoader } from '../DocumentLoader/DocumentLoader';
 import { EnlargedImage } from './EnlargedImage';
 import { aws_prompt } from '../../drawio/prompt/aws_prompt';
 import { basic_prompt } from '../../drawio/prompt/basic_prompt';
-import { icons } from '@iconify-json/logos';
 
 export const MermaidDiagram = ({ version, isReportPage, question, answers, token, apiEndpoint, requireGPT, language }) => {
   const [saveGraph, setSaveGraph] = useState(false);
@@ -20,13 +19,6 @@ export const MermaidDiagram = ({ version, isReportPage, question, answers, token
   const chartRef = useRef(null)
   // initial render 
   useEffect(() => {
-    // // Render logos
-    // mermaid.registerIconPacks([
-    //   {
-    //     name: 'logos',
-    //     loader: () => import('@iconify-json/logos').then((module) => module.icons),
-    //   },
-    // ]);
     mermaid.registerIconPacks([
       {
         name: 'logos',
