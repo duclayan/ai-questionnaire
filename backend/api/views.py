@@ -198,6 +198,70 @@ class openAICleanVersion(APIView):
 
         # Return a JSON response
         return Response({"generated_text": generated_text})
+class openAICleanVersion_O4MINI(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    def _build_prompt(self, data):
+        """Build the appropriate prompt based on available data"""
+        return f"""
+        Strictly return only mermaidjs code in plaintext. No explanations or other texts included
+        Language: english
+        Also consider architecture-beta of mermaidjs. Sample:
+        architecture-beta
+            group api(cloud)[API]
+
+            service db(database)[Database] in api
+            service disk1(disk)[Storage] in api
+            service disk2(disk)[Storage] in api
+            service server(server)[Server] in api
+
+            db:L -- R:server
+            disk1:T -- B:server
+            disk2:T -- B:db
+        ---
+            {data}
+        """
+
+
+    def post(self, request):
+        # Get user input
+        data = request.data.get("text")
+        final_prompt =self._build_prompt(data)
+        # Load environment variables
+        load_dotenv()
+        AZURE_OPENAI_ENDPOINT= os.getenv("O4MINI_AZURE_OPENAI_ENDPOINT")
+        AZURE_OPENAI_API_KEY = os.getenv("O4MINI_AZURE_OPENAI_API_KEY")
+        AZURE_OPENAI_DEPLOYMENT = os.getenv("O4MINI_AZURE_OPENAI_DEPLOYMENT")
+        AZURE_OPENAI_VERSION = os.getenv("O4MINI_AZURE_OPENAI_VERSION")
+
+        # Initialize the Azure OpenAI client
+        client = AzureOpenAI(
+            api_key=AZURE_OPENAI_API_KEY,
+            api_version=AZURE_OPENAI_VERSION,
+            base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
+        )
+
+        # Create a chat completion
+        response = client.chat.completions.create(
+            model=AZURE_OPENAI_DEPLOYMENT,
+            # removing temperature and max_completion changed to max_completion_tokens
+            # this is to accommodate to the new change of azureopenai error saying this method
+            # is depreciated
+            # Removed the max_completion completely when using O1 Models
+            # temperature=0.9,
+            # max_completion_tokens=2000,
+            messages=[{ 
+                        "role": "user",
+                        "content": f"""
+                          {final_prompt}
+                        """,
+                    }]
+        )
+        # Extract the generated text from the response
+        generated_text = response.choices[0].message.content
+
+        # Return a JSON response
+        return Response({"generated_text": generated_text})
 class openAICleanVersion_O1MINI(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -210,6 +274,18 @@ class openAICleanVersion_O1MINI(APIView):
         return f"""
         Strictly return only mermaidjs code in plaintext. No explanations or other texts included
         Language: {language}, if none, it is automatic english.
+        Also consider architecture-beta of mermaidjs. Sample:
+        architecture-beta
+            group api(cloud)[API]
+
+            service db(database)[Database] in api
+            service disk1(disk)[Storage] in api
+            service disk2(disk)[Storage] in api
+            service server(server)[Server] in api
+
+            db:L -- R:server
+            disk1:T -- B:server
+            disk2:T -- B:db
         ---
             {data}
         """

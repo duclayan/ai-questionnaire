@@ -1,4 +1,4 @@
-import{useState} from 'react';
+import{useEffect, useState} from 'react';
 import {
   Box,
   TextField,
@@ -7,8 +7,9 @@ import {
 } from '@mui/material';
 import { MermaidDiagram } from '../forms/MermaidDiagram/MermaidDiagram';
 import AudioRecorderComponent from '../voice/AudioRecorder';
-export const MermaidWithInputBox = () => {
+export const MermaidWithInputBox = ({version}) => {
   const [prompt, setPrompt] = useState('');
+  const [title, setTitle] = useState('');
   const [currentlyRecordingId, setCurrentlyRecordingId] = useState(123);
 
   const token = localStorage.getItem('token');
@@ -23,10 +24,22 @@ export const MermaidWithInputBox = () => {
     prompt: "",
     question:""
   }
+
+  useEffect(() => {
+    // Reset Prompt
+    setPrompt("")
+    // logic to run on mount (and optionally refresh)
+    if (version === "aws") {
+      setTitle(`Aqua Editor - AWS`);
+    } else if (version === "basic") {
+      setTitle(`Aqua Editor - Basic`);
+    }
+  }, [version]);
+
   return (
     <Container>
       <Box my={4}>
-        <Typography variant="h4">Get a preview of your Diagram</Typography>
+        <Typography variant="h4">{title}</Typography>
         <Box my={2}>
           <TextField
             fullWidth
@@ -47,6 +60,7 @@ export const MermaidWithInputBox = () => {
         </Box>
 
         <MermaidDiagram
+          version={version}
           isReportPage={false}
           isDiagram={false}
           token={token}

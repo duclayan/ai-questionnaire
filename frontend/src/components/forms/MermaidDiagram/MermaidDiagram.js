@@ -6,8 +6,11 @@ import './styles.css';
 import { Box, Button } from '@mui/material';
 import { DocumentLoader } from '../DocumentLoader/DocumentLoader';
 import { EnlargedImage } from './EnlargedImage';
+import { aws_prompt } from '../../drawio/prompt/aws_prompt';
+import { basic_prompt } from '../../drawio/prompt/basic_prompt';
+import { icons } from '@iconify-json/logos';
 
-export const MermaidDiagram = ({ isReportPage, question, answers, token, apiEndpoint, requireGPT, language }) => {
+export const MermaidDiagram = ({ version, isReportPage, question, answers, token, apiEndpoint, requireGPT, language }) => {
   const [saveGraph, setSaveGraph] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isEnlarged, setIsEnlarged] = useState(false);
@@ -15,7 +18,23 @@ export const MermaidDiagram = ({ isReportPage, question, answers, token, apiEndp
   const [errorMessage, setErrorMessage] = useState(null);
   const [cacheMermaid, setCacheMermaid] = useState("");
   const chartRef = useRef(null)
+  // initial render 
   useEffect(() => {
+    // // Render logos
+    // mermaid.registerIconPacks([
+    //   {
+    //     name: 'logos',
+    //     loader: () => import('@iconify-json/logos').then((module) => module.icons),
+    //   },
+    // ]);
+    mermaid.registerIconPacks([
+      {
+        name: 'logos',
+        loader: () =>
+          fetch('https://unpkg.com/@iconify-json/logos@1/icons.json').then((res) => res.json()),
+      },
+    ]);
+    // Render mermaid
     mermaid.initialize({
       startOnLoad: true,
       suppressErrorRendering: true,
@@ -26,6 +45,19 @@ export const MermaidDiagram = ({ isReportPage, question, answers, token, apiEndp
       }
     });
   }, []);
+  useEffect(() => {
+    // Reset all state to initial values
+      setSaveGraph(false);
+      setLoading(false);
+      setIsEnlarged(false);
+      setChartContent('');
+      setErrorMessage(null);
+      setCacheMermaid('');
+    // Clear the chart when version changes
+    if (chartRef.current) {
+      chartRef.current.innerHTML = "";
+    }
+  }, [version]);
   useEffect(() => {
     if (isEnlarged) {
       const mermaidChart = document.getElementById('enlarged-mermaid-chart');
@@ -133,8 +165,16 @@ export const MermaidDiagram = ({ isReportPage, question, answers, token, apiEndp
 
     return null;
   }
-  function generateMermaidPrompt(prompt) {
+  function generateExtendedPrompt(prompt){
+    if (version === "aws"){
+      return aws_prompt + prompt
+    } else {
+      return basic_prompt + prompt
+    }
+  }
+  function generateFollowUpPrompt(prompt) {
     // If cache is present -> prompt = Reference Diagram #previousdiagram + Prompt
+    // Add a prompt that will allow to add specific prompt if it to the mermaid version
     if (cacheMermaid) {
       return `${cacheMermaid} - 
       Improve this according to this: ${prompt}
@@ -142,7 +182,7 @@ export const MermaidDiagram = ({ isReportPage, question, answers, token, apiEndp
       - If prompt not related, then create a new diagram accordingly`
     } else {
       return prompt
-    }
+    } 
   }
   const renderMermaid = async (currentAnswer, isNew, isRetry = false) => {
     if (!currentAnswer || currentAnswer.trim() == "") {
@@ -157,17 +197,23 @@ export const MermaidDiagram = ({ isReportPage, question, answers, token, apiEndp
       if (requireGPT) {
         try {
           setLoading(true);
-
           const apiUrl = `${apiEndpoint}/api/gpt-omini/`;
-          const mermaidPrompt = isNew ? currentAnswer : generateMermaidPrompt(currentAnswer)
+          // If new prompt, takes the current answer 
+          // If old prompt, function builds from old prompt
+          const mermaidPrompt = isNew ? currentAnswer : generateFollowUpPrompt(currentAnswer)
+          // According to version, extra prompt is injected
+          // Current Versions: Basic, AWS
+          const finalPrompt = generateExtendedPrompt(mermaidPrompt)
+          console.log("Final Prompt", finalPrompt)
           const response = await axios.post(apiUrl, {
-            text: mermaidPrompt,
+            text: finalPrompt,
             language: {language: language ?? "english"}
           }, {
             headers: { Authorization: `Bearer ${token}` }
           });
 
           generated_chart = await processMermaidCode(response.data.generated_text);
+          console.log("Generated Chart", generated_chart)
           setCacheMermaid(generated_chart)
           setChartContent(generated_chart)
         } catch (error) {

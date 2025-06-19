@@ -61,6 +61,9 @@ const Navbar = () => {
                   <MenuItem component={Link} to="/editor" onClick={handleEditorMenuClose}>
                     Beta 1 Aqua Editor
                   </MenuItem>
+                  <MenuItem component={Link} to="/editor-aws" onClick={handleEditorMenuClose}>
+                    Beta 1.1 Aqua-AWS Editor
+                  </MenuItem>
                   {/* <MenuItem component={Link} to="/editor-v3" onClick={handleEditorMenuClose}>
         Beta 1.1 Aqua Editor
       </MenuItem> */}

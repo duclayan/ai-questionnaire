@@ -1,5 +1,5 @@
 // App.js
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Form from './views/Form/Form';
 import Dashboard from './views/Dashboard/Dashboard';
@@ -15,7 +15,6 @@ import { DrawioPage } from './components/drawio/DrawioPage';
 import { DrawioPageTest } from './components/drawio/DrawioPageCopy';
 import { DrawioPageAqua } from './components/drawio/DrawioPageAqua';
 import { DrawioPageV2 } from './components/drawio/DrawioPageV2';
-import { MermaidDiagram } from './components/forms/MermaidDiagram/MermaidDiagram';
 import MermaidInput from './components/forms/MermaidDiagram/MermaidInput';
 import ImageExplain from './components/text-to-audio/ImageExplain';
 function App() {
@@ -29,7 +28,8 @@ function App() {
       },
     },
   });
-
+  useEffect(() => {
+  }, []);
   return (
       <BackgroundCircle>
         <ThemeProvider theme={theme}>
@@ -40,7 +40,8 @@ function App() {
                 <Route path="/file-upload" element={<FileUploadComponent/>} />
                 <Route path="/" element={<ProtectedRoute element={<Dashboard />} />} />
                 <Route path="/home" element={<Home />} />
-                <Route path="/editor" element={<MermaidWithInputBox/>} />
+                <Route path="/editor" element={<MermaidWithInputBox version="basic"/>} />
+                <Route path="/editor-aws" element={<MermaidWithInputBox version="aws"/>} />
                 <Route path="/editor-v2" element={<DrawioPage/>} />
                 {/* Testing Page */}
                 <Route path="/test" element={<DrawioPageTest/> } /> 

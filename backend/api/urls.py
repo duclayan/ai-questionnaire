@@ -7,6 +7,7 @@ urlpatterns = [
     path("", openAIView.as_view(), name="anything"),
     path("gpt4o/", openAICleanVersion.as_view(), name="gpt4o"),
     path("gpt-omini/", openAICleanVersion_O1MINI.as_view(), name="gptomini"),
+    path("gpt-o4mini/", openAICleanVersion_O4MINI.as_view(), name="gpto4mini"),
     path("questions/", QuestionListView.as_view(), name="questions"),
     path("process-document/", ProcessDocumentView.as_view(), name="process_document"),
     path("submit-answers/", AnswersView.as_view(), name="submit_answers"),
