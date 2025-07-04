@@ -17,6 +17,9 @@ import { DrawioPageAqua } from './components/drawio/DrawioPageAqua';
 import { DrawioPageV2 } from './components/drawio/DrawioPageV2';
 import MermaidInput from './components/forms/MermaidDiagram/MermaidInput';
 import ImageExplain from './components/text-to-audio/ImageExplain';
+import SimpleMermaidTest from './components/forms/MermaidDiagram/MermaidTest';
+import GraphvizInput from './components/forms/Graphviz/GraphvizDiagram';
+import PythonDiagram from './components/forms/PythonDiagram/PythonDiagram';
 function App() {
   const theme = createTheme({
     palette: {
@@ -41,6 +44,10 @@ function App() {
                 <Route path="/" element={<ProtectedRoute element={<Dashboard />} />} />
                 <Route path="/home" element={<Home />} />
                 <Route path="/editor" element={<MermaidWithInputBox version="basic"/>} />
+                <Route path="/mermaid-test" element={<SimpleMermaidTest/>} />
+                <Route path="/graphviz" element={<GraphvizInput/>} />
+                <Route path="/p-diagram" element={<PythonDiagram/>} />
+                
                 <Route path="/editor-aws" element={<MermaidWithInputBox version="aws"/>} />
                 <Route path="/editor-v2" element={<DrawioPage/>} />
                 {/* Testing Page */}

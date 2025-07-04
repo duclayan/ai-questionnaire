@@ -73,6 +73,12 @@ const Navbar = () => {
                   <MenuItem component={Link} to="/editor-v2-1" onClick={handleEditorMenuClose}>
                     Beta 2.1 Editor DrawIO
                   </MenuItem>
+                  <MenuItem component={Link} to="/p-diagram" onClick={handleEditorMenuClose}>
+                    PDiagram
+                  </MenuItem>
+                  <MenuItem component={Link} to="/graphviz" onClick={handleEditorMenuClose}>
+                    Graphviz
+                  </MenuItem>
                   {/* <MenuItem component={Link} to="/test" onClick={handleEditorMenuClose}>
         Beta Flowdiagram DrawIO
       </MenuItem> */}
