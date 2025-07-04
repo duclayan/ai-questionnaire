@@ -49,6 +49,39 @@ from pathlib import Path
 import asyncio
 import uuid
 from .transcribe import transcribe_audio
+from .diagram_service import generate_architecture_diagram
+class ClassicGPT:
+    def getGPTResponse(self, prompt):
+
+        #prepare the prompt
+        AZURE_OPENAI_ENDPOINT= os.getenv("AZURE_OPENAI_ENDPOINT")
+        AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
+        AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT")
+        #CALL GPT
+        # Initialize the Azure OpenAI client
+        client = AzureOpenAI(
+            api_key=AZURE_OPENAI_API_KEY,
+            api_version="2024-02-15-preview",
+            base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
+        )
+
+        # Create a chat completion
+        response = client.chat.completions.create(
+            model=AZURE_OPENAI_DEPLOYMENT,
+            messages=[
+                    {"role": "system", "content": "You are a helpful assistant that responds in Markdown. Help me with my math homework!"},
+                    {"role": "user", "content": [
+                        {"type": "text", "text":f"{prompt}"},
+                    ]}
+                ],
+            temperature=0.0,
+        )
+        # Extract the generated text from the response
+        generated_text = response.choices[0].message.content
+        print("Generated Text Answer:", generated_text)
+        # Return a JSON response
+        return generated_text
+
 class DocumentGenerator:
     def create_document_response(self, gpt_response):
         doc = Document()
@@ -844,4 +877,350 @@ class ExplainImageView(APIView):
         print("Generated Text Answer:", generated_text)
         # Return a JSON response
         return Response({"explanation": generated_text})
-       
+class GenerateDiagramView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        # Get user input from request
+        prompt = request.data.get("prompt")
+        title = request.data.get("title", "System Architecture")
+
+        gpt_prompt = f"""
+            User Input: {prompt}
+            Prompt: 
+            GPT Prompt for Architecture Diagram Input Generation
+            Main Prompt
+            You are an expert system architect who converts user requests into detailed architecture descriptions that can be parsed by an automated diagram generator. Your task is to take a user's high-level architecture request and convert it into a comprehensive, detailed description that includes all necessary components and their relationships.
+            Instructions
+            When a user provides an architecture request, you should:
+            Identify the core system type and create a meaningful title
+            List all technology components mentioned or implied
+            Add typical/standard components that would be expected in such an architecture
+            Specify cloud provider (AWS, Azure, GCP) if mentioned or implied
+            Include security components that would be standard for the architecture
+            Add monitoring and management components as appropriate
+            Specify user/client access points
+            Describe component relationships and data flow
+            Output Format
+            Generate a detailed architecture description following this pattern:
+            "Create a [SYSTEM_NAME] architecture diagram with [FRONTEND_TECH] as the frontend, [BACKEND_TECH] as the backend, [DATABASE_TECH] database, [SERVICE_DISCOVERY] for service discovery, with typical [CLOUD_PROVIDER] resources. Include [SECURITY_COMPONENTS] for security, [MONITORING_COMPONENTS] for monitoring and management. [ADDITIONAL_SERVICES]. All components inside the [CLOUD_PROVIDER] cloud, with [CLIENT_ACCESS] outside the cloud."
+            Component Categories to Consider
+            Frontend Technologies
+            Angular, React, Vue.js, Web UI, Mobile App, etc.
+            Backend Technologies
+            Spring Framework, Node.js, .NET Core, Python Flask/Django, Java, etc.
+            Databases
+            PostgreSQL, MySQL, MongoDB, DynamoDB, CosmosDB, SQL Server, etc.
+            Cloud Services (AWS)
+            EC2, Lambda, ECS, S3, CloudFront, Route53, ELB, API Gateway, etc.
+            Cloud Services (Azure)
+            VM, Functions, Storage, SQL Database, Cosmos DB, Application Gateway, Active Directory, etc.
+            Cloud Services (GCP)
+            Compute Engine, Cloud Functions, Cloud Storage, Cloud SQL, etc.
+            Security Components
+            IAM, WAF, Firewall, Active Directory, Cognito, Key Vault, etc.
+            Monitoring & Management
+            CloudWatch, Application Insights, Monitoring, Logging, etc.
+            Service Discovery & Integration
+            Eureka, Consul, Service Bus, SQS, Event Grid, etc.
+            Example Transformations
+            Input:
+            "Create an Azure architecture diagram illustrating a real-time data processing pipeline. The pipeline should include Azure VM, Azure Storage, Azure SQL, Azure functions and Azure AD. Show the connection of user."
+            Output:
+            "Create a real-time data processing pipeline architecture diagram with a web dashboard as the frontend, Azure Functions as the serverless backend processing, Azure SQL database for structured data storage, Azure Storage for raw data ingestion, Azure VM for compute-intensive processing tasks, with typical Azure resources. Include Azure AD for authentication and authorization, WAF for firewall protection, Application Gateway for load balancing, Application Insights for monitoring and logging. Additional services include Event Grid for event routing and Service Bus for message queuing. All components inside the Azure cloud, with users and external data sources outside the cloud."
+            Key Rules
+            Always specify a clear system name/title
+            Include both explicitly mentioned and implied standard components
+            Add security and monitoring components even if not mentioned
+            Specify the cloud provider clearly
+            Mention user/client access points
+            Include service integration and messaging components for complex systems
+            Use specific technology names rather than generic terms
+            Ensure logical component relationships
+            Additional Guidelines
+            If no cloud provider is specified, default to AWS
+            If no frontend is mentioned but users are involved, assume a web interface
+            Always include basic security (IAM, firewall) and monitoring components
+            For data processing pipelines, include appropriate messaging/queuing services
+            For microservices, include service discovery and API gateway
+            For databases, specify the most appropriate type based on use case
+            Response Format
+            Provide only the enhanced architecture description without explanations or additional text. The output should be a single, comprehensive sentence that can be directly used as input for the diagram generator.
+
+            Note: 
+            - from diagrams.aws.integration import APIGateway gives an error
+            """
+        
+        available_technologies = """
+        
+        # Frontend technologies
+        self.frontend_mapping = {
+            'angular': 'diagrams.programming.framework.Angular',
+            'angular.js': 'diagrams.programming.framework.Angular',
+            'react': 'diagrams.programming.framework.React',
+            'vue': 'diagrams.programming.framework.Vue',
+            'frontend': 'diagrams.onprem.client.Client',
+            'web': 'diagrams.onprem.client.Client',
+            'ui': 'diagrams.onprem.client.Client'
+        }
+        
+        # Backend technologies
+        self.backend_mapping = {
+            'spring': 'diagrams.programming.framework.Spring',
+            'javaspring': 'diagrams.programming.framework.Spring',
+            'java spring': 'diagrams.programming.framework.Spring',
+            'node': 'diagrams.programming.language.Nodejs',
+            'nodejs': 'diagrams.programming.language.Nodejs',
+            'python': 'diagrams.programming.language.Python',
+            'backend': 'diagrams.aws.compute.EC2',
+            'api': 'diagrams.aws.compute.EC2'
+        }
+        
+        # Database technologies (multi-cloud)
+        self.database_mapping = {
+            # Generic/AWS
+            'postgresql': 'diagrams.aws.database.RDS',
+            'postgres': 'diagrams.aws.database.RDS',
+            'mysql': 'diagrams.aws.database.RDS',
+            'mongodb': 'diagrams.aws.database.DocumentDB',
+            'dynamodb': 'diagrams.aws.database.DynamoDB',
+            'redis': 'diagrams.aws.database.ElastiCache',
+            'database': 'diagrams.aws.database.RDS',
+            # Azure specific
+            'azure sql': 'diagrams.azure.database.SQLDatabases',
+            'cosmosdb': 'diagrams.azure.database.CosmosDb',
+            'cosmos db': 'diagrams.azure.database.CosmosDb',
+            'azure cache': 'diagrams.azure.database.CacheForRedis',
+            # GCP specific
+            'cloud sql': 'diagrams.gcp.database.SQL',
+            'firestore': 'diagrams.gcp.database.Firestore',
+            'bigtable': 'diagrams.gcp.database.Bigtable',
+            'memorystore': 'diagrams.gcp.database.Memorystore'
+        }
+        
+        # AWS services
+        self.aws_services = {
+            'ec2': 'diagrams.aws.compute.EC2',
+            'lambda': 'diagrams.aws.compute.Lambda',
+            'ecs': 'diagrams.aws.compute.ECS',
+            'eks': 'diagrams.aws.compute.EKS',
+            'fargate': 'diagrams.aws.compute.Fargate',
+            's3': 'diagrams.aws.storage.S3',
+            'cloudfront': 'diagrams.aws.network.CloudFront',
+            'route53': 'diagrams.aws.network.Route53',
+            'elb': 'diagrams.aws.network.ELB',
+            'alb': 'diagrams.aws.network.ALB',
+            'vpc': 'diagrams.aws.network.VPC',
+            'api gateway': 'diagrams.aws.network.APIGateway',
+            'apigateway': 'diagrams.aws.network.APIGateway',
+            'gateway': 'diagrams.aws.network.APIGateway',
+            'sqs': 'diagrams.aws.integration.SQS',
+            'sns': 'diagrams.aws.integration.SNS',
+            'eventbridge': 'diagrams.aws.integration.Eventbridge'
+        }
+        
+        # Azure services
+        self.azure_services = {
+            'vm': 'diagrams.azure.compute.VM',
+            'virtual machine': 'diagrams.azure.compute.VM',
+            'azure vm': 'diagrams.azure.compute.VM',
+            'app service': 'diagrams.azure.compute.AppServices',
+            'function app': 'diagrams.azure.compute.FunctionApps',
+            'azure functions': 'diagrams.azure.compute.FunctionApps',
+            'aks': 'diagrams.azure.compute.KubernetesServices',
+            'container instances': 'diagrams.azure.compute.ContainerInstances',
+            'storage account': 'diagrams.azure.storage.StorageAccounts',
+            'azure storage': 'diagrams.azure.storage.StorageAccounts',
+            'blob storage': 'diagrams.azure.storage.BlobStorage',
+            'cdn': 'diagrams.azure.network.CDNProfiles',
+            'application gateway': 'diagrams.azure.network.ApplicationGateway',
+            'load balancer': 'diagrams.azure.network.LoadBalancers',
+            'vnet': 'diagrams.azure.network.VirtualNetworks',
+            'virtual network': 'diagrams.azure.network.VirtualNetworks',
+            'api management': 'diagrams.azure.integration.APIManagement',
+            'service bus': 'diagrams.azure.integration.ServiceBus',
+            'event grid': 'diagrams.azure.integration.IntegrationAccounts',
+            'event hub': 'diagrams.azure.analytics.EventHubs',
+            'logic apps': 'diagrams.azure.integration.LogicApps'
+        }
+        
+        # GCP services
+        self.gcp_services = {
+            'compute engine': 'diagrams.gcp.compute.ComputeEngine',
+            'gce': 'diagrams.gcp.compute.ComputeEngine',
+            'cloud functions': 'diagrams.gcp.compute.Functions',
+            'cloud run': 'diagrams.gcp.compute.Run',
+            'gke': 'diagrams.gcp.compute.GKE',
+            'kubernetes engine': 'diagrams.gcp.compute.GKE',
+            'app engine': 'diagrams.gcp.compute.AppEngine',
+            'cloud storage': 'diagrams.gcp.storage.Storage',
+            'gcs': 'diagrams.gcp.storage.Storage',
+            'cloud cdn': 'diagrams.gcp.network.CDN',
+            'load balancing': 'diagrams.gcp.network.LoadBalancing',
+            'vpc': 'diagrams.gcp.network.VPC',
+            'api gateway': 'diagrams.oci.devops.APIGateway',
+            'pub/sub': 'diagrams.gcp.analytics.PubSub',
+            'pubsub': 'diagrams.gcp.analytics.PubSub',
+            'cloud scheduler': 'diagrams.gcp.devtools.Scheduler',
+            'cloud tasks': 'diagrams.gcp.compute.Functions'  # Using Functions as placeholder
+        }
+        
+        # Security components (multi-cloud)
+        self.security_mapping = {
+            # AWS
+            'iam': 'diagrams.aws.security.IAM',
+            'waf': 'diagrams.aws.security.WAF',
+            'shield': 'diagrams.aws.security.Shield',
+            'cognito': 'diagrams.aws.security.Cognito',
+            # Azure
+            'azure ad': 'diagrams.azure.identity.ActiveDirectory',
+            'active directory': 'diagrams.azure.identity.ActiveDirectory',
+            'key vault': 'diagrams.azure.security.KeyVaults',
+            'azure firewall': 'diagrams.azure.network.Firewall',
+            # GCP
+            'cloud iam': 'diagrams.gcp.security.IAM',
+            'cloud armor': 'diagrams.gcp.security.Armor',
+            'cloud kms': 'diagrams.gcp.security.KMS',
+            # Generic
+            'firewall': 'diagrams.aws.security.WAF',
+            'identity': 'diagrams.aws.security.IAM'
+        }
+        
+        # Monitoring and management (multi-cloud)
+        self.monitoring_mapping = {
+            # AWS
+            'cloudwatch': 'diagrams.aws.management.Cloudwatch',
+            'cloudtrail': 'diagrams.aws.management.Cloudtrail',
+            # Azure
+            'azure monitor': 'diagrams.azure.devops.Monitor',
+            'application insights': 'diagrams.azure.devops.ApplicationInsights',
+            'log analytics': 'diagrams.azure.analytics.LogAnalytics',
+            # GCP
+            'cloud monitoring': 'diagrams.gcp.operations.Monitoring',
+            'cloud logging': 'diagrams.gcp.operations.Logging',
+            'cloud trace': 'diagrams.gcp.operations.Trace',
+            # Generic
+            'monitoring': 'diagrams.aws.management.Cloudwatch',
+            'logging': 'diagrams.aws.management.Cloudtrail'
+        }
+        
+        # Container and orchestration (multi-cloud)
+        self.container_mapping = {
+            # Generic
+            'docker': 'diagrams.onprem.container.Docker',
+            'kubernetes': 'diagrams.k8s.compute.Pod',
+            'k8s': 'diagrams.k8s.compute.Pod',
+            # AWS
+            'ecs': 'diagrams.aws.compute.ECS',
+            'eks': 'diagrams.aws.compute.EKS',
+            'fargate': 'diagrams.aws.compute.Fargate',
+            # Azure
+            'aks': 'diagrams.azure.compute.KubernetesServices',
+            'container instances': 'diagrams.azure.compute.ContainerInstances',
+            # GCP
+            'gke': 'diagrams.gcp.compute.GKE',
+            'cloud run': 'diagrams.gcp.compute.Run'
+        }
+        
+        # Service discovery and messaging
+        self.service_discovery = {
+            # Generic
+            'eureka': 'diagrams.aws.integration.SQS',
+            'consul': 'diagrams.aws.integration.SQS',
+            'service discovery': 'diagrams.aws.integration.SQS',
+            'service exploration': 'diagrams.aws.integration.SQS',
+            # AWS
+            'sqs': 'diagrams.aws.integration.SQS',
+            'sns': 'diagrams.aws.integration.SNS',
+            # Azure
+            'service bus': 'diagrams.azure.integration.ServiceBus',
+            'event grid': 'diagrams.azure.integration.IntegrationAccounts',
+            # GCP
+            'pub/sub': 'diagrams.gcp.analytics.PubSub',
+            'pubsub': 'diagrams.gcp.analytics.PubSub'
+        }
+        
+        # User/Client
+        self.client_mapping = {
+            'user': 'diagrams.onprem.client.Users',
+            'users': 'diagrams.onprem.client.Users',
+            'client': 'diagrams.onprem.client.Client'
+        }
+        
+        # DevOps and CI/CD (multi-cloud)
+        self.devops_mapping = {
+            # Generic
+            'jenkins': 'diagrams.onprem.ci.Jenkins',
+            'gitlab': 'diagrams.onprem.vcs.Gitlab',
+            'github': 'diagrams.onprem.vcs.Github',
+            # AWS
+            'codebuild': 'diagrams.aws.devtools.Codebuild',
+            'codepipeline': 'diagrams.aws.devtools.Codepipeline',
+            'codecommit': 'diagrams.aws.devtools.Codecommit',
+            # Azure
+            'azure devops': 'diagrams.azure.devops.Devops',
+            'azure pipelines': 'diagrams.azure.devops.Pipelines',
+            'azure repos': 'diagrams.azure.devops.Repos',
+            # GCP
+            'cloud build': 'diagrams.gcp.devtools.Build',
+            'cloud source repositories': 'diagrams.gcp.devtools.SourceRepositories'
+        }
+        """
+        print("PROMPT ENTERED", prompt)
+        if not prompt:
+            return Response(
+                {"error": "Prompt is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        gpt = ClassicGPT()
+        max_retries = 3
+        current_prompt = gpt_prompt  # Start with initial prompt
+
+        for attempt in range(max_retries):
+            print(f"Attempt {attempt+1} with prompt: {current_prompt}")
+            result = gpt.getGPTResponse(current_prompt)
+            print("FINAL RESULT", result)
+            
+            # Generate diagram from GPT response
+            diagram_result = generate_architecture_diagram(result, title)
+            print("CODE:", diagram_result['code'] )
+
+            
+            if diagram_result['success']:
+                # Process successful diagram
+                image_path = diagram_result['image_path']
+                print("Image Path:", image_path)
+                if not os.path.exists(image_path):
+                    return Response(
+                        {"error": "Generated image not found"},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                    )
+                try:
+                    with open(image_path, 'rb') as image_file:
+                        image_data = image_file.read()
+                    os.unlink(image_path)
+                    return HttpResponse(image_data, content_type='image/png', status=200)
+                except Exception as e:
+                    return Response(
+                        {"error": f"File handling error: {str(e)}"},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                    )
+            else:
+                # On failure: Extract error and regenerate prompt
+                error_message = diagram_result.get('error', 'Diagram generation failed')
+                print(f"Attempt {attempt+1} failed: {error_message}")
+                
+                # Append error to prompt for regeneration
+                current_prompt = (
+                    f"this is the code:"
+                    f"{diagram_result['code']}\n\n"
+                    f"Error during execution: {error_message}\n"
+                    f"Please analyze the error and regenerate valid diagram code. Strictly only use what is in {available_technologies} "
+                )
+
+        # All retries failed
+        return Response(
+            {"error": "Failed to generate diagram after 3 attempts"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

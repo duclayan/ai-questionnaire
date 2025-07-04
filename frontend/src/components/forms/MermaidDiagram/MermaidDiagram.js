@@ -31,7 +31,7 @@ export const MermaidDiagram = ({ version, isReportPage, question, answers, token
       {
         name: 'logos',
         loader: () =>
-          fetch('https://unpkg.com/@iconify-json/logos@1/icons.json').then((res) => res.json()),
+          fetch('./icons.json').then((res) => res.json()),
       },
     ]);
     // Render mermaid
@@ -45,6 +45,39 @@ export const MermaidDiagram = ({ version, isReportPage, question, answers, token
       }
     });
   }, []);
+  async function fetchAndCheckJSON(url) {
+    try {
+      const response = await fetch(url);
+
+      // 1. Check response status
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      // 2. Check Content-Type header
+      const contentType = response.headers.get("content-type");
+      console.log("Content Type:", contentType)
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("File is not JSON!");
+      }
+
+      // 3. Parse JSON
+      const data = await response.json();
+
+      // 4. Optional: Check for expected keys
+      if (!data.expectedKey) {
+        throw new Error("JSON structure is not as expected!");
+      }
+
+      // Success
+      console.log("Successfully fetched and validated JSON:", data);
+      return data;
+    } catch (error) {
+      console.error("Error fetching or validating JSON:", error.message);
+      return null;
+    }
+  }
+
   useEffect(() => {
     // Reset all state to initial values
       setSaveGraph(false);
@@ -74,6 +107,8 @@ export const MermaidDiagram = ({ version, isReportPage, question, answers, token
     }
   }, [isEnlarged]);
   const prepareAndRenderMermaid = async (isNewDiagram) => {
+    const url = "./sample.json"
+    fetchAndCheckJSON(url)
     // Generate the chart based on the input answer
     const currentAnswer = isReportPage ? answers[question.question_id]?.input_answer : answers;
     // Render the chart after generating it
