@@ -27,12 +27,14 @@ export const DrawioPageV2 = () => {
   const [isSaved, setIsSaved] = useState(false);
   const [pages, setPages] = useState([])
   const [currentStatus, setCurrentStatus] = useState("")
+  const [cacheDrawIO, setCacheDrawIO] = useState([]) 
+  const [isUpdateOperation, setIsUpdateOperation] = useState(false);
 
   const drawioIframeRef = useRef(null);
   const token = localStorage.getItem("token");
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT;
   const [selectedSample, setSelectedSample] = useState('');
-    const [currentlyRecordingId, setCurrentlyRecordingId] = useState(123);
+  const [currentlyRecordingId, setCurrentlyRecordingId] = useState(123);
   
 
   const samples = [
@@ -58,6 +60,21 @@ export const DrawioPageV2 = () => {
     prompt: "",
     question:""
   }
+
+  function generateUpdatePrompt(prompt) {
+    // If cache is present -> prompt = Reference Diagram #previousdiagram + Prompt
+    // Add a prompt that will allow to add specific prompt if it to the mermaid version
+    if (cacheDrawIO) {
+      return `This is the existing DRAWIO in Cache"${cacheDrawIO}" - '
+      --
+      Improve this according to the user prompt:" ${prompt}"
+      - Return only the mermaidjs code remove any markups.
+      - If prompt not related, then create a new diagram accordingly`
+    } else {
+      return prompt
+    } 
+  }
+
   const handleInputChange = async (question_id, response, category) => {
     setPrompt(response)
   };
@@ -173,7 +190,7 @@ export const DrawioPageV2 = () => {
     const answer = await gptCall(prompt)
     return answer
   }
-  const generateXML = async (code) => {
+  const generateXML = async (userPrompt, isUpdatePrompt) => {
     // This generates the XML Code from the given code
     const delayedSetStatus = (status, delay) => {
       return new Promise(resolve => {
@@ -185,7 +202,7 @@ export const DrawioPageV2 = () => {
     };
     const sample = selectedSample.prompt ? selectedSample.prompt : default_xml
     setCurrentStatus("Analyzing the type of Diagram")
-    const technology = await getTechnology(code)
+    const technology = await getTechnology(userPrompt)
     setCurrentStatus(`Technology Detected as : ${technology}`)
     let icons = ''
     let sample_element = ''
@@ -200,6 +217,7 @@ export const DrawioPageV2 = () => {
       icons = gcp_images
     } else {
     }
+    const updated_prompt = isUpdatePrompt ? generateUpdatePrompt(userPrompt) : userPrompt
     const prompt = `
     Generate XML Code readable by DrawIO. Strictly return only the code content without any code block formatting.
 
@@ -216,7 +234,7 @@ export const DrawioPageV2 = () => {
     Ensure to include paths. If not available don't put any icon.
     Sample return code : ${sample}. 
     --
-    This is the code to convert: ${code}`
+    This is the user prompt: ${updated_prompt}`
 
     await delayedSetStatus(`Identifying the appropriate diagram`, 3000);
 
@@ -232,14 +250,16 @@ export const DrawioPageV2 = () => {
       },
     );
     const data = response.data.generated_text;
+    setCacheDrawIO(data)
     return data;
   };
 
-  const generateDiagram = async () => {
+  const generateDiagram = async (isUpdatePrompt) => {
     try {
       setIsLoading(true);
+      setIsUpdateOperation(isUpdatePrompt);
       try {
-        const xml = await generateXML(prompt);
+        const xml = await generateXML(prompt,isUpdatePrompt);
         setDrawioXml(xml)
       } catch (error) {
         console.log("Error has been encountered:", error)
@@ -254,12 +274,23 @@ export const DrawioPageV2 = () => {
     }
   };
   useEffect(() => {
-    if (drawioXml) {
-      setPages(prevPages => [...prevPages, drawioXml.trim()]);
-      setEditorOpen(true);
-      setIsLoading(false);
+    if (drawioXml && !isLoading) { // Only proceed when XML is ready and not loading
+      if (isUpdateOperation && editorOpen && drawioIframeRef.current) {
+        // For updates, directly update the current diagram in the iframe
+        setTimeout(() => {
+          drawioIframeRef.current.contentWindow.postMessage(
+            JSON.stringify({ action: "load", xml: drawioXml }),
+            "*"
+          );
+        }, 500);
+      } else if (!isUpdateOperation) {
+        // For new diagrams, add a new page and open editor
+        setPages(prevPages => [...prevPages, drawioXml.trim()]);
+        setEditorOpen(true);
+      }
     }
-  }, [drawioXml]);
+    
+  }, [drawioXml, isUpdateOperation, isLoading]);
 
   return (
     <Container>
@@ -299,10 +330,20 @@ export const DrawioPageV2 = () => {
           <Button
             variant="contained"
             color="primary"
-            onClick={generateDiagram}
+            onClick={() => generateDiagram(false)}
             sx={{ mt: 2 }}
           >
             Generate Diagram
+          </Button>
+
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => generateDiagram(true)}
+            sx={{ mt: 2 }}
+            disabled={!editorOpen}
+          >
+            Update Diagram
           </Button>
         </Box>
         <Grid item xs={12}>

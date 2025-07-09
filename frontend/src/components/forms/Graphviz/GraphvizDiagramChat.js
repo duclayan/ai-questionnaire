@@ -1,9 +1,16 @@
 import React, { useState, useMemo } from 'react';
 import GraphvizSafe from './GraphvizSafe/GraphvizSafe';
+import axios from "axios"
+import { CircularProgress } from "@mui/material";
 
-const GraphvizDiagram = () => {
+const GraphvizDiagramChat = () => {
   const [dotCode, setDotCode] = useState('');
   const [renderedDot, setRenderedDot] = useState('');
+  const [graphvizCode, setGraphvizCode] = useState('');
+const [isLoading, setIsLoading] = useState(false);
+  
+  const token = localStorage.getItem("token");
+  const apiEndpoint = process.env.REACT_APP_API_ENDPOINT;
 
   const graphOptions = useMemo(() => ({
     fit: true,
@@ -139,12 +146,52 @@ const GraphvizDiagram = () => {
       }
   }
   `
+  const generatePrompt = async (prompt) => {
+    const updated_prompt = `
+     Using the user prompt : ${prompt}. Create a DOT Diagram based on the following code as reference. 
+    ---------
+     AWS Coe Reference : ${awsCode}
+     -----
+     UnifiedIcodeCode Reference : ${unifiedIconCode}
+     -----
+     Important:
+     1. Only  return the code without any markdown. Remove markdown.
+     2. Ensure that it will work with graphviz 100% if you are not sure, make it simple.
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (dotCode.trim()) {
-      setRenderedDot(dotCode);
+     IGNORE OTHER ARCHITECTURE. ONLY USE DOT FOR GRAPHVIZ. DO NOT USE MERMAIDJS.
+    `
+    return updated_prompt
+  }
+  const renderGraphvizCode = async (prompt) => {
+    const final_prompt = await generatePrompt(prompt)
+
+    try { 
+        const apiUrl = `${apiEndpoint}/api/gpt-omini/`;
+
+        const response = await axios.post(apiUrl, {
+        text: final_prompt,
+        language: "english"
+        }, {
+        headers: { Authorization: `Bearer ${token}` }
+        });
+
+        const generated_chart = response.data.generated_text;
+        console.log("Generated Chart", generated_chart)
+        setGraphvizCode(generated_chart)
+        setDotCode(generated_chart);
+        setRenderedDot(generated_chart);
+        console.log("dot chart", generated_chart)
+        setIsLoading(false)
+
+    } catch (error) {
+        console.log("That was challenging. Maybe make it more simple.")
+        throw error;
     }
+    };
+  const handleSubmit = (e) => {
+    setIsLoading(true)
+    e.preventDefault();
+    renderGraphvizCode(dotCode)
   };
 
   const loadUnifiedIconDiagram = () => {
@@ -157,16 +204,22 @@ const GraphvizDiagram = () => {
     setRenderedDot(awsCode);
   };
 
+  
+  const loadUpdatedDiagram = () => {
+    setDotCode(dotCode);
+    setRenderedDot(dotCode);
+  };
+
   return (
     <div style={{ padding: '20px', maxWidth: '1400px', margin: '0 auto' }}>
-      <h1>Graphviz Diagram Render</h1>
+      <h1>Graphviz Diagram Chat</h1>
 
       <form onSubmit={handleSubmit} style={{ marginBottom: '20px' }}>
         <div style={{ marginBottom: '10px' }}>
           <textarea
             value={dotCode}
             onChange={(e) => setDotCode(e.target.value)}
-            placeholder="Enter your DOT code here..."
+            placeholder="Enter diagram description here..."
             style={{
               width: '100%',
               height: '300px',
@@ -194,6 +247,22 @@ const GraphvizDiagram = () => {
             }}
           >
             Render Diagram
+          </button>
+
+            <button
+            type="button"
+            onClick={loadUpdatedDiagram}
+            style={{
+              padding: '10px 20px',
+              backgroundColor: '#007bff',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '16px'
+            }}
+          >
+            Update
           </button>
 
           <button
@@ -229,8 +298,13 @@ const GraphvizDiagram = () => {
           </button>
         </div>
       </form>
+    {isLoading && (
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20 }}>
+        <CircularProgress />
+      </div>
+    )}
 
-      {renderedDot && (
+      {graphvizCode && (
         <div style={{
           marginTop: '30px',
           border: '1px solid #ddd',
@@ -249,4 +323,4 @@ const GraphvizDiagram = () => {
   );
 };
 
-export default GraphvizDiagram;
+export default GraphvizDiagramChat;

@@ -20,6 +20,7 @@ import ImageExplain from './components/text-to-audio/ImageExplain';
 import SimpleMermaidTest from './components/forms/MermaidDiagram/MermaidTest';
 import GraphvizInput from './components/forms/Graphviz/GraphvizDiagram';
 import PythonDiagram from './components/forms/PythonDiagram/PythonDiagram';
+import GraphvizDiagramChat from './components/forms/Graphviz/GraphvizDiagramChat';
 function App() {
   const theme = createTheme({
     palette: {
@@ -46,6 +47,7 @@ function App() {
                 <Route path="/editor" element={<MermaidWithInputBox version="basic"/>} />
                 <Route path="/mermaid-test" element={<SimpleMermaidTest/>} />
                 <Route path="/graphviz" element={<GraphvizInput/>} />
+                <Route path="/graphviz-chat" element={<GraphvizDiagramChat/>} />
                 <Route path="/p-diagram" element={<PythonDiagram/>} />
                 
                 <Route path="/editor-aws" element={<MermaidWithInputBox version="aws"/>} />

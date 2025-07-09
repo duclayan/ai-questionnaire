@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import {
   Box,
@@ -17,7 +17,6 @@ import { default_xml, sequence_diagram_xml } from "./xmlSampleData";
 import { saveAs } from 'file-saver';
 import AudioRecorderComponent from "../voice/AudioRecorder";
 export const DrawioPage = () => {
-
   const [prompt, setPrompt] = useState("");
   const [editorOpen, setEditorOpen] = useState(false);
   const [editorLoading, setEditorLoading] = useState(true);
@@ -26,8 +25,13 @@ export const DrawioPage = () => {
   const [drawioError, setDrawioError] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [pages, setPages] = useState([])
+  const [cacheDrawIO, setCacheDrawIO] = useState([]) 
+  // Track if the current operation is an update
+  const [isUpdateOperation, setIsUpdateOperation] = useState(false);
+  // when new prompt, add the latest prompt here
+  // current version only allows update on the current screen 
+  // future update: you can go back to other screens and it can still get updated
   const [currentlyRecordingId, setCurrentlyRecordingId] = useState(123);
-  
 
   const drawioIframeRef = useRef(null);
   const token = localStorage.getItem("token");
@@ -39,12 +43,14 @@ export const DrawioPage = () => {
     sample2: "Create an echarging management system architecture diagram with angular.js as the frontend, javaspring frame work as the backend, java Eureka for service exploration, postgressql database, with typical AWS resources. Consider typical security components such as iam, firewall, gateway, monitoring. All components inside the AWS cloud, only the user is outside of the cloud.",
     sample3: "Create a sequence diagram  to assess risks based on their likelihood and impact on the organization. Risks may include data breaches, system outages, compliance violations, and insider threats."
   };
+  
   const question = {
     question_id: 123,
     category: "general",
     prompt: "",
     question:""
   }
+  
   const handleInputChange = async (question_id, response, category) => {
     setPrompt(response)
   };
@@ -54,18 +60,19 @@ export const DrawioPage = () => {
     setSelectedSample(selected);
     setPrompt(samples[selected] || '');
   };
+
   // Initialize Draw.io editor when it loads
   const handleDrawioLoad = () => {
-    setEditorLoading(false);; // 1 minute timeout
-
-    const iframe = drawioIframeRef.current;
+    setEditorLoading(false);
+    
     const timeoutId = setTimeout(() => {
-      setEditorOpen(false) // close the editor if it is morethan 10 seconds
+      setEditorOpen(false) // close the editor if it is more than 10 seconds
     }, 10000)
+    
     try {
       const iframe = drawioIframeRef.current;
 
-      const timeoutId = setTimeout(() => {
+      const timeoutId2 = setTimeout(() => {
         setEditorOpen(false)
         console.log("Took too long to open")
       }, 100000)
@@ -76,7 +83,7 @@ export const DrawioPage = () => {
             JSON.stringify({ action: "load", xml: drawioXml }),
             "*"
           );
-          clearTimeout(timeoutId)
+          clearTimeout(timeoutId2)
         }, 1000);
       }
     } catch (error) {
@@ -87,6 +94,7 @@ export const DrawioPage = () => {
       clearTimeout(timeoutId)
     }
   };
+
   // Everytime a Page is Added, it is rendered
   useEffect(() => {
     if (drawioIframeRef.current && pages.length > 0) {
@@ -105,6 +113,7 @@ export const DrawioPage = () => {
       }, 1000);
     }
   }, [pages]);
+
   // Handle messages from Draw.io V2
   useEffect(() => {
     const handleMessage = (event) => {
@@ -143,17 +152,38 @@ export const DrawioPage = () => {
     }
   }, [isSaved]);
 
-  const generateXML = async (code) => {
-    // This generates the XML Code from the given code
-    const prompt = `With max 500 lines create a simple representation of this. Always start and end with the mxGraphModel Tag. Generate XML Code readable by DrawIO. Strictly return only the code content without any code block formatting.`;
+  function generateUpdatePrompt(prompt) {
+    // If cache is present -> prompt = Reference Diagram #previousdiagram + Prompt
+    // Add a prompt that will allow to add specific prompt if it to the mermaid version
+    if (cacheDrawIO) {
+      return `This is the existing DRAWIO in Cache"${cacheDrawIO}" - '
+      --
+      Improve this according to the user prompt:" ${prompt}"
+      - Return only the mermaidjs code remove any markups.
+      - If prompt not related, then create a new diagram accordingly`
+    } else {
+      return prompt
+    } 
+  }
 
+  const generateXML = async (userPrompt, isUpdatePrompt) => {
+    // This generates the XML Code from the given code
+    const prompt = `With max 500 lines create a simple representation of this. Always start and end with the mxGraphModel Tag. 
+    Generate XML Code readable by DrawIO. Strictly return only the code content without any code block formatting.`;
+
+    // If there is an existing code, and update is on then we 
+    // If Follow Up Code : Generate a Follow Up Code
+    // Generate follow up codde : uses the cacheDrawIO 
     try {
-      const apiUrl = `${apiEndpoint}/api/gpt4o/`;
+      const apiUrl = `${apiEndpoint}/api/gpt-omini/`;
+      const updated_prompt = isUpdatePrompt ? generateUpdatePrompt(userPrompt) : userPrompt
       const response = await axios.post(
         apiUrl,
         {
           text: `
-          ${prompt}. This is the code to convert: ${code}
+          ${prompt}. 
+          
+          This is the user prompt: "${updated_prompt}"
           --
           Sample Return Code for Microsoft Azure, GCP and AWS : ${default_xml}
           --
@@ -167,37 +197,52 @@ export const DrawioPage = () => {
         },
       );
       const data = response.data.generated_text;
-      setDrawioXml(data);
-      setIsLoading(false)
+      setDrawioXml(data)
+      setCacheDrawIO(data)
+      setIsLoading(false) // Set loading to false here when XML is ready
       return response.data.generated_text;
     } catch (error) {
+      console.error("Error generating XML:", error);
     }
   };
 
-  const generateDiagram = async () => {
+  const generateDiagram = async (isUpdatePrompt) => {
     try {
       setIsLoading(true);
-      generateXML(prompt);
+      setIsUpdateOperation(isUpdatePrompt); // Track if this is an update operation
+      // If it is an update to the diagram, it should be true otherwise it should be false
+      generateXML(prompt, isUpdatePrompt);
     } catch (error) {
       // **WRITE A CODE HERE TO ADDRESS THE ERROR**
       setEditorOpen(false);
       setDrawioError(true);
     }
   };
+
   useEffect(() => {
-    if (drawioXml) {
-      setPages(prevPages => [...prevPages, drawioXml.trim()]);
-      setEditorOpen(true);
-      setIsLoading(false);
+    if (drawioXml && !isLoading) { // Only proceed when XML is ready and not loading
+      if (isUpdateOperation && editorOpen && drawioIframeRef.current) {
+        console.log("updating current diagram")
+        // For updates, directly update the current diagram in the iframe
+        setTimeout(() => {
+          drawioIframeRef.current.contentWindow.postMessage(
+            JSON.stringify({ action: "load", xml: drawioXml }),
+            "*"
+          );
+        }, 500);
+      } else if (!isUpdateOperation) {
+        // For new diagrams, add a new page and open editor
+        setPages(prevPages => [...prevPages, drawioXml.trim()]);
+        setEditorOpen(true);
+      }
     }
-  }, [drawioXml]);
+  }, [drawioXml, isUpdateOperation, isLoading]);
 
   return (
     <Container>
       <Box my={4}>
         <Typography variant="h4"> Diagram Generator</Typography>
         <Box my={2}>
-
           <Select
             value={selectedSample}
             onChange={handleSampleChange}
@@ -225,15 +270,24 @@ export const DrawioPage = () => {
                 </Box>
               ),
             }}
-                      
           />
           <Button
             variant="contained"
             color="primary"
-            onClick={generateDiagram}
+            onClick={() => generateDiagram(false)}
             sx={{ mt: 2 }}
           >
             Generate Diagram
+          </Button>
+          {/* add button here to add changes through chat */}
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => generateDiagram(true)}
+            sx={{ mt: 2 }}
+            disabled={!editorOpen} // Disable if editor is not open (no current diagram to update)
+          >
+            Update Diagram
           </Button>
         </Box>
         <Grid item xs={12}>
@@ -241,8 +295,7 @@ export const DrawioPage = () => {
         </Grid>
         {drawioError && (
           <Grid item xs={12}> Please try to generate a diagram again.</Grid>
-        )
-        }
+        )}
 
         {editorOpen && (
           <Box

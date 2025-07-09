@@ -64,9 +64,7 @@ const Navbar = () => {
                   <MenuItem component={Link} to="/editor-aws" onClick={handleEditorMenuClose}>
                     Beta 1.1 Aqua-AWS Editor
                   </MenuItem>
-                  {/* <MenuItem component={Link} to="/editor-v3" onClick={handleEditorMenuClose}>
-        Beta 1.1 Aqua Editor
-      </MenuItem> */}
+
                   <MenuItem component={Link} to="/editor-v2" onClick={handleEditorMenuClose}>
                     Beta 2 Editor DrawIO
                   </MenuItem>
@@ -79,9 +77,9 @@ const Navbar = () => {
                   <MenuItem component={Link} to="/graphviz" onClick={handleEditorMenuClose}>
                     Graphviz
                   </MenuItem>
-                  {/* <MenuItem component={Link} to="/test" onClick={handleEditorMenuClose}>
-        Beta Flowdiagram DrawIO
-      </MenuItem> */}
+                  <MenuItem component={Link} to="/graphviz-chat" onClick={handleEditorMenuClose}>
+                    Graphviz Chat
+                  </MenuItem>
                 </Menu>
                 <Button component={Link} to="/audio-1" color="inherit">Diagram Audio</Button>
                 <Button component={Link} to="/diagram" color="inherit">Code Editor</Button>
