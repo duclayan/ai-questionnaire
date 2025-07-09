@@ -22,8 +22,7 @@ export const MermaidDiagram = ({ version, isReportPage, question, answers, token
     mermaid.registerIconPacks([
       {
         name: 'logos',
-        loader: () =>
-          fetch('./icons.json').then((res) => res.json()),
+        loader: () => import('@iconify-json/logos').then((module) => module.icons),
       },
     ]);
     // Render mermaid
