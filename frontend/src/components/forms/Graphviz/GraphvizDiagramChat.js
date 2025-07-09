@@ -1,12 +1,20 @@
 import React, { useState, useMemo } from 'react';
 import GraphvizSafe from './GraphvizSafe/GraphvizSafe';
 import axios from "axios"
-import { CircularProgress } from "@mui/material";
+import {
+  CircularProgress, 
+  Box,
+  TextField
+} from "@mui/material";
+import AudioRecorderComponent from "../../voice/AudioRecorder";
+
 
 const GraphvizDiagramChat = () => {
   const [dotCode, setDotCode] = useState('');
   const [renderedDot, setRenderedDot] = useState('');
   const [graphvizCode, setGraphvizCode] = useState('');
+  const [currentlyRecordingId, setCurrentlyRecordingId] = useState(123);
+  
 const [isLoading, setIsLoading] = useState(false);
   
   const token = localStorage.getItem("token");
@@ -21,6 +29,12 @@ const [isLoading, setIsLoading] = useState(false);
     useWorker: false, // Disable web worker for better error handling
   }), []);
 
+  const question = {
+    question_id: 123,
+    category: "general",
+    prompt: "",
+    question:""
+  }
   const unifiedIconCode = `digraph UnifiedIcons {
     rankdir=LR;
     node [shape=none label=""];
@@ -188,6 +202,11 @@ const [isLoading, setIsLoading] = useState(false);
         throw error;
     }
     };
+  const handleInputChange = async (question_id, response, category) => {
+    setDotCode(response)
+  };
+
+
   const handleSubmit = (e) => {
     setIsLoading(true)
     e.preventDefault();
@@ -216,20 +235,26 @@ const [isLoading, setIsLoading] = useState(false);
 
       <form onSubmit={handleSubmit} style={{ marginBottom: '20px' }}>
         <div style={{ marginBottom: '10px' }}>
-          <textarea
+          <TextField
+            fullWidth
+            multiline
             value={dotCode}
             onChange={(e) => setDotCode(e.target.value)}
-            placeholder="Enter diagram description here..."
-            style={{
-              width: '100%',
-              height: '300px',
-              padding: '10px',
-              fontFamily: 'monospace',
-              fontSize: '14px',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-              resize: 'vertical'
+            placeholder="Enter your DOT code here..."
+            variant="outlined"
+            InputProps={{
+              endAdornment: (
+                <Box sx={{ display: "flex" }}>
+                  <AudioRecorderComponent
+                    question={question}
+                    handleInputChange={handleInputChange}
+                    currentlyRecordingId={currentlyRecordingId}
+                    setCurrentlyRecordingId={setCurrentlyRecordingId}
+                  />
+                </Box>
+              ),
             }}
+            sx={{ mt: 1 }}
           />
         </div>
 

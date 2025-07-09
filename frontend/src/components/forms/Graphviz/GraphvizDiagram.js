@@ -1,10 +1,21 @@
 import React, { useState, useMemo } from 'react';
 import GraphvizSafe from './GraphvizSafe/GraphvizSafe';
+import {
+  Box,
+  TextField,
+  Button,
+  Container,
+  Typography,
+  Grid,
+  Select,
+  MenuItem,
+} from "@mui/material";
+import AudioRecorderComponent from "../../voice/AudioRecorder";
 
 const GraphvizDiagram = () => {
   const [dotCode, setDotCode] = useState('');
   const [renderedDot, setRenderedDot] = useState('');
-
+  const [currentlyRecordingId, setCurrentlyRecordingId] = useState(123);
   const graphOptions = useMemo(() => ({
     fit: true,
     height: 700,
@@ -156,28 +167,44 @@ const GraphvizDiagram = () => {
     setDotCode(awsCode);
     setRenderedDot(awsCode);
   };
-
+  const handleInputChange = async (question_id, response, category) => {
+    setDotCode(response)
+  };
+  const question = {
+    question_id: 123,
+    category: "general",
+    prompt: "",
+    question:""
+  }
+  
   return (
     <div style={{ padding: '20px', maxWidth: '1400px', margin: '0 auto' }}>
       <h1>Graphviz Diagram Render</h1>
 
       <form onSubmit={handleSubmit} style={{ marginBottom: '20px' }}>
         <div style={{ marginBottom: '10px' }}>
-          <textarea
+          <TextField
+            fullWidth
+            multiline
             value={dotCode}
             onChange={(e) => setDotCode(e.target.value)}
             placeholder="Enter your DOT code here..."
-            style={{
-              width: '100%',
-              height: '300px',
-              padding: '10px',
-              fontFamily: 'monospace',
-              fontSize: '14px',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-              resize: 'vertical'
+            variant="outlined"
+            InputProps={{
+              endAdornment: (
+                <Box sx={{ display: "flex" }}>
+                  <AudioRecorderComponent
+                    question={question}
+                    handleInputChange={handleInputChange}
+                    currentlyRecordingId={currentlyRecordingId}
+                    setCurrentlyRecordingId={setCurrentlyRecordingId}
+                  />
+                </Box>
+              ),
             }}
+            sx={{ mt: 1 }}
           />
+
         </div>
 
         <div style={{ display: 'flex', gap: '10px' }}>
