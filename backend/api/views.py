@@ -60,12 +60,20 @@ class ClassicGPT:
         AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT")
         #CALL GPT
         # Initialize the Azure OpenAI client
-        client = AzureOpenAI(
-            api_key=AZURE_OPENAI_API_KEY,
-            api_version="2024-02-15-preview",
-            base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
-            http_client=httpx.Client(verify=False)
-        )
+
+        if os.getenv("DJANGO_DEVELOPMENT", "False") == "True":
+            client = AzureOpenAI(
+                api_key=AZURE_OPENAI_API_KEY,
+                api_version="2024-02-15-preview",
+                base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
+                http_client=httpx.Client(verify=False)
+            )
+        else:
+            client = AzureOpenAI(
+                api_key=AZURE_OPENAI_API_KEY,
+                api_version="2024-02-15-preview",
+                base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}"
+            )
 
         # Create a chat completion
         response = client.chat.completions.create(
