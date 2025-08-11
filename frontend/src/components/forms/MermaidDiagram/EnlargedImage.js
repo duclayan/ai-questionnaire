@@ -40,36 +40,44 @@ export const EnlargedImage = ({ chart, onClose }) => {
         <h2 style={{ margin: '0 0 4px 0', fontWeight: 700, fontSize: 22, color: '#1e293b', letterSpacing: 0.5, textAlign: 'center' }}>
           Diagram Preview (Interactive)
         </h2>
-        <p style={{ margin: '0 0 2px 0', color: '#475569', fontSize: 15, textAlign: 'center', maxWidth: 520 }}>
-          <b>Tip:</b> Use your mouse wheel or trackpad to zoom in and out. Click and drag anywhere on the diagram to pan and explore details. For the best view, maximize your browser window.
+        <p style={{ margin: '0 0 12px 0', color: '#475569', fontSize: 15, textAlign: 'center', maxWidth: 520 }}>
+          <b>Tip:</b> Use the buttons below to zoom in and out, or use your mouse wheel or trackpad. Click and drag anywhere on the diagram to pan and explore details.
         </p>
         <TransformWrapper ref={wrapperRef} minScale={0.2} initialScale={0.8} wheel={{ step: 0.1 }} doubleClick={{ disabled: true }}>
-          <TransformComponent>
-            <div
-              className="mermaid"
-              style={{
-                width: '80vw',
-                height: '100vh',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: 'white',
-                overflow: 'auto',
-                borderRadius: 8,
-              }}
-            >
-              <div
-                style={{
-                  minWidth: '80vw',
-                  minHeight: '100vh',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-                dangerouslySetInnerHTML={{ __html: chart }}
-              />
-            </div>
-          </TransformComponent>
+          {({ zoomIn, zoomOut }) => (
+            <>
+              <div style={{ display: 'flex', gap: 10, marginBottom: 12, justifyContent: 'center', width: '100%' }}>
+                <button onClick={() => zoomIn()} style={{ padding: '6px 16px', fontSize: 18, borderRadius: 6, border: '1px solid #cbd5e1', background: '#f1f5f9', cursor: 'pointer', fontWeight: 600 }}>+</button>
+                <button onClick={() => zoomOut()} style={{ padding: '6px 16px', fontSize: 18, borderRadius: 6, border: '1px solid #cbd5e1', background: '#f1f5f9', cursor: 'pointer', fontWeight: 600 }}>-</button>
+              </div>
+              <TransformComponent>
+                <div
+                  className="mermaid"
+                  style={{
+                    width: '80vw',
+                    height: '100vh',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'white',
+                    overflow: 'auto',
+                    borderRadius: 8,
+                  }}
+                >
+                  <div
+                    style={{
+                      minWidth: '80vw',
+                      minHeight: '100vh',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                    dangerouslySetInnerHTML={{ __html: chart }}
+                  />
+                </div>
+              </TransformComponent>
+            </>
+          )}
         </TransformWrapper>
       </div>
     </div>
