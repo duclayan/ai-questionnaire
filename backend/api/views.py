@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 from io import BytesIO
 from docx import Document
 import os
+import httpx
 import requests
 from django.http import HttpResponse
 
@@ -63,6 +64,7 @@ class ClassicGPT:
             api_key=AZURE_OPENAI_API_KEY,
             api_version="2024-02-15-preview",
             base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
+            http_client=httpx.Client(verify=False)
         )
 
         # Create a chat completion
@@ -204,11 +206,19 @@ class openAICleanVersion(APIView):
         AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT")
 
         # Initialize the Azure OpenAI client
-        client = AzureOpenAI(
-            api_key=AZURE_OPENAI_API_KEY,
-            api_version="2024-02-15-preview",
-            base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
-        )
+        if os.getenv("DJANGO_DEVELOPMENT", "False") == "True":
+            client = AzureOpenAI(
+                api_key=AZURE_OPENAI_API_KEY,
+                api_version="2024-02-15-preview",
+                base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
+                http_client=httpx.Client(verify=False)
+            )
+        else:
+            client = AzureOpenAI(
+                api_key=AZURE_OPENAI_API_KEY,
+                api_version="2024-02-15-preview",
+                base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}"
+            )
 
         # Create a chat completion
         response = client.chat.completions.create(
@@ -268,11 +278,19 @@ class openAICleanVersion_O4MINI(APIView):
         AZURE_OPENAI_VERSION = os.getenv("O4MINI_AZURE_OPENAI_VERSION")
 
         # Initialize the Azure OpenAI client
-        client = AzureOpenAI(
-            api_key=AZURE_OPENAI_API_KEY,
-            api_version=AZURE_OPENAI_VERSION,
-            base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
-        )
+        if os.getenv("DJANGO_DEVELOPMENT", "False") == "True":
+            client = AzureOpenAI(
+                api_key=AZURE_OPENAI_API_KEY,
+                api_version=AZURE_OPENAI_VERSION,
+                base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
+                http_client=httpx.Client(verify=False)
+            )
+        else:
+            client = AzureOpenAI(
+                api_key=AZURE_OPENAI_API_KEY,
+                api_version=AZURE_OPENAI_VERSION,
+                base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}"
+            )
 
         # Create a chat completion
         response = client.chat.completions.create(
@@ -337,11 +355,19 @@ class openAICleanVersion_O1MINI(APIView):
         AZURE_OPENAI_API_KEY = os.getenv("O1MINI_AZURE_OPENAI_API_KEY")
         AZURE_OPENAI_DEPLOYMENT = os.getenv("O1MINI_AZURE_OPENAI_DEPLOYMENT")
 
-        client = AzureOpenAI(
-            api_key=AZURE_OPENAI_API_KEY,
-            api_version="2024-08-01-preview",
-            base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
-        )
+        if os.getenv("DJANGO_DEVELOPMENT", "False") == "True":
+            client = AzureOpenAI(
+                api_key=AZURE_OPENAI_API_KEY,
+                api_version="2024-08-01-preview",
+                base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
+                http_client=httpx.Client(verify=False)
+            )
+        else:
+            client = AzureOpenAI(
+                api_key=AZURE_OPENAI_API_KEY,
+                api_version="2024-08-01-preview",
+                base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}"
+            )
 
         # Build the appropriate prompt
         content = self._build_prompt(
@@ -382,11 +408,19 @@ class openAIView(APIView):
         AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT")
 
         # Initialize the Azure OpenAI client
-        client = AzureOpenAI(
-            api_key=AZURE_OPENAI_API_KEY,
-            api_version="2024-02-15-preview",
-            base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
-        )
+        if os.getenv("DJANGO_DEVELOPMENT", "False") == "True":
+            client = AzureOpenAI(
+                api_key=AZURE_OPENAI_API_KEY,
+                api_version="2024-02-15-preview",
+                base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
+                http_client=httpx.Client(verify=False)
+            )
+        else:
+            client = AzureOpenAI(
+                api_key=AZURE_OPENAI_API_KEY,
+                api_version="2024-02-15-preview",
+                base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}"
+            )
 
         # Create a chat completion
         response = client.chat.completions.create(
@@ -856,6 +890,7 @@ class ExplainImageView(APIView):
             api_key=AZURE_OPENAI_API_KEY,
             api_version="2024-02-15-preview",
             base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
+            http_client=httpx.Client(verify=False)
         )
 
         # Create a chat completion
