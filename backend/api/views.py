@@ -58,20 +58,22 @@ class ClassicGPT:
         AZURE_OPENAI_ENDPOINT= os.getenv("AZURE_OPENAI_ENDPOINT")
         AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
         AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT")
+        AZURE_OPENAI_VERSION = os.getenv("LATEST_AZURE_OPENAI_VERSION")
+
         #CALL GPT
         # Initialize the Azure OpenAI client
 
         if os.getenv("DJANGO_DEVELOPMENT", "False") == "True":
             client = AzureOpenAI(
                 api_key=AZURE_OPENAI_API_KEY,
-                api_version="2024-02-15-preview",
+                api_version=AZURE_OPENAI_VERSION,
                 base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
                 http_client=httpx.Client(verify=False)
             )
         else:
             client = AzureOpenAI(
                 api_key=AZURE_OPENAI_API_KEY,
-                api_version="2024-02-15-preview",
+                api_version=AZURE_OPENAI_VERSION,
                 base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}"
             )
 
@@ -212,19 +214,20 @@ class openAICleanVersion(APIView):
         AZURE_OPENAI_ENDPOINT= os.getenv("AZURE_OPENAI_ENDPOINT")
         AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
         AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT")
+        AZURE_OPENAI_VERSION = os.getenv("LATEST_AZURE_OPENAI_VERSION")
 
         # Initialize the Azure OpenAI client
         if os.getenv("DJANGO_DEVELOPMENT", "False") == "True":
             client = AzureOpenAI(
                 api_key=AZURE_OPENAI_API_KEY,
-                api_version="2024-02-15-preview",
+                api_version=AZURE_OPENAI_VERSION,
                 base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
                 http_client=httpx.Client(verify=False)
             )
         else:
             client = AzureOpenAI(
                 api_key=AZURE_OPENAI_API_KEY,
-                api_version="2024-02-15-preview",
+                api_version=AZURE_OPENAI_VERSION,
                 base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}"
             )
 
@@ -283,7 +286,7 @@ class openAICleanVersion_O4MINI(APIView):
         AZURE_OPENAI_ENDPOINT= os.getenv("O4MINI_AZURE_OPENAI_ENDPOINT")
         AZURE_OPENAI_API_KEY = os.getenv("O4MINI_AZURE_OPENAI_API_KEY")
         AZURE_OPENAI_DEPLOYMENT = os.getenv("O4MINI_AZURE_OPENAI_DEPLOYMENT")
-        AZURE_OPENAI_VERSION = os.getenv("O4MINI_AZURE_OPENAI_VERSION")
+        AZURE_OPENAI_VERSION = os.getenv("LATEST_AZURE_OPENAI_VERSION")
 
         # Initialize the Azure OpenAI client
         if os.getenv("DJANGO_DEVELOPMENT", "False") == "True":
@@ -362,18 +365,20 @@ class openAICleanVersion_O1MINI(APIView):
         AZURE_OPENAI_ENDPOINT = os.getenv("O1MINI_AZURE_OPENAI_ENDPOINT")
         AZURE_OPENAI_API_KEY = os.getenv("O1MINI_AZURE_OPENAI_API_KEY")
         AZURE_OPENAI_DEPLOYMENT = os.getenv("O1MINI_AZURE_OPENAI_DEPLOYMENT")
+        AZURE_OPENAI_VERSION = os.getenv("LATEST_AZURE_OPENAI_VERSION")
+
 
         if os.getenv("DJANGO_DEVELOPMENT", "False") == "True":
             client = AzureOpenAI(
                 api_key=AZURE_OPENAI_API_KEY,
-                api_version="2024-08-01-preview",
+                api_version=AZURE_OPENAI_VERSION,
                 base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
                 http_client=httpx.Client(verify=False)
             )
         else:
             client = AzureOpenAI(
                 api_key=AZURE_OPENAI_API_KEY,
-                api_version="2024-08-01-preview",
+                api_version=AZURE_OPENAI_VERSION,
                 base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}"
             )
 
@@ -414,19 +419,20 @@ class openAIView(APIView):
         AZURE_OPENAI_ENDPOINT= os.getenv("AZURE_OPENAI_ENDPOINT")
         AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
         AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT")
+        AZURE_OPENAI_VERSION = os.getenv("LATEST_AZURE_OPENAI_VERSION")
 
         # Initialize the Azure OpenAI client
         if os.getenv("DJANGO_DEVELOPMENT", "False") == "True":
             client = AzureOpenAI(
                 api_key=AZURE_OPENAI_API_KEY,
-                api_version="2024-02-15-preview",
+                api_version=AZURE_OPENAI_VERSION,
                 base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
                 http_client=httpx.Client(verify=False)
             )
         else:
             client = AzureOpenAI(
                 api_key=AZURE_OPENAI_API_KEY,
-                api_version="2024-02-15-preview",
+                api_version=AZURE_OPENAI_VERSION,
                 base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}"
             )
 
@@ -881,6 +887,7 @@ class ExplainImageView(APIView):
         AZURE_OPENAI_ENDPOINT= os.getenv("AZURE_OPENAI_ENDPOINT")
         AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
         AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT")
+        AZURE_OPENAI_VERSION = os.getenv("LATEST_AZURE_OPENAI_VERSION")
 
         #PREPROCESSING OF IMAGE
         image = request.FILES.get('image')
@@ -896,7 +903,7 @@ class ExplainImageView(APIView):
         # Initialize the Azure OpenAI client
         client = AzureOpenAI(
             api_key=AZURE_OPENAI_API_KEY,
-            api_version="2024-02-15-preview",
+            api_version=AZURE_OPENAI_VERSION,
             base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
             http_client=httpx.Client(verify=False)
         )
