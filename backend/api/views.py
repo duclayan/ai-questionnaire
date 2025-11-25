@@ -367,7 +367,6 @@ class openAICleanVersion_O1MINI(APIView):
         AZURE_OPENAI_DEPLOYMENT = os.getenv("O1MINI_AZURE_OPENAI_DEPLOYMENT")
         AZURE_OPENAI_VERSION = os.getenv("LATEST_AZURE_OPENAI_VERSION")
 
-
         if os.getenv("DJANGO_DEVELOPMENT", "False") == "True":
             client = AzureOpenAI(
                 api_key=AZURE_OPENAI_API_KEY,
