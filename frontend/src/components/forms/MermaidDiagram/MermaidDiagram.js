@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import mermaid from 'mermaid';
@@ -260,21 +259,33 @@ export const MermaidDiagram = ({ version, isReportPage, question, answers, token
   const saveDiagram = async () => {
     if (!saveGraph) {
       triggerError("Diagram is not present/submitted");
+      console.error("SaveGraph state is false. Diagram cannot be saved.");
       return;
     }
+
+    const node = document.getElementById('mermaid-chart');
+    if (!node || !node.querySelector('svg')) {
+      triggerError("Diagram image not found. Please ensure the diagram is generated before saving.");
+      console.error("Mermaid chart element is empty or SVG not found.");
+      return;
+    }
+
     try {
-      const node = document.getElementById('mermaid-chart');
       const canvas = await html2canvas(node);
       const dataUrl = canvas.toDataURL('image/png');
+      console.log("Diagram successfully captured as PNG.");
+
       await axios.post(
         `${apiEndpoint}/api/save-diagram/`,
         { diagram: dataUrl },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      console.log("Diagram successfully saved to the server.");
     } catch (error) {
       console.error('Error saving diagram:', error.response ? error.response.data : error.message);
       triggerError("Error Saving Diagram");
     }
+
     setSaveGraph(false);
   };
   const exportAsPNG = () => {

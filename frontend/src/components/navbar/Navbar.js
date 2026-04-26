@@ -84,6 +84,7 @@ const Navbar = () => {
                 <Button component={Link} to="/audio-1" color="inherit">Diagram Audio</Button>
                 <Button component={Link} to="/diagram" color="inherit">Code Editor</Button>
                 <Button component={Link} to="/dashboard" color="inherit">Dashboard</Button>
+                <Button component={Link} to="/plantuml" color="inherit">PlantUML Diagram</Button>
                 <Button color="inherit" onClick={handleLogoutClick}>Logout</Button>
               </Box>
             </>

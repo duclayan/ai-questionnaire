@@ -21,6 +21,7 @@ import SimpleMermaidTest from './components/forms/MermaidDiagram/MermaidTest';
 import GraphvizInput from './components/forms/Graphviz/GraphvizDiagram';
 import PythonDiagram from './components/forms/PythonDiagram/PythonDiagram';
 import GraphvizDiagramChat from './components/forms/Graphviz/GraphvizDiagramChat';
+import { PlantUMLDiagram } from './components/forms/PlantUMLDiagram/PlantUMLDiagram';
 function App() {
   const theme = createTheme({
     palette: {
@@ -65,6 +66,8 @@ function App() {
                 <Route path="/forms/:project_id" element={<ProtectedRoute element={<Form />} />} />
                 {/* Text to Audio */}
                 <Route path="/audio-1" element={<ImageExplain />} />
+
+                <Route path="/plantuml" element={<PlantUMLDiagram/>} />
 
                 {/* Redirect all unmatched routes to the dashboard */}
                 <Route path="*" element={<ProtectedRoute element={<Dashboard />} />} />
