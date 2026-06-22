@@ -27,20 +27,13 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-
-      - name: Create and start virtual environment
-        run: |
-          cd backend
-          python -m venv venv
-          source venv/bin/activate
       
       - name: Install dependencies
         run: |
           cd backend
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip uninstall -y django-simple-captcha
-          pip install django-simple-captcha
+          
       - name: Run deployment script
         env:
           # AZURE_WEBAPP_NAME: ${{ secrets.AZURE_WEBAPP_NAME }}
