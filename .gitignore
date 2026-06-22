@@ -7,3 +7,10 @@
 /frontend/.env
 
 db.sqlite3
+/backend/app.zip
+/backend/staticfiles/
+
+#archive/
+.vscode/
+
+archive/
