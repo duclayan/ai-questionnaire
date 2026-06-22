@@ -14,7 +14,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      SECRET: ${{ secrets.SECRET }}
+      SECRET_KEY: ${{ secrets.SECRET }}
       WEBSITE_HOSTNAME: ${{ secrets.WEBSITE_HOSTNAME }}
       AZURE_POSTGRESQL_CONNECTIONSTRING: ${{ secrets.AZURE_POSTGRESQL_CONNECTIONSTRING }}
       AZURE_OPEN_API_KEY: ${{ secrets.LATEST_AZURE_OPEN_API_KEY }}
@@ -33,11 +33,11 @@ jobs:
           cd backend
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          
+
       - name: Run deployment script
         env:
           # AZURE_WEBAPP_NAME: ${{ secrets.AZURE_WEBAPP_NAME }}
-          SECRET: ${{ secrets.SECRET }}
+          SECRET_KEY: ${{ secrets.SECRET }}
           WEBSITE_HOSTNAME: ${{ secrets.WEBSITE_HOSTNAME }}
           AZURE_POSTGRESQL_CONNECTIONSTRING: ${{ secrets.AZURE_POSTGRESQL_CONNECTIONSTRING }}
           AZURE_OPENAI_API_KEY: ${{ secrets.LATEST_AZURE_OPEN_API_KEY }}
