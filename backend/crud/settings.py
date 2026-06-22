@@ -1,49 +1,62 @@
 from pathlib import Path
 from dotenv import load_dotenv
-from openai import AzureOpenAI
+# from openai import AzureOpenAI - REMOVED because of error
 from datetime import timedelta
 
 import os
 
-# Load .env
-load_dotenv()
+# # Load .env
+# load_dotenv()
 
 # Azure OpenAI configuration
-AZURE_OPENAI_ENDPOINT= os.getenv("AZURE_OPENAI_ENDPOINT")
-AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
-AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT")
+AZURE_OPENAI_ENDPOINT= os.getenv("LATEST_AZURE_OPENAI_ENDPOINT")
+AZURE_OPENAI_API_KEY = os.getenv("LATEST_AZURE_OPENAI_API_KEY")
+AZURE_OPENAI_DEPLOYMENT = os.getenv("LATEST_AZURE_OPENAI_DEPLOYMENT")
 
 #Azure OpenAI-mini Configuration 
-O1MINI_AZURE_OPENAI_API_KEY = os.getenv('O1MINI_AZURE_OPENAI_API_KEY')
-O1MINI_AZURE_OPENAI_ENDPOINT = os.getenv('O1MINI_AZURE_OPENAI_ENDPOINT')
-O1MINI_AZURE_OPENAI_DEPLOYMENT = os.getenv('O1MINI_AZURE_OPENAI_DEPLOYMENT')
+O1MINI_AZURE_OPENAI_API_KEY = os.getenv('LATEST_AZURE_OPENAI_API_KEY')
+O1MINI_AZURE_OPENAI_ENDPOINT = os.getenv('LATEST_AZURE_OPENAI_ENDPOINT')
+O1MINI_AZURE_OPENAI_DEPLOYMENT = os.getenv('LATEST_AZURE_OPENAI_DEPLOYMENT')
 
-#Initialitation O1 Mini Client Azure OpenAI
-O1MINI_AZURE_OAI_CLIENT = AzureOpenAI(
-            api_key=AZURE_OPENAI_API_KEY,
-            api_version="2024-08-01-preview",
-            base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
-        )
-# Initialize the Azure OpenAI client
-AZURE_OAI_CLIENT = AzureOpenAI(
-    api_key=AZURE_OPENAI_API_KEY,
-    api_version="2024-02-15-preview",
-    base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
-)
+# REMOVED BECAUSE OF DEPLOYMENT ERROR
+# #Initialitation O1 Mini Client Azure OpenAI
+# O1MINI_AZURE_OAI_CLIENT = AzureOpenAI(
+#             api_key=AZURE_OPENAI_API_KEY,
+#             api_version="2026-03-05",
+#             azure_endpoint=AZURE_OPENAI_ENDPOINT,
+#         )
+# # Initialize the Azure OpenAI client
+
+# AZURE_OAI_CLIENT = AzureOpenAI(
+#     api_key=AZURE_OPENAI_API_KEY,
+#     api_version="2025-04-01-preview",  # or whatever you use consistently
+#     azure_endpoint=AZURE_OPENAI_ENDPOINT,
+# )
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-1@rqrs8dt_ptyd@2sn_y(-vpef0u0risop95j*_2p^y&)bt6iz"
+SECRET_KEY = os.getenv("SECRET_KEY")
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DJANGO_DEVELOPMENT", "False") == "True"
 
 ALLOWED_HOSTS = [
     'localhost',
-    '127.0.0.1'
+    '127.0.0.1',
+    ".azurewebsites.net",
+    "adm.cyberai.sbs",
+    "usr.cyberai.sbs",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.azurewebsites.net",
+    "https://adm.cyberai.sbs",
+    "https://usr.cyberai.sbs",
 ]
 
 
@@ -58,7 +71,6 @@ INSTALLED_APPS = [
     "corsheaders",
     "captcha",
     "api",
-    "whitenoise",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
@@ -68,6 +80,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -159,8 +172,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 

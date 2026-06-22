@@ -15,6 +15,7 @@ from docx import Document
 import os
 import httpx
 import requests
+import traceback
 from django.http import HttpResponse
 
 from django.contrib.auth import authenticate
@@ -55,9 +56,9 @@ class ClassicGPT:
     def getGPTResponse(self, prompt):
 
         #prepare the prompt
-        AZURE_OPENAI_ENDPOINT= os.getenv("AZURE_OPENAI_ENDPOINT")
-        AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
-        AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT")
+        AZURE_OPENAI_ENDPOINT = os.getenv("LATEST_AZURE_OPENAI_ENDPOINT")
+        AZURE_OPENAI_API_KEY = os.getenv("LATEST_AZURE_OPENAI_API_KEY")
+        AZURE_OPENAI_DEPLOYMENT = os.getenv("LATEST_AZURE_OPENAI_DEPLOYMENT")
         AZURE_OPENAI_VERSION = os.getenv("LATEST_AZURE_OPENAI_VERSION")
 
         #CALL GPT
@@ -67,29 +68,31 @@ class ClassicGPT:
             client = AzureOpenAI(
                 api_key=AZURE_OPENAI_API_KEY,
                 api_version=AZURE_OPENAI_VERSION,
-                base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
+                azure_endpoint=f"{AZURE_OPENAI_ENDPOINT}",
                 http_client=httpx.Client(verify=False)
             )
         else:
             client = AzureOpenAI(
                 api_key=AZURE_OPENAI_API_KEY,
                 api_version=AZURE_OPENAI_VERSION,
-                base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}"
+                azure_endpoint=f"{AZURE_OPENAI_ENDPOINT}"
             )
 
         # Create a chat completion
         response = client.chat.completions.create(
             model=AZURE_OPENAI_DEPLOYMENT,
-            messages=[
+            input=[
                     {"role": "system", "content": "You are a helpful assistant that responds in Markdown. Help me with my math homework!"},
                     {"role": "user", "content": [
                         {"type": "text", "text":f"{prompt}"},
                     ]}
                 ],
             temperature=0.0,
+            max_output_tokens=1024
         )
         # Extract the generated text from the response
-        generated_text = response.choices[0].message.content
+        # generated_text = response.choices[0].message.content
+        generated_text = response.output_text
         print("Generated Text Answer:", generated_text)
         # Return a JSON response
         return generated_text
@@ -211,9 +214,9 @@ class openAICleanVersion(APIView):
         data = request.data.get("text")
         # Load environment variables
         load_dotenv()
-        AZURE_OPENAI_ENDPOINT= os.getenv("AZURE_OPENAI_ENDPOINT")
-        AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
-        AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT")
+        AZURE_OPENAI_ENDPOINT = os.getenv("LATEST_AZURE_OPENAI_ENDPOINT")
+        AZURE_OPENAI_API_KEY = os.getenv("LATEST_AZURE_OPENAI_API_KEY")
+        AZURE_OPENAI_DEPLOYMENT = os.getenv("LATEST_AZURE_OPENAI_DEPLOYMENT")
         AZURE_OPENAI_VERSION = os.getenv("LATEST_AZURE_OPENAI_VERSION")
 
         # Initialize the Azure OpenAI client
@@ -221,14 +224,14 @@ class openAICleanVersion(APIView):
             client = AzureOpenAI(
                 api_key=AZURE_OPENAI_API_KEY,
                 api_version=AZURE_OPENAI_VERSION,
-                base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
+                azure_endpoint=AZURE_OPENAI_ENDPOINT,
                 http_client=httpx.Client(verify=False)
             )
         else:
             client = AzureOpenAI(
                 api_key=AZURE_OPENAI_API_KEY,
                 api_version=AZURE_OPENAI_VERSION,
-                base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}"
+                azure_endpoint=f"{AZURE_OPENAI_ENDPOINT}"
             )
 
         # Create a chat completion
@@ -245,9 +248,12 @@ class openAICleanVersion(APIView):
                         "content": f"""
                           {data}
                         """,
-                    }]
+                    }],
+            temperature=0.9,
+
         )
         # Extract the generated text from the response
+        # generated_text = response.choices[0].message.content
         generated_text = response.choices[0].message.content
 
         # Return a JSON response
@@ -283,9 +289,9 @@ class openAICleanVersion_O4MINI(APIView):
         final_prompt =self._build_prompt(data)
         # Load environment variables
         load_dotenv()
-        AZURE_OPENAI_ENDPOINT= os.getenv("O4MINI_AZURE_OPENAI_ENDPOINT")
-        AZURE_OPENAI_API_KEY = os.getenv("O4MINI_AZURE_OPENAI_API_KEY")
-        AZURE_OPENAI_DEPLOYMENT = os.getenv("O4MINI_AZURE_OPENAI_DEPLOYMENT")
+        AZURE_OPENAI_ENDPOINT = os.getenv("LATEST_AZURE_OPENAI_ENDPOINT")
+        AZURE_OPENAI_API_KEY = os.getenv("LATEST_AZURE_OPENAI_API_KEY")
+        AZURE_OPENAI_DEPLOYMENT = os.getenv("LATEST_AZURE_OPENAI_DEPLOYMENT")
         AZURE_OPENAI_VERSION = os.getenv("LATEST_AZURE_OPENAI_VERSION")
 
         # Initialize the Azure OpenAI client
@@ -293,14 +299,14 @@ class openAICleanVersion_O4MINI(APIView):
             client = AzureOpenAI(
                 api_key=AZURE_OPENAI_API_KEY,
                 api_version=AZURE_OPENAI_VERSION,
-                base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
+                azure_endpoint=f"{AZURE_OPENAI_ENDPOINT}",
                 http_client=httpx.Client(verify=False)
             )
         else:
             client = AzureOpenAI(
                 api_key=AZURE_OPENAI_API_KEY,
                 api_version=AZURE_OPENAI_VERSION,
-                base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}"
+                azure_endpoint=f"{AZURE_OPENAI_ENDPOINT}"
             )
 
         # Create a chat completion
@@ -312,7 +318,7 @@ class openAICleanVersion_O4MINI(APIView):
             # Removed the max_completion completely when using O1 Models
             # temperature=0.9,
             # max_completion_tokens=2000,
-            messages=[{ 
+            input=[{ 
                         "role": "user",
                         "content": f"""
                           {final_prompt}
@@ -324,6 +330,14 @@ class openAICleanVersion_O4MINI(APIView):
 
         # Return a JSON response
         return Response({"generated_text": generated_text})
+    
+#to remove
+
+import os
+import logging
+
+logger = logging.getLogger(__name__)
+
 class openAICleanVersion_O1MINI(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -361,24 +375,53 @@ class openAICleanVersion_O1MINI(APIView):
         question = request.data.get("question")
         sample = request.data.get("sample_answer")
         # Load environment variables
-        load_dotenv()
-        AZURE_OPENAI_ENDPOINT = os.getenv("O1MINI_AZURE_OPENAI_ENDPOINT")
-        AZURE_OPENAI_API_KEY = os.getenv("O1MINI_AZURE_OPENAI_API_KEY")
-        AZURE_OPENAI_DEPLOYMENT = os.getenv("O1MINI_AZURE_OPENAI_DEPLOYMENT")
+        AZURE_OPENAI_ENDPOINT = os.getenv("LATEST_AZURE_OPENAI_ENDPOINT")
+        AZURE_OPENAI_API_KEY = os.getenv("LATEST_AZURE_OPENAI_API_KEY")
+        AZURE_OPENAI_DEPLOYMENT = os.getenv("LATEST_AZURE_OPENAI_DEPLOYMENT")
         AZURE_OPENAI_VERSION = os.getenv("LATEST_AZURE_OPENAI_VERSION")
+
+
+        # if os.getenv("DJANGO_DEVELOPMENT", "False") == "True":
+        #     client = AzureOpenAI(
+        #         api_key=AZURE_OPENAI_API_KEY,
+        #         api_version=AZURE_OPENAI_VERSION,
+        #         base_url=f"https://xijintestopenai.openai.azure.com/openai/deployments/0-gpt-5.4",
+        #         http_client=httpx.Client(verify=False)
+        #     )
+        # else:
+        #     client = AzureOpenAI(
+        #         api_key=AZURE_OPENAI_API_KEY,
+        #         api_version=AZURE_OPENAI_VERSION,
+        #         base_url=f"https://xijintestopenai.openai.azure.com/openai/deployments/0-gpt-5.4"
+        #     )
+        ## TO REMOVE ######################################################################
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!ENTERED THE PLACE")
+        logger.error(
+            "AZURE_OPENAI_API_KEY present: %s",
+            bool(os.environ.get("LATEST_AZURE_OPENAI_API_KEY"))
+        )
+        logger.error(
+            "AZURE_OPENAI_ENDPOINT: %s",
+            os.environ.get("LATEST_AZURE_OPENAI_ENDPOINT")
+        )
+        logger.error(
+            "AZURE_OPENAI_API_VERSION: %s",
+            os.environ.get("LATEST_AZURE_OPENAI_VERSION")
+        )
+        logger.error("🔥🔥 GPT-OMINI VIEW VERSION 2026-04-23 🔥")
 
         if os.getenv("DJANGO_DEVELOPMENT", "False") == "True":
             client = AzureOpenAI(
                 api_key=AZURE_OPENAI_API_KEY,
                 api_version=AZURE_OPENAI_VERSION,
-                base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
-                http_client=httpx.Client(verify=False)
+                azure_endpoint=f"{AZURE_OPENAI_ENDPOINT}",
+                http_client=httpx.Client(verify=False),
             )
         else:
             client = AzureOpenAI(
                 api_key=AZURE_OPENAI_API_KEY,
                 api_version=AZURE_OPENAI_VERSION,
-                base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}"
+                azure_endpoint=f"{AZURE_OPENAI_ENDPOINT}",
             )
 
         # Build the appropriate prompt
@@ -391,17 +434,27 @@ class openAICleanVersion_O1MINI(APIView):
         )
 
         # Create a chat completion
-        response = client.chat.completions.create(
-            model=AZURE_OPENAI_DEPLOYMENT,
-            messages=[{
-                "role": "user",
-                "content": content
-            }]
-        )
-        # Extract the generated text from the response
-        generated_text = response.choices[0].message.content
-        # Return a JSON response
-        return Response({"generated_text": generated_text})
+        try:
+            response = client.chat.completions.create(
+                model=AZURE_OPENAI_DEPLOYMENT,
+                messages=[{
+                    "role": "user",
+                    "content": content
+                }]
+            )
+            # Extract the generated text from the response
+            generated_text = response.choices[0].message.content
+            # Return a JSON response
+            return Response({"generated_text": generated_text})
+
+        except Exception as e:
+            logger.error("❌ GPT-OMINI CRASH")
+            logger.error(traceback.format_exc())
+            return Response(
+                {"error": str(e)},
+                status=500,
+            )
+
 
 class openAIView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -415,9 +468,9 @@ class openAIView(APIView):
         sample = request.data.get("sample_answer")
         # Load environment variables
         load_dotenv()
-        AZURE_OPENAI_ENDPOINT= os.getenv("AZURE_OPENAI_ENDPOINT")
-        AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
-        AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT")
+        AZURE_OPENAI_ENDPOINT = os.getenv("LATEST_AZURE_OPENAI_ENDPOINT")
+        AZURE_OPENAI_API_KEY = os.getenv("LATEST_AZURE_OPENAI_API_KEY")
+        AZURE_OPENAI_DEPLOYMENT = os.getenv("LATEST_AZURE_OPENAI_DEPLOYMENT")
         AZURE_OPENAI_VERSION = os.getenv("LATEST_AZURE_OPENAI_VERSION")
 
         # Initialize the Azure OpenAI client
@@ -425,21 +478,20 @@ class openAIView(APIView):
             client = AzureOpenAI(
                 api_key=AZURE_OPENAI_API_KEY,
                 api_version=AZURE_OPENAI_VERSION,
-                base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
+                azure_endpoint=f"{AZURE_OPENAI_ENDPOINT}",
                 http_client=httpx.Client(verify=False)
             )
         else:
             client = AzureOpenAI(
                 api_key=AZURE_OPENAI_API_KEY,
                 api_version=AZURE_OPENAI_VERSION,
-                base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}"
+                azure_endpoint=f"{AZURE_OPENAI_ENDPOINT}"
             )
 
         # Create a chat completion
         response = client.chat.completions.create(
             model=AZURE_OPENAI_DEPLOYMENT,
             temperature=0.9,
-            max_tokens=2000,
             messages=[
                 {
                     "role": "user",
@@ -777,50 +829,95 @@ class TranscribeAudio(APIView):
 class ProcessDocumentView(APIView):
     permission_classes = [AllowAny]
     parser_classes = [MultiPartParser, FormParser]
+class ProcessDocumentView(APIView):
+    permission_classes = [AllowAny]
+    parser_classes = [MultiPartParser, FormParser]
+
 
     def post(self, request):
-        file = request.FILES.get('file')
-        question = request.data.get('question')
-        if not file:
-            return Response({'error': 'No file uploaded'}, status=status.HTTP_400_BAD_REQUEST)
+            logger.info("📥 ProcessDocumentView called")
 
-        try:
-            # Create a temporary file
-            with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-                for chunk in file.chunks():
-                    temp_file.write(chunk)
-                temp_file_path = temp_file.name
+            file = request.FILES.get('file')
+            question = request.data.get('question')
 
-            # Read the file content based on its type
-            file_extension = os.path.splitext(file.name)[1].lower()
-            if file_extension == '.docx':
-                doc = docx.Document(temp_file_path)
-                text = '\n'.join([paragraph.text for paragraph in doc.paragraphs])
-            elif file_extension == '.pdf':
-                with open(temp_file_path, 'rb') as pdf_file:
-                    pdf_reader = PyPDF2.PdfReader(pdf_file)
-                    text = '\n'.join([page.extract_text() for page in pdf_reader.pages])
-            else:  # Assume it's a text file
-                with open(temp_file_path, 'r', encoding='utf-8') as f:
-                    text = f.read()
+            logger.info("File present: %s", bool(file))
+            logger.info("Question present: %s", bool(question))
 
-            # Create a mock request with the data
-            prompt_text = {"text": f"Answer the question: '{question}' according to the following information: {text} --- If the question is not in the data, return ''"}
+            if not file:
+                logger.error("❌ No file uploaded")
+                return Response({'error': 'No file uploaded'}, status=status.HTTP_400_BAD_REQUEST)
 
-            mock_request = MockRequest(prompt_text)
-            azure_open_ai = openAICleanVersion()
-            # Process the text with Azure OpenAI
-            result = azure_open_ai.post(mock_request)
-            if result.status_code == 200:
-                return result
-            else:
-                return Response({'error': 'Failed to generate summary'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        finally:
-            # Delete the temporary file
-            if os.path.exists(temp_file_path):
-                os.unlink(temp_file_path)
+            temp_file_path = None
+
+            try:
+                # ✅ Save uploaded file
+                with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+                    for chunk in file.chunks():
+                        temp_file.write(chunk)
+                    temp_file_path = temp_file.name
+
+                logger.info("✅ Temp file created at %s", temp_file_path)
+
+                # ✅ Detect extension
+                file_extension = os.path.splitext(file.name)[1].lower()
+                logger.info("File extension detected: %s", file_extension)
+
+                # ✅ Read content
+                if file_extension == '.docx':
+                    logger.info("Reading DOCX")
+                    doc = docx.Document(temp_file_path)
+                    text = '\n'.join(p.text for p in doc.paragraphs)
+
+                elif file_extension == '.pdf':
+                    logger.info("Reading PDF")
+                    with open(temp_file_path, 'rb') as pdf_file:
+                        pdf_reader = PyPDF2.PdfReader(pdf_file)
+                        text = '\n'.join(
+                            page.extract_text() or "" for page in pdf_reader.pages
+                        )
+
+                else:
+                    logger.info("Reading text file")
+                    with open(temp_file_path, 'r', encoding='utf-8') as f:
+                        text = f.read()
+
+                logger.info("✅ File content length: %d characters", len(text))
+
+                # ✅ Build prompt
+                prompt_text = {
+                    "text": f"Answer the question: '{question}' according to the following information: {text}"
+                }
+
+                logger.info("✅ Prompt constructed")
+
+                # ✅ Call Azure OpenAI wrapper
+                logger.info("🔁 Calling Azure OpenAI")
+                azure_open_ai = openAICleanVersion()
+                result = azure_open_ai.post(MockRequest(prompt_text))
+
+                logger.info("Azure OpenAI response status: %s", result.status_code)
+
+                if result.status_code == 200:
+                    return result
+
+                logger.error("❌ OpenAI failed with status %s", result.status_code)
+                return Response(
+                    {'error': 'Failed to generate summary'},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+
+            except Exception as e:
+                logger.error("🔥 Exception during file processing")
+                logger.error(traceback.format_exc())
+                return Response(
+                    {'error': 'Error processing file'},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+
+            finally:
+                if temp_file_path and os.path.exists(temp_file_path):
+                    os.unlink(temp_file_path)
+                    logger.info("🧹 Temp file deleted")
 
     def put(self, request):
         data = json.loads(request.body)
@@ -879,13 +976,114 @@ class ProcessDocumentView(APIView):
             "updated_answers": updated_answers_dict
         }, status=status.HTTP_200_OK)
 
+    # def post(self, request):
+    #     file = request.FILES.get('file')
+    #     question = request.data.get('question')
+    #     if not file:
+    #         return Response({'error': 'No file uploaded'}, status=status.HTTP_400_BAD_REQUEST)
+
+    #     try:
+    #         # Create a temporary file
+    #         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+    #             for chunk in file.chunks():
+    #                 temp_file.write(chunk)
+    #             temp_file_path = temp_file.name
+
+    #         # Read the file content based on its type
+    #         file_extension = os.path.splitext(file.name)[1].lower()
+    #         if file_extension == '.docx':
+    #             doc = docx.Document(temp_file_path)
+    #             text = '\n'.join([paragraph.text for paragraph in doc.paragraphs])
+    #         elif file_extension == '.pdf':
+    #             with open(temp_file_path, 'rb') as pdf_file:
+    #                 pdf_reader = PyPDF2.PdfReader(pdf_file)
+    #                 text = '\n'.join([page.extract_text() for page in pdf_reader.pages])
+    #         else:  # Assume it's a text file
+    #             with open(temp_file_path, 'r', encoding='utf-8') as f:
+    #                 text = f.read()
+
+    #         # Create a mock request with the data
+    #         prompt_text = {"text": f"Answer the question: '{question}' according to the following information: {text} --- If the question is not in the data, return ''"}
+
+    #         mock_request = MockRequest(prompt_text)
+    #         azure_open_ai = openAICleanVersion()
+    #         # Process the text with Azure OpenAI
+    #         result = azure_open_ai.post(mock_request)
+    #         if result.status_code == 200:
+    #             return result
+    #         else:
+    #             return Response({'error': 'Failed to generate summary'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    #     except Exception as e:
+    #         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    #     finally:
+    #         # Delete the temporary file
+    #         if os.path.exists(temp_file_path):
+    #             os.unlink(temp_file_path)
+
+    # def put(self, request):
+    #     data = json.loads(request.body)
+    #     ref_answers = data.get('ref_answers')
+    #     project_id = data.get('project_id')
+    #     fill_all = data.get('fill_all', False)
+
+    #     # Validate input
+    #     if not isinstance(ref_answers, list):
+    #         return Response({"error": "ref_answers must be a list"}, status=status.HTTP_400_BAD_REQUEST)
+
+    #     project = get_object_or_404(Project, project_id=project_id)
+    #     updated_answer_ids = []
+
+    #     for ref in ref_answers:
+    #         try:
+    #             question = Question.objects.get(question_id=ref['question_id'])
+    #             try:
+    #                 answer = Answer.objects.create(
+    #                     answer_id =  f"{project_id}-{question.question_id}",
+    #                     question=question,
+    #                     project_id=project,
+    #                     input_answer=ref['ref_answer']
+    #                 )
+    #             except IntegrityError:
+    #                 # Handle the duplicate case, e.g., by updating the existing answer
+    #                 answer = Answer.objects.get(answer_id = f"{project_id}-{question.question_id}")
+
+    #             isNotEmpty = True if ref.get('ref_answer', '').strip() != '' else False
+
+    #             if (fill_all or not answer.input_answer) and isNotEmpty:
+    #                 answer.input_answer = ref['ref_answer'].strip()
+    #                 answer.save(update_fields=['input_answer'])
+    #                 updated_answer_ids.append(answer)
+    #             else:
+    #                 if(len(answer.input_answer) < 1):   
+    #                     answer.input_answer = ref['ref_answer'].strip()
+    #                     answer.save(update_fields=['input_answer'])
+    #                     updated_answer_ids.append(answer)
+    #                 else:
+    #                     updated_answer_ids.append(answer)
+
+
+    #         except Question.DoesNotExist:
+    #             print(f"Question with id {ref['question_id']} does not exist")
+    #         except KeyError as e:
+    #             print(f"Missing key in ref: {e}")
+    #         serialized_answers = AnswerSerializer(updated_answer_ids, many=True)
+    #         updated_answers_dict = {}
+    #         for answer in serialized_answers.data:
+    #             question_id = answer['question']  # Assuming 'question' field contains the question_id
+    #             updated_answers_dict[question_id] = answer
+
+    #     return Response({
+    #         "message": "Answers updated successfully",
+    #         "updated_answers": updated_answers_dict
+    #     }, status=status.HTTP_200_OK)
+
 class ExplainImageView(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
     def post(self, request, format=None):
-        AZURE_OPENAI_ENDPOINT= os.getenv("AZURE_OPENAI_ENDPOINT")
-        AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
-        AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT")
+        AZURE_OPENAI_ENDPOINT = os.getenv("LATEST_AZURE_OPENAI_ENDPOINT")
+        AZURE_OPENAI_API_KEY = os.getenv("LATEST_AZURE_OPENAI_API_KEY")
+        AZURE_OPENAI_DEPLOYMENT = os.getenv("LATEST_AZURE_OPENAI_DEPLOYMENT")
         AZURE_OPENAI_VERSION = os.getenv("LATEST_AZURE_OPENAI_VERSION")
 
         #PREPROCESSING OF IMAGE
@@ -903,7 +1101,7 @@ class ExplainImageView(APIView):
         client = AzureOpenAI(
             api_key=AZURE_OPENAI_API_KEY,
             api_version=AZURE_OPENAI_VERSION,
-            base_url=f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}",
+            azure_endpoint=f"{AZURE_OPENAI_ENDPOINT}",
             http_client=httpx.Client(verify=False)
         )
 
